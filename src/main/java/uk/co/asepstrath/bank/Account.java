@@ -5,9 +5,10 @@ import java.math.BigDecimal;
 public class Account {
 
     private BigDecimal balance;
-
-    public Account(BigDecimal initialBalance) {
+    private String accountName;
+    public Account(String accountName, BigDecimal initialBalance) {
         this.balance = initialBalance;
+        this.accountName = accountName;
     }
 
     public void deposit(BigDecimal amount) {
