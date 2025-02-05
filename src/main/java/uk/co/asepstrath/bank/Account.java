@@ -1,18 +1,28 @@
 package uk.co.asepstrath.bank;
 
+import java.math.BigDecimal;
+
 public class Account {
 
-    private int balance = 0;
+    private BigDecimal balance;
 
-    public void deposit(int amount) {
-        balance += amount;
+    public Account(BigDecimal initialBalance) {
+        this.balance = initialBalance;
     }
 
-    public void withdraw(int amount) {
-        balance -= amount;
+    public void deposit(BigDecimal amount) {
+        balance = balance.add(amount);
     }
 
-    public int getBalance() {
+    public void withdraw(BigDecimal amount) {
+        // If money withdrawn is greater than amount in account
+        if (amount.compareTo(balance) > 0) {
+            throw new ArithmeticException("Insufficient funds");
+        }
+        balance = balance.subtract(amount);
+    }
+
+    public BigDecimal getBalance() {
         return balance;
     }
 
