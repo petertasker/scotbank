@@ -1,36 +1,44 @@
 package uk.co.asepstrath.bank;
 
+import java.math.BigDecimal;
+/** BigDecimals
+ * -1 = first value (AccBal) < than second value (amount)
+ *  0 = first value (AccBal) = than second value (amount)
+ *  1 = first value (AccBal) > than second value (amount)
+ */
+
+
 public class Account {
 
-    private int AccBalance;
+    private BigDecimal AccBalance;
 
     public Account() {
-        this.AccBalance = 0;
-    }
+        this.AccBalance = BigDecimal.ZERO;
+    } // initialise to 0.00
 
-    public Account(int accBalance) {
+    public Account(BigDecimal accBalance) {
         this.AccBalance = accBalance;
     }
 
-    public void deposit(int amount) {
-        if (amount > 0){
-            AccBalance += amount;
+    public void deposit(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) > 0){
+            AccBalance = AccBalance.add(amount);
         }else{
             System.out.println("Deposit amount needs to be greater than 0");
         }
     }
 
-    public void Withdraw(int amount) throws ArithmeticException{
-        if (amount < AccBalance){
-            AccBalance -= amount;
-        }else if(amount <= 0){
+    public void Withdraw(BigDecimal amount) throws ArithmeticException{
+        if (amount.compareTo(AccBalance) > 0){ // if amount is greater than current Balance throw exception
+            throw new ArithmeticException("Insufficient Funds: cannot withdrawal amount more than available balance");
+        }else if(amount.compareTo(BigDecimal.ZERO) <= 0){ // if withdral amount is less or equal to 0
             System.out.println("Withdraw amount needs to be greater than 0");
         } else {
-            throw new ArithmeticException("Insufficient Funds: cannot withdrawal amount more than available balance");
+           AccBalance = AccBalance.subtract(amount);
         }
     }
 
-    public int getBalance() {
+    public BigDecimal getBalance() {
         return AccBalance;
     }
 
