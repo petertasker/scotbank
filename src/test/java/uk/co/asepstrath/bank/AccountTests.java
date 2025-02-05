@@ -58,4 +58,11 @@ public class AccountTests {
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
     }
+
+    @Test
+
+    void displayingData(){
+        Account a = new Account("John Doe", BigDecimal.valueOf(5.45));
+        assertEquals( "Account name: John Doe, Balance: 5.45", a.toString());
+    }
 }

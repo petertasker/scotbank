@@ -13,6 +13,7 @@ public class Account {
 
     public void deposit(BigDecimal amount) {
         balance = balance.add(amount);
+
     }
 
     public void withdraw(BigDecimal amount) {
@@ -26,5 +27,10 @@ public class Account {
     public BigDecimal getBalance() {
         return balance;
     }
+
+    public String toString(){
+        return "Account name: " + this.accountName + ", Balance: " + this.balance;
+    }
+
 
 }
