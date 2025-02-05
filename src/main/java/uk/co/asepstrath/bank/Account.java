@@ -27,4 +27,9 @@ public class Account {
         return balance;
     }
 
+    public String toString(){
+        return "Account name: " + this.accountName + ", Balance: " + this.balance;
+    }
+
+
 }
