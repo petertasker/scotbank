@@ -1,19 +1,25 @@
 package uk.co.asepstrath.bank;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class Account {
 
     private BigDecimal balance;
     private String accountName;
-    public Account(String accountName, BigDecimal initialBalance) {
-        this.balance = initialBalance;
+    private boolean roundUpEnabled;
+
+    public Account(String accountName, BigDecimal startingBalance) {
+        String userID = UUID.randomUUID().toString(); // Generate unique identifier for each customer
         this.accountName = accountName;
+        this.balance = startingBalance;
     }
+
 
     public void deposit(BigDecimal amount) {
         balance = balance.add(amount);
     }
+
 
     public void withdraw(BigDecimal amount) {
         // If money withdrawn is greater than amount in account
@@ -22,6 +28,7 @@ public class Account {
         }
         balance = balance.subtract(amount);
     }
+
 
     public BigDecimal getBalance() {
         return balance;
