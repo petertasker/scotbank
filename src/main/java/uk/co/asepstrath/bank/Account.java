@@ -13,9 +13,6 @@ public class Account {
     private BigDecimal AccBalance;
     private String AccName;
 
-    public Account() {
-        this.AccBalance = BigDecimal.ZERO;
-    } // initialise to 0.00
 
     public Account(String Account_Name, BigDecimal accBalance) {
         this.AccBalance = accBalance;
