@@ -77,6 +77,20 @@ public class AccountTests {
     }
 
     @Test
+    /* Depositing an amount of zero should throw an ArithmeticException */
+    void illegalDepositZero() {
+        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(0)));
+    }
+
+    @Test
+    /* Depositing a negative amount should throw an ArithmeticException */
+    void illegalDepositNegative() {
+        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(-5)));
+    }
+
+    @Test
     /* Starting with an account with £20, deposit £10 five times then withdraw £20 three times.
     The account should end with £10*/
     void complexDepositAndWithdraw() {
