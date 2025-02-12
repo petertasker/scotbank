@@ -37,6 +37,12 @@ public class AccountTests {
     }
 
     @Test
+    public void TestArithmeticException2() {
+        Account a = new Account("John Smith",BigDecimal.valueOf(20));
+        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(-5)));
+    }
+
+    @Test
     public void SuperSavingTest(){
         Account a = new Account("Michale",BigDecimal.valueOf(20));
         for (int i=0; i<5; i++){
