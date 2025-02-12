@@ -1,18 +1,23 @@
 package uk.co.asepstrath.bank;
 
 import java.math.BigDecimal;
-/** BigDecimals
- * -1 = first value (AccBal) < than second value (amount)
- *  0 = first value (AccBal) = than second value (amount)
- *  1 = first value (AccBal) > than second value (amount)
- */
-
+import java.util.UUID;
 
 public class Account {
 
-    private BigDecimal AccBalance;
-    private String AccName;
+    private BigDecimal balance;
+    private String accountName;
+    private boolean roundUpEnabled;
 
+    public Account(String accountName, BigDecimal startingBalance) {
+        String userID = UUID.randomUUID().toString(); // Generate unique identifier for each customer
+        this.accountName = accountName;
+        this.balance = startingBalance;
+    }
+
+
+    public void deposit(BigDecimal amount) {
+        balance = balance.add(amount);
 
     public Account(String Account_Name, BigDecimal accBalance) {
         this.AccBalance = accBalance;
@@ -40,5 +45,15 @@ public class Account {
     public BigDecimal getBalance() {
         return AccBalance;
     }
+
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public String toString(){
+        return "Account name: " + this.accountName + ", Balance: " + this.balance;
+    }
+
 
 }
