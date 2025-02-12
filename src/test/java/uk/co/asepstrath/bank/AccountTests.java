@@ -49,7 +49,7 @@ public class AccountTests {
     }
 
     @Test
-    public void Testforpennies(){
+    public void TestForPennies(){
         Account a = new Account("Jack",BigDecimal.valueOf(5.45));
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
@@ -93,7 +93,7 @@ public class AccountTests {
 
     @Test
 
-    void displayingData(){
+    void displayData(){
         Account a = new Account("John Doe", BigDecimal.valueOf(5.45));
         assertEquals( "Account name: John Doe, Balance: 5.45", a.toString());
     }
