@@ -9,15 +9,50 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AccountTests {
     /* A new Account should have a value of 0 */
     @Test
-    void createAccount() {
-        Account a = new Account("John Doe", BigDecimal.ZERO);
-        assertNotNull(a);
+    public void createAccount(){
+        Account a = new Account();
+        Assertions.assertNotNull(a);
+    }
+    
+    @Test
+    public void deposit(){
+        Account a = new Account("Jacob",BigDecimal.valueOf(20));
+        a.deposit(BigDecimal.valueOf(50)); // deposit a 50 in a 20
+        Assertions.assertEquals(BigDecimal.valueOf(70),a.getBalance());
     }
 
-    /* Depositing £50 in an account with £20 should result in an account containing £70 */
     @Test
-    void addFunds() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+    public void Withdraw(){
+        Account a = new Account("Simon",BigDecimal.valueOf(40));
+        a.Withdraw(BigDecimal.valueOf(20)); // withdraw 20 pounds
+        Assertions.assertEquals(BigDecimal.valueOf(20), a.getBalance());
+    }
+
+    @Test
+    public void TestArithmeticException(){
+        Account a = new Account();
+        a.deposit(BigDecimal.valueOf(30));
+        Assertions.assertThrows(ArithmeticException.class, () -> a.Withdraw(BigDecimal.valueOf(100)));
+    }
+
+    @Test
+    public void SuperSavingTest(){
+        Account a = new Account("Michale",BigDecimal.valueOf(20));
+        for (int i=0; i<5; i++){
+            a.deposit(BigDecimal.valueOf(10));
+        }
+        for (int i=0; i<3; i++){
+            a.Withdraw(BigDecimal.valueOf(20));
+        }
+        Assertions.assertEquals(BigDecimal.valueOf(10),a.getBalance());
+    }
+
+    @Test
+    public void Testforpennies(){
+        Account a = new Account("Jack",BigDecimal.valueOf(5.45));
+        a.deposit(BigDecimal.valueOf(17.56));
+        Assertions.assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
+    }
 
         a.deposit(BigDecimal.valueOf(50));
         assertEquals(BigDecimal.valueOf(70), a.getBalance());

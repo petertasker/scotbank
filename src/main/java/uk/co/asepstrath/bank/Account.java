@@ -19,15 +19,31 @@ public class Account {
     public void deposit(BigDecimal amount) {
         balance = balance.add(amount);
 
+    public Account(String Account_Name, BigDecimal accBalance) {
+        this.AccBalance = accBalance;
+        this.AccName = Account_Name;
     }
 
-
-    public void withdraw(BigDecimal amount) {
-        // If money withdrawn is greater than amount in account
-        if (amount.compareTo(balance) > 0) {
-            throw new ArithmeticException("Insufficient funds");
+    public void deposit(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) > 0){
+            AccBalance = AccBalance.add(amount);
+        }else{
+            System.out.println("Deposit amount needs to be greater than 0");
         }
-        balance = balance.subtract(amount);
+    }
+
+    public void Withdraw(BigDecimal amount) throws ArithmeticException{
+        if (amount.compareTo(AccBalance) > 0){ // if amount is greater than current Balance throw exception
+            throw new ArithmeticException("Insufficient Funds: cannot withdrawal amount more than available balance");
+        }else if(amount.compareTo(BigDecimal.ZERO) <= 0){ // if withdral amount is less or equal to 0
+            System.out.println("Withdraw amount needs to be greater than 0");
+        } else {
+           AccBalance = AccBalance.subtract(amount);
+        }
+    }
+
+    public BigDecimal getBalance() {
+        return AccBalance;
     }
 
 
