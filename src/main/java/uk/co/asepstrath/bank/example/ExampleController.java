@@ -6,6 +6,8 @@ import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.AccountManager;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -111,7 +114,12 @@ public class ExampleController {
         return new ModelAndView("dice.hbs", model);
 
     }
-
+    @GET("/listallaccounts")
+    public List<Account> listAllAccounts() {
+        AccountManager accountManager = new AccountManager();
+        List<Account> accounts = AccountManager.exampleAccounts();
+        return accounts;
+    }
     /*
     The @POST annotation registers this function as a HTTP POST handler.
     It will look at the body of the POST request and try to deserialise into a MyMessage object
