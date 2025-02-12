@@ -28,7 +28,7 @@ public class Account {
         if (amount.compareTo(balance) > 0){ // if amount is greater than current Balance throw exception
             throw new ArithmeticException("Insufficient Funds: cannot withdrawal amount more than available balance");
         }else if(amount.compareTo(BigDecimal.ZERO) <= 0){ // if withdral amount is less or equal to 0
-            System.out.println("Withdraw amount needs to be greater than 0");
+            throw new ArithmeticException("Insufficient Funds: cannot withdrawal less than 0");
         } else {
            balance = balance.subtract(amount);
         }
