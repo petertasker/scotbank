@@ -32,8 +32,8 @@ public class UserController {
     }
 
     @GET("/listaccounts")
-    public String getAccounts() {
-        return "Hello!";
+    public List<Account> getAccounts() {
+        return AccountManager.generateExampleAccounts();
     }
 
 }

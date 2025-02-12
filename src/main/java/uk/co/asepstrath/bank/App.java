@@ -7,6 +7,7 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.controllers.UserController;
+import uk.co.asepstrath.bank.controllers.UserController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -37,7 +38,7 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        mvc(new UserController(ds,log));
+        mvc(new UserController_(ds,log));
 
         /*
         Finally we register our application lifecycle methods
