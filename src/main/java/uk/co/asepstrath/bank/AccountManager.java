@@ -6,7 +6,7 @@ import java.util.List;
 
 public class AccountManager {
 
-    public static List<Account> exampleAccounts(){
+    public static List<Account> generateExampleAccounts(){
         List<Account> accounts = new ArrayList<Account>();
 
         accounts.add(new Account("Rachel", BigDecimal.valueOf(50.00)));
