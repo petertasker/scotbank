@@ -11,8 +11,10 @@ import uk.co.asepstrath.bank.controllers.UserController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public class App extends Jooby {
 
@@ -65,9 +67,35 @@ public class App extends Jooby {
         try (Connection connection = ds.getConnection()) {
             //
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE `Example` (`Key` varchar(255),`Value` varchar(255))");
-            stmt.executeUpdate("INSERT INTO Example " + "VALUES ('WelcomeMessage', 'Welcome to A Bank')");
-        } catch (SQLException e) {
+            // Create Pseudo Database with users and accounts
+            stmt.executeUpdate(
+                    "CREATE TABLE `Users` (" +
+                    "`userID` varchar(255) NOT NULL, " +
+                    "`forename` varchar(255) NOT NULL, " +
+                    "`surname` varchar(255) NOT NULL, " +
+                    " PRIMARY KEY (`userID`))");
+
+            stmt.executeUpdate(
+                    "CREATE TABLE `Accounts` (" +
+                            "`AccountID` varchar(255) NOT NULL," +
+                            "`AccountName` varchar(255) NOT NULL," +
+                            "`Balance` DECIMAL NOT NULL," +
+                            "`roundUpEnabled` bit NOT NULL ," +
+                            "`userID` varchar(255) NOT NULL," +
+                            "PRIMARY KEY (`AccountID`)," +
+                            "FOREIGN KEY (`userID`) REFERENCES `Users`(`userID`))");
+
+//            List<Account> accounts = AccountManager.generateExampleAccounts();
+//            /**
+//             This is called a prepared statement, where the query is compiled before it's parametised, which through divine
+//             benevolence makes SQL injections impossible
+//             */
+//            for (Account account : accounts) {
+//                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
+//                pstmt.setString(account.getAccountID());
+//            }
+        }
+        catch (SQLException e) {
             log.error("Database Creation Error",e);
         }
     }
