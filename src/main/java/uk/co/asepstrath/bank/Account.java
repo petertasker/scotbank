@@ -3,17 +3,18 @@ package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class Account extends Customer {
+public class Account {
 
+    private String accountID;
     private BigDecimal balance;
-    private String accountName;
     private boolean roundUpEnabled;
-    private UUID accountID;
+    private Customer customer;
 
-    public Account(String accountName, BigDecimal startingBalance) {
-        UUID accountID = UUID.randomUUID(); // Generate unique identifier for each customer
-        this.accountName = accountName;
+    public Account(Customer customer, BigDecimal startingBalance) {
+        this.customer = customer;
+        this.accountID = UUID.randomUUID().toString().replace("-", "");
         this.balance = startingBalance;
+        this.roundUpEnabled = false;
     }
 
 
@@ -38,12 +39,9 @@ public class Account extends Customer {
         return balance;
     }
 
-    public String getAccountID() {
-        return accountID.toString();
-    }
 
     public String toString() {
-        return "Account name: " + this.accountName + ", Balance: " + this.balance;
+        return "Account name: " + customer.getUserName() + ", Balance: " + getBalance();
     }
 
 

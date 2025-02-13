@@ -11,40 +11,40 @@ public class AccountTests {
     /* A new Account should have a value of 0 */
     @Test
     public void createAccount(){
-        Account a = new Account("John Smith", BigDecimal.valueOf(15));
+        Account a = new Account(new Customer("John Smith"), BigDecimal.valueOf(15));
         assertNotNull(a);
     }
     
     @Test
     public void deposit(){
-        Account a = new Account("Jacob",BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("Jacob"),BigDecimal.valueOf(20));
         a.deposit(BigDecimal.valueOf(50)); // deposit a 50 in a 20
         assertEquals(BigDecimal.valueOf(70),a.getBalance());
     }
 
     @Test
     public void Withdraw(){
-        Account a = new Account("Simon",BigDecimal.valueOf(40));
+        Account a = new Account(new Customer("Simon"),BigDecimal.valueOf(40));
         a.withdraw(BigDecimal.valueOf(20)); // withdraw 20 pounds
         assertEquals(BigDecimal.valueOf(20), a.getBalance());
     }
 
     @Test
     public void TestArithmeticException(){
-        Account a = new Account("John Smith",BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("John Smith"),BigDecimal.valueOf(20));
         a.deposit(BigDecimal.valueOf(30));
         Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(100)));
     }
 
     @Test
     public void TestArithmeticException2() {
-        Account a = new Account("John Smith",BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("John Smith"),BigDecimal.valueOf(20));
         Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(-5)));
     }
 
     @Test
     public void SuperSavingTest(){
-        Account a = new Account("Michale",BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("Michael"),BigDecimal.valueOf(20));
         for (int i=0; i<5; i++){
             a.deposit(BigDecimal.valueOf(10));
         }
@@ -56,7 +56,7 @@ public class AccountTests {
 
     @Test
     public void TestForPennies(){
-        Account a = new Account("Jack",BigDecimal.valueOf(5.45));
+        Account a = new Account(new Customer("Jack"),BigDecimal.valueOf(5.45));
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
     }
@@ -64,7 +64,7 @@ public class AccountTests {
     @Test
     /* Withdrawing £20 from an account with £40 should result in an account containing £20 */
     void addFunds2() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(40));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(40));
         a.withdraw(BigDecimal.valueOf(20));
         assertEquals(BigDecimal.valueOf(20), a.getBalance());
     }
@@ -72,21 +72,21 @@ public class AccountTests {
     @Test
     /* Withdrawing £100 from an account with £30 should throw an ArithmeticException */
     void illegalWithdraw() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(30));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(30));
         assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(100)));
     }
 
     @Test
     /* Depositing an amount of zero should throw an ArithmeticException */
     void illegalDepositZero() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(20));
         assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(0)));
     }
 
     @Test
     /* Depositing a negative amount should throw an ArithmeticException */
     void illegalDepositNegative() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(20));
         assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(-5)));
     }
 
@@ -94,7 +94,7 @@ public class AccountTests {
     /* Starting with an account with £20, deposit £10 five times then withdraw £20 three times.
     The account should end with £10*/
     void complexDepositAndWithdraw() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(20));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(20));
         for (int i = 0; i < 5; i++) {
             a.deposit(BigDecimal.valueOf(10));
         }
@@ -106,7 +106,7 @@ public class AccountTests {
     @Test
     /* Depositing £17.56 into an account with £5.45 should result in an account containing £23.01*/
     void floatWithdraw() {
-        Account a = new Account("John Doe", BigDecimal.valueOf(5.45));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(5.45));
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
     }
@@ -114,7 +114,7 @@ public class AccountTests {
     @Test
 
     void displayData(){
-        Account a = new Account("John Doe", BigDecimal.valueOf(5.45));
+        Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(5.45));
         assertEquals( "Account name: John Doe, Balance: 5.45", a.toString());
     }
 }
