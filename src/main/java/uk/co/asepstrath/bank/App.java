@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Jooby {
@@ -71,29 +72,37 @@ public class App extends Jooby {
             stmt.executeUpdate(
                     "CREATE TABLE `Users` (" +
                     "`userID` varchar(255) NOT NULL, " +
-                    "`forename` varchar(255) NOT NULL, " +
-                    "`surname` varchar(255) NOT NULL, " +
+                    "`name` varchar(255) NOT NULL, " +
                     " PRIMARY KEY (`userID`))");
 
             stmt.executeUpdate(
                     "CREATE TABLE `Accounts` (" +
                             "`AccountID` varchar(255) NOT NULL," +
-                            "`AccountName` varchar(255) NOT NULL," +
                             "`Balance` DECIMAL NOT NULL," +
                             "`roundUpEnabled` bit NOT NULL ," +
                             "`userID` varchar(255) NOT NULL," +
                             "PRIMARY KEY (`AccountID`)," +
                             "FOREIGN KEY (`userID`) REFERENCES `Users`(`userID`))");
 
-//            List<Account> accounts = AccountManager.generateExampleAccounts();
-//            /**
-//             This is called a prepared statement, where the query is compiled before it's parametised, which through divine
-//             benevolence makes SQL injections impossible
-//             */
-//            for (Account account : accounts) {
-//                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
-//                pstmt.setString(account.getAccountID());
-//            }
+            // Assume this comes from the register part of the system
+            List<Customer> customers = AccountManager.generateExampleCustomers();
+            List<Account> accounts = AccountManager.generateExampleAccounts();
+
+            // Example generate new user
+            for (Customer customer : customers) {
+                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Users VALUES (?, ?)");
+                pstmt.setString(1, customer.getUserID());
+                pstmt.setString(2, customer.getUserName());
+            }
+
+            // Example generate new account
+            for (Account account : accounts) {
+                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Accounts VALUES (?, ?, ?, ?)");
+                pstmt.setString(1, account.getAccountID());
+                pstmt.setBigDecimal(2, account.getBalance());
+                pstmt.setInt(3, 0);
+                pstmt.setString(4, account.getCustomerID());
+            }
         }
         catch (SQLException e) {
             log.error("Database Creation Error",e);

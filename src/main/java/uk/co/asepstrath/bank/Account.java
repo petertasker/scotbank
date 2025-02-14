@@ -39,6 +39,13 @@ public class Account {
         return balance;
     }
 
+    public String getAccountID() {
+        return accountID;
+    }
+
+    public String getCustomerID() {
+        return this.getCustomerID();
+    }
 
     public String toString() {
         return "Account name: " + customer.getUserName() + ", Balance: " + getBalance();
