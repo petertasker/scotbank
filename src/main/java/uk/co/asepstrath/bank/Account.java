@@ -44,8 +44,10 @@ public class Account {
     }
 
     public String getCustomerID() {
-        return this.getCustomerID();
+        return customer.getUserID();
     }
+
+    public Customer getCustomer() {return customer;} // returns the Customer object
 
     public String toString() {
         return "Account name: " + customer.getUserName() + ", Balance: " + getBalance();

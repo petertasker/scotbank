@@ -117,4 +117,14 @@ public class AccountTests {
         Account a = new Account(new Customer("John Doe"), BigDecimal.valueOf(5.45));
         assertEquals( "Account name: John Doe, Balance: 5.45", a.toString());
     }
+
+    @Test
+    void getUserIDTest(){
+        Customer customer = new Customer("John Smith");
+        Account a = customer.createAccount();
+
+        String UserID = a.getCustomer().getUserID();
+
+        Assertions.assertEquals(UserID,customer.getUserID(),"The Account matches from the User ID");
+    }
 }
