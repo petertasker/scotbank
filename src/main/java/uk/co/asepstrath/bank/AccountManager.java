@@ -8,12 +8,12 @@ public class AccountManager {
 
     public static List<Customer> generateExampleCustomers() {
         List<Customer> exampleCustomers = List.of(
-                new Customer("Rachel"),
-                new Customer("Monica"),
-                new Customer("Pheobe"),
-                new Customer("Joey"),
-                new Customer("Ross"),
-                new Customer("Chandler") // Added Chandler for completeness
+                new Customer("Rachel", "rachel@msn.com"),
+                new Customer("Monica", "monica@msn.com"),
+                new Customer("Pheobe", "pheobe@msn.com"),
+                new Customer("Joey", "joey@msn.com"),
+                new Customer("Ross", "ross@msn.com"),
+                new Customer("Chandler", "chandler@msn.com") // Added Chandler for completeness
         );
         return exampleCustomers;
     }

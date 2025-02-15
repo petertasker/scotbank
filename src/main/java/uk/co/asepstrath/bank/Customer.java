@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class Customer extends User {
 
-    public Customer(String name) {
-        super(name);
+    public Customer(String name, String email) {
+        super(name, email);
     }
 
     // Create new account for this customer
