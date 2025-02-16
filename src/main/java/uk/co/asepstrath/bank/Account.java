@@ -1,5 +1,4 @@
 package uk.co.asepstrath.bank;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -11,14 +10,12 @@ public class Account {
     private Customer customer;
 
 
-
     public Account(Customer customer, BigDecimal startingBalance) {
         this.customer = customer;
         this.accountID = UUID.randomUUID().toString().replace("-", "");
         this.balance = startingBalance;
         this.roundUpEnabled = false;
     }
-
 
     public void deposit(BigDecimal amount) throws ArithmeticException{
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -52,14 +49,11 @@ public class Account {
     public Customer getCustomer() {return customer;} // returns the Customer object
 
     public String toString() {
-        return "Account name: " + customer.getUserName() + ", Balance: " + getBalance()+ ", Id: " + getAccountID();
+        return "Account name: " + getCustomer().getUserName() + ", Balance: " + getBalance();
     }
-
 
     public void UpdateBalance(BigDecimal b){
         this.balance = b;
     }
-
-
 
 }
