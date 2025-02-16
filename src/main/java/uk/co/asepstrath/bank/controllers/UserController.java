@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-@Path("/users")
 public class UserController {
 
     private final DataSource dataSource;
@@ -31,10 +30,32 @@ public class UserController {
         logger.info("UserController initialised");
     }
 
-    @GET("/listaccounts")
-    public List<Account> getAccounts() {
-        return AccountManager.generateExampleAccounts();
+    /**
+     * Main Login Page
+     */
+    @GET
+    @Path("/login")
+    public ModelAndView DisplayLogin() {
+        Map<String, Object> model = new HashMap<>();
+        return new ModelAndView("loginform.hbs", model);
     }
+
+    /**
+     * Main Register Page
+     */
+    @GET
+    @Path("/register")
+    public ModelAndView DisplayRegister() {
+        Map<String, Object> model = new HashMap<>();
+        return new ModelAndView("registerform.hbs", model);
+    }
+
+
+//
+//    @GET("/listaccounts")
+//    public List<Account> getAccounts() {
+//        return AccountManager.generateExampleAccounts();
+//    }
 
 
 

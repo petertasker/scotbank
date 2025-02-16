@@ -46,7 +46,9 @@ public class Account {
         return customer.getUserID();
     }
 
-    public Customer getCustomer() {return customer;} // returns the Customer object
+    public Customer getCustomer() {
+        return customer;
+    }
 
     public String toString() {
         return "Account name: " + getCustomer().getUserName() + ", Balance: " + getBalance();

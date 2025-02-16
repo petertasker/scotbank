@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank;
 
+import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
 import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
@@ -8,8 +9,6 @@ import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 
 
-import uk.co.asepstrath.bank.controllers.LoginController;
-import uk.co.asepstrath.bank.controllers.LoginController_;
 
 import uk.co.asepstrath.bank.controllers.UserController;
 import uk.co.asepstrath.bank.controllers.UserController_;
@@ -32,6 +31,7 @@ public class App extends Jooby {
         install(new UniRestExtension());
         install(new HandlebarsModule());
         install(new HikariModule("mem"));
+        install(new JacksonModule()); // Handle JSON requests
 
         /*
         This will host any files in src/main/resources/assets on <host>/assets
@@ -46,7 +46,6 @@ public class App extends Jooby {
         Logger log = getLog();
 
         mvc(new UserController_(ds,log));
-        mvc(new LoginController_(ds,log));
         /*
         Finally we register our application lifecycle methods
          */
