@@ -10,6 +10,8 @@ public class Account {
     private boolean roundUpEnabled;
     private Customer customer;
 
+
+
     public Account(Customer customer, BigDecimal startingBalance) {
         this.customer = customer;
         this.accountID = UUID.randomUUID().toString().replace("-", "");
@@ -50,8 +52,14 @@ public class Account {
     public Customer getCustomer() {return customer;} // returns the Customer object
 
     public String toString() {
-        return "Account name: " + customer.getUserName() + ", Balance: " + getBalance();
+        return "Account name: " + customer.getUserName() + ", Balance: " + getBalance()+ ", Id: " + getAccountID();
     }
+
+
+    public void UpdateBalance(BigDecimal b){
+        this.balance = b;
+    }
+
 
 
 }
