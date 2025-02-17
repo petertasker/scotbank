@@ -41,11 +41,29 @@ public class ContextManager {
             Session session = ctx.session();
             ObjectMapper mapper = new ObjectMapper();
 
-            String userJson = String.valueOf(session.get("user"));
+            String userJson = session.get("customer").toString();
+            System.out.printf("userJson: %s\n", userJson);
             return mapper.readValue(userJson, Customer.class);
         }
         catch (Exception e) {
             return null;
+        }
+    }
+
+    public void putCustomerIntoContext(Customer customer, Context ctx) {
+        try {
+            // Create Session
+            Session session = ctx.session();
+
+            // Map the attributes of User to a JSON string
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(customer);
+            System.out.println("json: " + json);
+            // Add json string to the session
+            session.put("customer", json);
+        }
+        catch (Exception e) {
+            return;
         }
     }
 
