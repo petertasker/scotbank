@@ -34,7 +34,22 @@ public class ContextManager {
         }
     }
 
-    public Customer getCustomerFromContext(Context ctx) {
+    public void putAccountIntoContext(Account account, Context ctx) throws JsonProcessingException {
+        try {
+            Session session = ctx.session();
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(account);
+            System.out.printf("Account JSON: " + json);
+            session.put("account", json);
+        }
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to put account into context");
+            throw e;
+        }
+    }
+
+
+    public Customer getCustomerFromContext(Context ctx) throws JsonProcessingException {
         try {
             // Grab User details from the session
 
@@ -45,12 +60,13 @@ public class ContextManager {
             System.out.printf("userJson: %s\n", userJson);
             return mapper.readValue(userJson, Customer.class);
         }
-        catch (Exception e) {
-            return null;
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to get customer context");
+            throw e;
         }
     }
 
-    public void putCustomerIntoContext(Customer customer, Context ctx) {
+    public void putCustomerIntoContext(Customer customer, Context ctx) throws JsonProcessingException {
         try {
             // Create Session
             Session session = ctx.session();
@@ -58,12 +74,13 @@ public class ContextManager {
             // Map the attributes of User to a JSON string
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(customer);
-            System.out.println("json: " + json);
+            System.out.println("Customer JSON: " + json);
             // Add json string to the session
             session.put("customer", json);
         }
-        catch (Exception e) {
-            return;
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to put customer into context");
+            throw e;
         }
     }
 

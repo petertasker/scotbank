@@ -81,13 +81,13 @@ public class DashboardController {
      */
     @POST
     @Path("/openaccount")
-    public ModelAndView openAccount(Context ctx) throws JsonProcessingException {
+    public ModelAndView openAccount(Context ctx) {
         String formBalance = ctx.form("startingbalance").value();
         BigDecimal balance = new BigDecimal(formBalance);
 
 
         Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("openaccount.hbs", model);
+        return new ModelAndView("dashboard.hbs", model);
     }
 
 }
