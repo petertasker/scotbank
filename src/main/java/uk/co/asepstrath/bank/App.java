@@ -1,10 +1,7 @@
 package uk.co.asepstrath.bank;
-import io.jooby.Context;
-import io.jooby.Cookie;
-import io.jooby.SessionStore;
+import io.jooby.*;
 import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
-import io.jooby.Jooby;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
@@ -51,6 +48,23 @@ public class App extends Jooby {
          */
         onStarted(() -> onStart());
         onStop(() -> onStop());
+
+        // Redirect to login page if no session exists
+        before(ctx -> {
+            String path = ctx.getRequestPath();
+            if (!path.equals("/login")) {
+                Session session = ctx.sessionOrNull();
+                if (session == null) {
+                    ctx.sendRedirect("/login");
+                }
+            }
+
+        });
+        // Dashboard as landing page
+        get("/", ctx -> {
+            ctx.sendRedirect("/dashboard");
+            return ctx;
+        });
     }
 
     public static void main(final String[] args) {

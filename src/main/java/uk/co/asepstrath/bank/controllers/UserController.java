@@ -44,23 +44,28 @@ public class UserController {
     }
 
     @POST
-    @Path("/submitlogin")
+    @Path("/dashboard")
     public ModelAndView loginUser(Context ctx) throws UnirestException {
         try {
+            // Get from data via POST
             String name = ctx.form("name").value();
             String email = ctx.form("email").value();
             User user = new User(name, email);
 
+            // Create Session
             Session session = ctx.session();
 
+            // Map the attributes of User to a JSON string
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(user);
+
+            // Add json string to the session
             session.put("user", json);
+
+            // view new model
             Map<String, Object> model = new HashMap<>();
             model.put("username", user.getUserName());
             return new ModelAndView("/dashboard.hbs", model);
-
-
         }
         catch (Exception e) {
             throw new UnirestException(e.getMessage());
