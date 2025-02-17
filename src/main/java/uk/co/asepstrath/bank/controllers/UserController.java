@@ -2,12 +2,11 @@ package uk.co.asepstrath.bank.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jooby.Context;
-import io.jooby.ModelAndView;
-import io.jooby.StatusCode;
+import io.jooby.*;
 import io.jooby.annotation.*;
 import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.AccountManager;
@@ -41,42 +40,65 @@ public class UserController {
     @Path("/login")
     public ModelAndView DisplayLogin() {
         Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("loginform.hbs", model);
+        return new ModelAndView("/loginform.hbs", model);
     }
 
-    /**
-     * Main Register Page
-     */
-    @GET
-    @Path("/register")
-    public ModelAndView DisplayRegister() {
-        Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("registerform.hbs", model);
-    }
-
-    /**
-     * Register a new user and add to session as JSON object
-     */
     @POST
-    @Path("/register")
+    @Path("/submitlogin")
+    public ModelAndView loginUser(Context ctx) throws UnirestException {
+        try {
+            String name = ctx.form("name").value();
+            String email = ctx.form("email").value();
+            User user = new User(name, email);
+
+            Session session = ctx.session();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(user);
+            session.put("user", json);
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", user.getUserName());
+            return new ModelAndView("/dashboard.hbs", model);
+
+
+        }
+        catch (Exception e) {
+            throw new UnirestException(e.getMessage());
+        }
+    }
+//    /**
+//     * Main Register Page
+//     */
+//    @GET
+//    @Path("/register")
+//    public ModelAndView DisplayRegister() {
+//        Map<String, Object> model = new HashMap<>();
+//        return new ModelAndView("registerform.hbs", model);
+//    }
+//
+//    /**
+//     * Register a new user and add to session as JSON object
+//     */
+//    @POST
+//    @Path("/register")
 //    @Consumes("application/json") // Take in a JSON object
 //    @Produces("application/json") // Produce a JSON object
-    public User registerUser(Context ctx) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> formData = new HashMap<>();
-            formData.put("fullname", ctx.form("fullname").value());
-            formData.put("email", ctx.form("email").value());
-            String jsonString = mapper.writeValueAsString(formData); // Map register data into JSON object cast to string
-            User user = mapper.readValue(jsonString, User.class); // Create java user and put into the session
-            ctx.session().put("user", jsonString);
-
-            return user;
-        }
-        catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public User registerUser(Context ctx) {
+//        try {
+//            ObjectMapper mapper = new ObjectMapper();
+//            Map<String, String> formData = new HashMap<>();
+//            formData.put("fullname", ctx.form("fullname").value());
+//            formData.put("email", ctx.form("email").value());
+//            String jsonString = mapper.writeValueAsString(formData); // Map register data into JSON object cast to string
+//            User user = mapper.readValue(jsonString, User.class); // Create java user and put into the session
+//            ctx.session().put("user", jsonString);
+//
+//            return user;
+//        }
+//        catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 //
 //    @GET("/listaccounts")
 //    public List<Account> getAccounts() {

@@ -1,5 +1,7 @@
 package uk.co.asepstrath.bank;
-
+import io.jooby.Context;
+import io.jooby.Cookie;
+import io.jooby.SessionStore;
 import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
 import io.jooby.Jooby;
@@ -32,7 +34,6 @@ public class App extends Jooby {
         install(new HandlebarsModule());
         install(new HikariModule("mem"));
         install(new JacksonModule()); // Handle JSON requests
-
         /*
         This will host any files in src/main/resources/assets on <host>/assets
          */
@@ -44,7 +45,6 @@ public class App extends Jooby {
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
-
         mvc(new UserController_(ds,log));
         /*
         Finally we register our application lifecycle methods
@@ -66,52 +66,52 @@ public class App extends Jooby {
         log.info("Starting Up...");
 
         // Fetch DB Source
-        DataSource ds = require(DataSource.class);
-        // Open Connection to DB
-        try (Connection connection = ds.getConnection()) {
-            //
-            Statement stmt = connection.createStatement();
-            // Create Pseudo Database with users and accounts
-            stmt.executeUpdate(
-                    "CREATE TABLE `Users` (" +
-                    "`userID` varchar(255) NOT NULL, " +
-                    "`name` varchar(255) NOT NULL, " +
-                    "email varchar(255) NOT NULL, " +
-                    "`password` varchar(255) NOT NULL, " +
-                    " PRIMARY KEY (`userID`))");
-
-            stmt.executeUpdate(
-                    "CREATE TABLE `Accounts` (" +
-                            "`AccountID` varchar(255) NOT NULL," +
-                            "`Balance` DECIMAL NOT NULL," +
-                            "`roundUpEnabled` bit NOT NULL ," +
-                            "`userID` varchar(255) NOT NULL," +
-                            "PRIMARY KEY (`AccountID`)," +
-                            "FOREIGN KEY (`userID`) REFERENCES `Users`(`userID`))");
-
-            // Assume this comes from the register part of the system
-            List<Customer> customers = AccountManager.generateExampleCustomers();
-            List<Account> accounts = AccountManager.generateExampleAccounts();
-
-            // Example generate new user
-            for (Customer customer : customers) {
-                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Users VALUES (?, ?)");
-                pstmt.setString(1, customer.getUserID());
-                pstmt.setString(2, customer.getUserName());
-            }
-
-            // Example generate new account
-            for (Account account : accounts) {
-                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Accounts VALUES (?, ?, ?, ?)");
-                pstmt.setString(1, account.getAccountID());
-                pstmt.setBigDecimal(2, account.getBalance());
-                pstmt.setInt(3, 0);
-                pstmt.setString(4, account.getCustomerID());
-            }
-        }
-        catch (SQLException e) {
-            log.error("Database Creation Error",e);
-        }
+//        DataSource ds = require(DataSource.class);
+//        // Open Connection to DB
+//        try (Connection connection = ds.getConnection()) {
+//            //
+//            Statement stmt = connection.createStatement();
+//            // Create Pseudo Database with users and accounts
+//            stmt.executeUpdate(
+//                    "CREATE TABLE `Users` (" +
+//                    "`userID` varchar(255) NOT NULL, " +
+//                    "`name` varchar(255) NOT NULL, " +
+//                    "email varchar(255) NOT NULL, " +
+//                    "`password` varchar(255) NOT NULL, " +
+//                    " PRIMARY KEY (`userID`))");
+//
+//            stmt.executeUpdate(
+//                    "CREATE TABLE `Accounts` (" +
+//                            "`AccountID` varchar(255) NOT NULL," +
+//                            "`Balance` DECIMAL NOT NULL," +
+//                            "`roundUpEnabled` bit NOT NULL ," +
+//                            "`userID` varchar(255) NOT NULL," +
+//                            "PRIMARY KEY (`AccountID`)," +
+//                            "FOREIGN KEY (`userID`) REFERENCES `Users`(`userID`))");
+//
+//            // Assume this comes from the register part of the system
+//            List<Customer> customers = AccountManager.generateExampleCustomers();
+//            List<Account> accounts = AccountManager.generateExampleAccounts();
+//
+//            // Example generate new user
+//            for (Customer customer : customers) {
+//                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Users VALUES (?, ?)");
+//                pstmt.setString(1, customer.getUserID());
+//                pstmt.setString(2, customer.getUserName());
+//            }
+//
+//            // Example generate new account
+//            for (Account account : accounts) {
+//                PreparedStatement pstmt = connection.prepareStatement("INSERT INTO Accounts VALUES (?, ?, ?, ?)");
+//                pstmt.setString(1, account.getAccountID());
+//                pstmt.setBigDecimal(2, account.getBalance());
+//                pstmt.setInt(3, 0);
+//                pstmt.setString(4, account.getCustomerID());
+//            }
+//        }
+//        catch (SQLException e) {
+//            log.error("Database Creation Error",e);
+//        }
     }
 
     /*
