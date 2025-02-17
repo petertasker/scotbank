@@ -7,10 +7,12 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 
-
-
-import uk.co.asepstrath.bank.controllers.UserController;
-import uk.co.asepstrath.bank.controllers.UserController_;
+import uk.co.asepstrath.bank.controllers.AccountController;
+import uk.co.asepstrath.bank.controllers.DashboardController;
+import uk.co.asepstrath.bank.controllers.CustomerController;
+import uk.co.asepstrath.bank.controllers.AccountController_;
+import uk.co.asepstrath.bank.controllers.DashboardController_;
+import uk.co.asepstrath.bank.controllers.CustomerController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -42,12 +44,14 @@ public class App extends Jooby {
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
-        mvc(new UserController_(ds,log));
+        mvc(new CustomerController_(ds,log));
+        mvc(new DashboardController_(ds,log));
+        mvc(new AccountController_(ds,log));
         /*
         Finally we register our application lifecycle methods
          */
-        onStarted(() -> onStart());
-        onStop(() -> onStop());
+        onStarted(this::onStart);
+        onStop(this::onStop);
 
         // Redirect to login page if no session exists
         before(ctx -> {
@@ -73,7 +77,6 @@ public class App extends Jooby {
 
     /*
     This function will be called when the application starts up,
-    it should be used to ensure that the DB is properly setup
      */
     public void onStart() {
         Logger log = getLog();

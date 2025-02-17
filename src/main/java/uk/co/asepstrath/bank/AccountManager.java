@@ -13,7 +13,7 @@ public class AccountManager {
                 new Customer("Pheobe", "pheobe@msn.com"),
                 new Customer("Joey", "joey@msn.com"),
                 new Customer("Ross", "ross@msn.com"),
-                new Customer("Chandler", "chandler@msn.com") // Added Chandler for completeness
+                new Customer("Chandler", "chandler@msn.com")
         );
         return exampleCustomers;
     }

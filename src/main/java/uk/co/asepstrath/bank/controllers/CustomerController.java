@@ -1,33 +1,24 @@
+/**
+ * Customer focused endpoints:
+ *  - Log in Customer
+ */
+
 package uk.co.asepstrath.bank.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jooby.*;
 import io.jooby.annotation.*;
-import io.jooby.exception.StatusCodeException;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.AccountManager;
-import uk.co.asepstrath.bank.User;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-public class UserController {
+public class CustomerController {
 
     private final DataSource dataSource;
     private final Logger logger;
 
-    public UserController(DataSource dataSource, Logger logger) {
+    public CustomerController(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
         logger.info("UserController initialised");
@@ -43,34 +34,8 @@ public class UserController {
         return new ModelAndView("/loginform.hbs", model);
     }
 
-    @POST
-    @Path("/dashboard")
-    public ModelAndView loginUser(Context ctx) throws UnirestException {
-        try {
-            // Get from data via POST
-            String name = ctx.form("name").value();
-            String email = ctx.form("email").value();
-            User user = new User(name, email);
 
-            // Create Session
-            Session session = ctx.session();
 
-            // Map the attributes of User to a JSON string
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(user);
-
-            // Add json string to the session
-            session.put("user", json);
-
-            // view new model
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", user.getUserName());
-            return new ModelAndView("/dashboard.hbs", model);
-        }
-        catch (Exception e) {
-            throw new UnirestException(e.getMessage());
-        }
-    }
 //    /**
 //     * Main Register Page
 //     */
