@@ -66,28 +66,5 @@ public class DashboardController {
         }
     }
 
-    /**
-     * Open a new account
-     */
-    @GET
-    @Path("/openaccount")
-    public ModelAndView displayOpenAccount() {
-        Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("openaccount.hbs", model);
-    }
-
-    /**
-     * Open a new account
-     */
-    @POST
-    @Path("/openaccount")
-    public ModelAndView openAccount(Context ctx) throws JsonProcessingException {
-        String formBalance = ctx.form("startingbalance").value();
-        BigDecimal balance = new BigDecimal(formBalance);
-
-
-        Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("openaccount.hbs", model);
-    }
 
 }

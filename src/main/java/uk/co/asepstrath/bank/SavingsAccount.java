@@ -10,7 +10,7 @@ public class SavingsAccount extends Account{
     private static final BigDecimal rateOne = new BigDecimal("0.01");
     private static final BigDecimal rateTwo = new BigDecimal("0.02");
 
-   private static int withdrawalsNum = 3;
+    private static int withdrawalsNum = 3;
 
     private int currentMonth;
 

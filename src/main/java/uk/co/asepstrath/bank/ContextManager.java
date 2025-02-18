@@ -11,9 +11,7 @@ import io.jooby.annotation.Path;
 import kong.unirest.core.UnirestException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Customer;
-import uk.co.asepstrath.bank.User;
+
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -25,32 +23,48 @@ public class ContextManager {
         try {
             Session session = ctx.session();
             ObjectMapper mapper = new ObjectMapper();
-            String accountJson = String.valueOf(session.get("account"));
+            String json = String.valueOf(session.get("account"));
 
-            return mapper.readValue(accountJson, Account.class);
+            return mapper.readValue(json, Account.class);
         }
         catch (Exception e) {
             return null;
         }
     }
 
-    public Customer getCustomerFromContext(Context ctx) {
+    public void putAccountIntoContext(Account account, Context ctx) throws JsonProcessingException {
+        try {
+            Session session = ctx.session();
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(account);
+            System.out.printf("Account JSON: " + json);
+            session.put("account", json);
+        }
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to put account into context");
+            throw e;
+        }
+    }
+
+
+    public Customer getCustomerFromContext(Context ctx) throws JsonProcessingException {
         try {
             // Grab User details from the session
 
             Session session = ctx.session();
             ObjectMapper mapper = new ObjectMapper();
 
-            String userJson = session.get("customer").toString();
-            System.out.printf("userJson: %s\n", userJson);
-            return mapper.readValue(userJson, Customer.class);
+            String json = session.get("customer").toString();
+            System.out.printf("Getting customer from context: %s\n", json);
+            return mapper.readValue(json, Customer.class);
         }
-        catch (Exception e) {
-            return null;
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to get customer context");
+            throw e;
         }
     }
 
-    public void putCustomerIntoContext(Customer customer, Context ctx) {
+    public void putCustomerIntoContext(Customer customer, Context ctx) throws JsonProcessingException {
         try {
             // Create Session
             Session session = ctx.session();
@@ -58,12 +72,13 @@ public class ContextManager {
             // Map the attributes of User to a JSON string
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(customer);
-            System.out.println("json: " + json);
+            System.out.println("Customer JSON: " + json);
             // Add json string to the session
             session.put("customer", json);
         }
-        catch (Exception e) {
-            return;
+        catch (JsonProcessingException e) {
+            System.out.println("Failed to put customer into context");
+            throw e;
         }
     }
 

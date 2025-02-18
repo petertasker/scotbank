@@ -1,10 +1,16 @@
 package uk.co.asepstrath.bank;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 
 public class Customer extends User {
 
-    public Customer(String name, String email) {
+    @JsonCreator
+    public Customer(
+            @JsonProperty("userName") String name,
+            @JsonProperty("email") String email
+            ) {
         super(name, email);
     }
 

@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Account {
 
@@ -10,7 +12,10 @@ public class Account {
     private Customer customer;
 
 
-    public Account(Customer customer, BigDecimal startingBalance) {
+    public Account(
+            @JsonProperty("customer") Customer customer,
+            @JsonProperty("balance") BigDecimal startingBalance
+        ) {
         this.customer = customer;
         this.accountID = UUID.randomUUID().toString().replace("-", "");
         this.balance = startingBalance;
