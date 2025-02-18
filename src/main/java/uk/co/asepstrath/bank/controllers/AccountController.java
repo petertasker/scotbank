@@ -33,13 +33,13 @@ public class AccountController {
         logger.info("Account Controller initialised");
     }
 
-//    @GET
-//    @Path("/{accountid}")
-//    public ModelAndView getAccount(@PathParam("accountid") String accountid) {
-//        Map<String, Object> model = new HashMap<>();
-//        model.put("account", accountid);
-//        return new ModelAndView("account", model);
-//    }
+    @GET
+    @Path("/{accountid}")
+    public ModelAndView getAccount(@PathParam("accountid") String accountid) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("account", accountid);
+        return new ModelAndView("accountview.hbs", model);
+    }
 
     /**
      * Open a new account
