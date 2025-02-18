@@ -15,7 +15,7 @@ public class Customer extends User {
     }
 
     // Create new account for this customer
-    public Account createAccount() {
-        return new Account(this, BigDecimal.ZERO);
+    public Account createAccount(BigDecimal balance) {
+        return new Account(this, balance);
     }
 }

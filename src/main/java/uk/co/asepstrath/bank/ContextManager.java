@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
@@ -11,73 +12,78 @@ import io.jooby.annotation.Path;
 import kong.unirest.core.UnirestException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-public class ContextManager {
+import java.util.*;
 
-    public Account getAccountFromContext(Context ctx) {
+public class ContextManager {
+    private static final Logger log = LoggerFactory.getLogger(ContextManager.class);
+    private final ObjectMapper mapper = new ObjectMapper();
+
+
+    // User can have no accounts, so either return nothing or the list or accounts
+    public Optional<List<Account>> getAccountsFromContext(Context ctx) {
         try {
             Session session = ctx.session();
-            ObjectMapper mapper = new ObjectMapper();
-            String json = String.valueOf(session.get("account"));
-
-            return mapper.readValue(json, Account.class);
+            String json = session.get("accounts").value();
+            if (ObjectUtils.isEmpty(json)) {
+                return Optional.of(new ArrayList<>());
+            }
+            // Get each value from the JSON accounts and parse it into the actual accounts
+            List<Account> accounts = mapper.readValue(json, new TypeReference<List<Account>>() {});
+            log.debug("Accounts: {}", json);
+            return Optional.of(accounts);
         }
         catch (Exception e) {
-            return null;
+            log.error(e.getMessage(), e);
+            return Optional.empty();
         }
     }
 
-    public void putAccountIntoContext(Account account, Context ctx) throws JsonProcessingException {
+    public void addAccountToContext(Account account, Context ctx) throws JsonProcessingException {
         try {
+            List<Account> accounts = getAccountsFromContext(ctx).orElse(new ArrayList<>());
+            accounts.add(account);
             Session session = ctx.session();
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(account);
-            System.out.printf("Account JSON: " + json);
-            session.put("account", json);
+            session.put("accounts", mapper.writeValueAsString(accounts));
         }
-        catch (JsonProcessingException e) {
-            System.out.println("Failed to put account into context");
-            throw e;
+        catch (Exception e) {
+
         }
     }
-
 
     public Customer getCustomerFromContext(Context ctx) throws JsonProcessingException {
         try {
-            // Grab User details from the session
-
+            // Grab customer details from the session
             Session session = ctx.session();
-            ObjectMapper mapper = new ObjectMapper();
+            String json = session.get("customer").value();
+            if (ObjectUtils.isEmpty(json)) {
+                throw new RuntimeException("Customer not found");
+            }
 
-            String json = session.get("customer").toString();
-            System.out.printf("Getting customer from context: %s\n", json);
-            return mapper.readValue(json, Customer.class);
+            Customer customer = mapper.readValue(json, Customer.class);
+            log.debug("Customer Retrieved from session: {}", customer);
+            return customer;
         }
         catch (JsonProcessingException e) {
-            System.out.println("Failed to get customer context");
+            log.debug("Failed to get customer context");
             throw e;
         }
     }
 
-    public void putCustomerIntoContext(Customer customer, Context ctx) throws JsonProcessingException {
+    public void addCustomerToContext(Customer customer, Context ctx) throws JsonProcessingException {
         try {
-            // Create Session
             Session session = ctx.session();
-
-            // Map the attributes of User to a JSON string
-            ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(customer);
-            System.out.println("Customer JSON: " + json);
+            log.debug("Customer added to session {}", json);
             // Add json string to the session
             session.put("customer", json);
         }
         catch (JsonProcessingException e) {
-            System.out.println("Failed to put customer into context");
+            log.debug("Failed to put customer into context");
             throw e;
         }
     }

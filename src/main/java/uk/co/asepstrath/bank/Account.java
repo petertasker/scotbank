@@ -12,6 +12,7 @@ public class Account {
     private Customer customer;
 
 
+    @JsonCreator
     public Account(
             @JsonProperty("customer") Customer customer,
             @JsonProperty("balance") BigDecimal startingBalance
@@ -47,8 +48,14 @@ public class Account {
         return accountID;
     }
 
+    @JsonProperty("customerID")
     public String getCustomerID() {
         return customer.getUserID();
+    }
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public void setCustomerID(String customerID) {
+        // Do nothing, but keep this here so json does not deserialise
     }
 
     public Customer getCustomer() {

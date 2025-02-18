@@ -24,20 +24,22 @@ public class AccountController {
 
     private final DataSource dataSource;
     private final Logger logger;
+    private final ContextManager contextManager;
 
     public AccountController(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
+        this.contextManager = new ContextManager();
         logger.info("Account Controller initialised");
     }
 
-    @GET
-    @Path("/{accountid}")
-    public ModelAndView getAccount(@PathParam("accountid") String accountid) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("account", accountid);
-        return new ModelAndView("account", model);
-    }
+//    @GET
+//    @Path("/{accountid}")
+//    public ModelAndView getAccount(@PathParam("accountid") String accountid) {
+//        Map<String, Object> model = new HashMap<>();
+//        model.put("account", accountid);
+//        return new ModelAndView("account", model);
+//    }
 
     /**
      * Open a new account
@@ -53,24 +55,18 @@ public class AccountController {
      * Open a new account
      */
     @POST
-    @Path("/openaccount/process")
-    public ModelAndView openAccount(Context ctx) throws JsonProcessingException {
+    @Path("/create")
+    public void openAccount(Context ctx) throws JsonProcessingException {
         try {
             String formBalance = ctx.form("startingbalance").value();
             BigDecimal balance = new BigDecimal(formBalance);
-
-            ContextManager contextManager = new ContextManager();
             Customer customer = contextManager.getCustomerFromContext(ctx);
+            Account account = customer.createAccount(balance);
+            contextManager.addAccountToContext(account, ctx);
+            ctx.sendRedirect("/dashboard");
 
-            Account account = new Account(customer, balance);
-            contextManager.putAccountIntoContext(account, ctx);
-
-            Map<String, Object> model = new HashMap<>();
-            model.put("accountid", account.getAccountID());
-            return new ModelAndView("accountcreated.hbs", model);
-
-        } catch (JsonProcessingException e) {
-            System.out.println("Failed to put account into context");
+        } catch (Exception e) {
+            logger.error("Failed to put account into context", e);
             throw e;
         }
 

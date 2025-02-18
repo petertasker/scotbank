@@ -18,7 +18,9 @@ import uk.co.asepstrath.bank.User;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("/dashboard")
@@ -26,20 +28,38 @@ public class DashboardController {
 
     private final DataSource dataSource;
     private final Logger logger;
+    private final ContextManager contextManager;
 
     public DashboardController(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
         logger.info("Dashboard Controller initialised");
+        this.contextManager = new ContextManager();
     }
 
     @GET
-    public ModelAndView getDashboard(Context ctx) {
-        Map<String, Object> model = new HashMap<>();
-        Session session = ctx.session();
-        String userJson = String.valueOf(session.get("user"));
-        model.put("username", userJson);
-        return new ModelAndView("dashboard.hbs", model);
+    public ModelAndView getDashboard(Context ctx) throws JsonProcessingException {
+            try {
+            Map<String, Object> model = new HashMap<>();
+
+            Customer customer = contextManager.getCustomerFromContext(ctx);
+            model.put("customer", customer);
+            model.put("customername", customer.getUserName());
+
+            // Get all accounts belonging to the customer as a list, or produce an empty list
+            List<Account> customerAccounts = contextManager.getAccountsFromContext(ctx)
+                .orElse(new ArrayList<>())
+                .stream()
+                .filter(account -> account.getCustomerID().equals(customer.getUserID()))
+                .toList();
+
+            model.put("accounts", customerAccounts);
+            model.put("hasaccounts", !customerAccounts.isEmpty());
+            return new ModelAndView("dashboard.hbs", model);
+        }
+        catch (Exception e) {
+            throw new UnirestException(e);
+        }
     }
 
     /**
@@ -53,12 +73,11 @@ public class DashboardController {
             String email = ctx.form("email").value();
 
             Customer customer = new Customer(name, email);
-            ContextManager contextManager = new ContextManager();
-            contextManager.putCustomerIntoContext(customer, ctx);
+            contextManager.addCustomerToContext(customer, ctx);
 
             // view new model
             Map<String, Object> model = new HashMap<>();
-            model.put("username", customer.getUserName());
+            model.put("customername", customer.getUserName());
             return new ModelAndView("/dashboard.hbs", model);
         }
         catch (Exception e) {
