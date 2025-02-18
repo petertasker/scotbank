@@ -69,6 +69,7 @@ public class App extends Jooby {
             ctx.sendRedirect("/dashboard");
             return ctx;
         });
+
     }
 
     public static void main(final String[] args) {
