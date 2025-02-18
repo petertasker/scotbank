@@ -121,7 +121,7 @@ public class AccountTests {
     @Test
     void getUserIDTest(){
         Customer customer = new Customer("John Smith", "johnsmith@yahoo.co.uk");
-        Account a = customer.createAccount();
+        Account a = customer.createAccount(BigDecimal.ZERO);
 
         String UserID = a.getCustomer().getUserID();
 
