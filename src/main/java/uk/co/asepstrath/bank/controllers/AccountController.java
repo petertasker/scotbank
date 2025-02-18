@@ -66,6 +66,7 @@ public class AccountController {
             contextManager.putAccountIntoContext(account, ctx);
 
             Map<String, Object> model = new HashMap<>();
+            model.put("accountid", account.getAccountID());
             return new ModelAndView("accountcreated.hbs", model);
 
         } catch (JsonProcessingException e) {

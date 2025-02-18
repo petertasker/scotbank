@@ -11,9 +11,7 @@ import io.jooby.annotation.Path;
 import kong.unirest.core.UnirestException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Customer;
-import uk.co.asepstrath.bank.User;
+
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -25,9 +23,9 @@ public class ContextManager {
         try {
             Session session = ctx.session();
             ObjectMapper mapper = new ObjectMapper();
-            String accountJson = String.valueOf(session.get("account"));
+            String json = String.valueOf(session.get("account"));
 
-            return mapper.readValue(accountJson, Account.class);
+            return mapper.readValue(json, Account.class);
         }
         catch (Exception e) {
             return null;
@@ -56,9 +54,9 @@ public class ContextManager {
             Session session = ctx.session();
             ObjectMapper mapper = new ObjectMapper();
 
-            String userJson = session.get("customer").toString();
-            System.out.printf("userJson: %s\n", userJson);
-            return mapper.readValue(userJson, Customer.class);
+            String json = session.get("customer").toString();
+            System.out.printf("Getting customer from context: %s\n", json);
+            return mapper.readValue(json, Customer.class);
         }
         catch (JsonProcessingException e) {
             System.out.println("Failed to get customer context");
