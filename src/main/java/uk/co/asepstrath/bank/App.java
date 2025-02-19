@@ -7,12 +7,12 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.controllers.AccountController;
-import uk.co.asepstrath.bank.controllers.DashboardController;
-import uk.co.asepstrath.bank.controllers.CustomerController;
-import uk.co.asepstrath.bank.controllers.AccountController_;
-import uk.co.asepstrath.bank.controllers.DashboardController_;
-import uk.co.asepstrath.bank.controllers.CustomerController_;
+//import uk.co.asepstrath.bank.controllers.AccountController;
+//import uk.co.asepstrath.bank.controllers.DashboardController;
+//import uk.co.asepstrath.bank.controllers.CustomerController;
+//import uk.co.asepstrath.bank.controllers.AccountController_;
+//import uk.co.asepstrath.bank.controllers.DashboardController_;
+//import uk.co.asepstrath.bank.controllers.CustomerController_;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -44,9 +44,9 @@ public class App extends Jooby {
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
-        mvc(new CustomerController_(ds,log));
-        mvc(new DashboardController_(ds,log));
-        mvc(new AccountController_(ds,log));
+//        mvc(new CustomerController_(ds,log));
+//        mvc(new DashboardController_(ds,log));
+//        mvc(new AccountController_(ds,log));
         /*
         Finally we register our application lifecycle methods
          */
@@ -62,7 +62,6 @@ public class App extends Jooby {
                     ctx.sendRedirect("/login");
                 }
             }
-
         });
         // Dashboard as landing page
         get("/", ctx -> {

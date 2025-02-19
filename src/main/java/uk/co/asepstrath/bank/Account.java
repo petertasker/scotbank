@@ -9,17 +9,16 @@ public class Account {
     private String accountID;
     private BigDecimal balance;
     private boolean roundUpEnabled;
-    private Customer customer;
-
+    private String name;
 
     @JsonCreator
     public Account(
-            @JsonProperty("customer") Customer customer,
+            @JsonProperty("name") String name,
             @JsonProperty("balance") BigDecimal startingBalance
         ) {
-        this.customer = customer;
         this.accountID = UUID.randomUUID().toString().replace("-", "");
         this.balance = startingBalance;
+        this.name = name;
         this.roundUpEnabled = false;
     }
 
@@ -48,22 +47,8 @@ public class Account {
         return accountID;
     }
 
-    @JsonProperty("customerID")
-    public String getCustomerID() {
-        return customer.getUserID();
-    }
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    public void setCustomerID(String customerID) {
-        // Do nothing, but keep this here so json does not deserialise
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
     public String toString() {
-        return "Account name: " + getCustomer().getUserName() + ", Balance: " + getBalance();
+        return "Account name: " + accountID + ", Balance: " + getBalance();
     }
 
     public void UpdateBalance(BigDecimal b){
