@@ -9,16 +9,18 @@ public class Account {
     private String accountID;
     private BigDecimal balance;
     private boolean roundUpEnabled;
-    private Customer customer;
+    private String name;
 
-
+    @JsonCreator
     public Account(
-            @JsonProperty("customer") Customer customer,
-            @JsonProperty("balance") BigDecimal startingBalance
+            @JsonProperty("id")  String accountID,
+            @JsonProperty("name") String name,
+            @JsonProperty("startingBalance") BigDecimal startingBalance,
+            @JsonProperty("roundUpEnabled") boolean roundUpEnabled
         ) {
-        this.customer = customer;
-        this.accountID = UUID.randomUUID().toString().replace("-", "");
+        this.accountID = accountID;
         this.balance = startingBalance;
+        this.name = name;
         this.roundUpEnabled = false;
     }
 
@@ -47,16 +49,17 @@ public class Account {
         return accountID;
     }
 
-    public String getCustomerID() {
-        return customer.getUserID();
+    public String getName() {
+        return name;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public boolean isRoundUpEnabled() {
+        return roundUpEnabled;
     }
 
     public String toString() {
-        return "Account name: " + getCustomer().getUserName() + ", Balance: " + getBalance();
+        return String.format("id: %s\nname: %s\nbalance: %s\nroundUpEnabled: %s",
+                getAccountID(), getName(), getBalance(), isRoundUpEnabled());
     }
 
     public void UpdateBalance(BigDecimal b){
