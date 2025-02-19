@@ -67,59 +67,17 @@ public class App extends Jooby {
     /*
     This function will be called when the application starts up,
      */
-    public void onStart() {
+    public void onStart() throws SQLException {
         Logger log = getLog();
         log.info("Starting Up...");
 
         //Fetch DB Source
-        DataSource ds = require(DataSource.class);
-        // Open Connection to DB
-        try (Connection connection = ds.getConnection()) {
-            Statement stmt = connection.createStatement();
-            // Create Pseudo Database with users and accounts
-            stmt.executeUpdate(
-            "CREATE TABLE `Accounts` (" +
-                    "`AccountID` varchar(255) NOT NULL, " +
-                    "`Balance` DECIMAL NOT NULL, " +
-                    "`Name` varchar(255) NOT NULL, " +
-                    "`RoundUpEnabled` BIT NOT NULL, " +
-                    "PRIMARY KEY (`AccountID`));"
-            );
-            stmt.close();
-            // Assume this comes from the register part of the system
-            URL url = new URL("https://api.asep-strath.co.uk/api/accounts");
-            ObjectMapper mapper = new ObjectMapper();
-            List<Account> accounts = mapper.readValue(url, new TypeReference<List<Account>>() {});
-            for (Account account : accounts) {
-                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Accounts VALUES (?, ?, ?, ?)");
-                preparedStatement.setString(1, account.getAccountID());    // AccountID
-                preparedStatement.setBigDecimal(2, account.getBalance());  // Balance
-                preparedStatement.setString(3, account.getName());         // Name
-                preparedStatement.setBoolean(4, true);                     // RoundUpEnabled
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-            }
+        DataSource dataSource = require(DataSource.class);
 
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Accounts");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("AccountID"));
-                System.out.println(resultSet.getString("Balance"));
-                System.out.println(resultSet.getString("Name"));
-                System.out.println(resultSet.getString("RoundUpEnabled"));
-            }
-        }
-        catch (SQLException e) {
-            log.error("Database Creation Error",e);
-        } catch (JsonMappingException e) {
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // Create tables and populate with data via API
+        DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
+        initialiser.initialise();
+        initialiser.queryAccounts();
     }
 
     /*
