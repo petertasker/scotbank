@@ -1,7 +1,7 @@
 package uk.co.asepstrath.bank;
 
 import java.math.BigDecimal;
-public class Transactiongi {
+public class Transaction {
 
     private String timestamp;
     private BigDecimal amount;
@@ -10,7 +10,7 @@ public class Transactiongi {
     private String to;
     private String type;
 
-    public Transactions(String timestamp, String amount, String from, String id, String to, String type) {
+    public Transaction(String timestamp, String amount, String from, String id, String to, String type) {
         this.timestamp= timestamp;
         this.amount = new BigDecimal(amount);
         this.from = from;
