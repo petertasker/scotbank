@@ -10,9 +10,9 @@ public class Transaction {
     private String to;
     private String type;
 
-    public Transaction(String timestamp, String amount, String from, String id, String to, String type) {
+    public Transaction(String timestamp, int amount, String from, String id, String to, String type) {
         this.timestamp= timestamp;
-        this.amount = new BigDecimal(amount);
+        this.amount = BigDecimal.valueOf(amount);
         this.from = from;
         this.id = id;
         this.to = to;
