@@ -109,16 +109,10 @@ public class App extends Jooby {
             List<Account> accounts = mapper.readValue(url, new TypeReference<List<Account>>() {});
             for (Account account : accounts) {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Accounts VALUES (?, ?, ?, ?)");
-                System.out.println("Inserting into database: ");
-                System.out.println(account.getAccountID());
-                preparedStatement.setString(1, account.getAccountID());
-                System.out.println(account.getName());
-                preparedStatement.setString(2, account.getName());
-                System.out.println(account.getBalance());
-                preparedStatement.setBigDecimal(3, account.getBalance());
-                System.out.println(account.isRoundUpEnabled() ? "1" : "0");
-//                preparedStatement.setString(4, account.isRoundUpEnabled() ? "1" : "0");
-                preparedStatement.setBoolean(4, true);
+                preparedStatement.setString(1, account.getAccountID());    // AccountID
+                preparedStatement.setBigDecimal(2, account.getBalance());  // Balance
+                preparedStatement.setString(3, account.getName());         // Name
+                preparedStatement.setBoolean(4, true);                     // RoundUpEnabled
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
             }
@@ -128,8 +122,8 @@ public class App extends Jooby {
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("AccountID"));
                 System.out.println(resultSet.getString("Balance"));
+                System.out.println(resultSet.getString("Name"));
                 System.out.println(resultSet.getString("RoundUpEnabled"));
-                System.out.println(resultSet.getString("userID"));
             }
         }
         catch (SQLException e) {
