@@ -17,7 +17,7 @@ public class Account {
             @JsonProperty("name") String name,
             @JsonProperty("startingBalance") BigDecimal startingBalance,
             @JsonProperty("roundUpEnabled") boolean roundUpEnabled
-    ) {
+        ) {
         this.accountID = accountID;
         this.balance = startingBalance;
         this.name = name;

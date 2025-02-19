@@ -95,12 +95,12 @@ public class App extends Jooby {
             Statement stmt = connection.createStatement();
             // Create Pseudo Database with users and accounts
             stmt.executeUpdate(
-                    "CREATE TABLE `Accounts` (" +
-                            "`AccountID` varchar(255) NOT NULL, " +
-                            "`Balance` DECIMAL NOT NULL, " +
-                            "`Name` varchar(255) NOT NULL, " +
-                            "`RoundUpEnabled` BIT NOT NULL, " +
-                            "PRIMARY KEY (`AccountID`));"
+            "CREATE TABLE `Accounts` (" +
+                    "`AccountID` varchar(255) NOT NULL, " +
+                    "`Balance` DECIMAL NOT NULL, " +
+                    "`Name` varchar(255) NOT NULL, " +
+                    "`RoundUpEnabled` BIT NOT NULL, " +
+                    "PRIMARY KEY (`AccountID`));"
             );
             stmt.close();
             // Assume this comes from the register part of the system
