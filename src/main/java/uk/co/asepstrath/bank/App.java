@@ -58,23 +58,6 @@ public class App extends Jooby {
          */
         onStarted(this::onStart);
         onStop(this::onStop);
-
-        // Redirect to login page if no session exists
-        before(ctx -> {
-            String path = ctx.getRequestPath();
-            if (!path.equals("/login")) {
-                Session session = ctx.sessionOrNull();
-                if (session == null) {
-                    ctx.sendRedirect("/login");
-                }
-            }
-        });
-        // Dashboard as landing page
-        get("/", ctx -> {
-            ctx.sendRedirect("/dashboard");
-            return ctx;
-        });
-
     }
 
     public static void main(final String[] args) {
