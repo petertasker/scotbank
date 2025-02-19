@@ -4,15 +4,17 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseInitialiser {
 
@@ -30,7 +32,7 @@ public class DatabaseInitialiser {
         INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)""";
 
     private final DataSource dataSource;
-    private static final Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
+    Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
     private final ObjectMapper mapper;
 
     public DatabaseInitialiser(DataSource dataSource) {
@@ -65,7 +67,7 @@ public class DatabaseInitialiser {
     }
 
     // Fetch accounts from API in JSON form
-    private List<Account> fetchAccounts() {
+    List<Account> fetchAccounts() {
         try {
             URL url = new URL("https://api.asep-strath.co.uk/api/accounts");
             return mapper.readValue(url, new TypeReference<List<Account>>() {});
@@ -88,17 +90,24 @@ public class DatabaseInitialiser {
 
     }
 
-    public void queryAccounts() throws SQLException {
+    public List<Account> queryAccounts() throws SQLException {
         try {
             Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Accounts");
             ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Account> accounts = new ArrayList<>();
+
             while (resultSet.next()) {
-                System.out.println(resultSet.getString("AccountID"));
-                System.out.println(resultSet.getString("Balance"));
-                System.out.println(resultSet.getString("Name"));
-                System.out.println(resultSet.getBoolean("RoundUpEnabled"));
+                accounts.add(new Account(
+                        resultSet.getString("AccountID"),
+                        resultSet.getString("Name"),
+                        resultSet.getBigDecimal("Balance"),
+                        resultSet.getBoolean("RoundUpEnabled")));
+                log.info("Added account: {}", resultSet.getString("AccountID"));
             }
+
+            return accounts;
         }
         catch (SQLException e) {
             throw new SQLException(e);
