@@ -58,7 +58,8 @@ public class Account {
     }
 
     public String toString() {
-        return "Account name: " + accountID + ", Balance: " + getBalance();
+        return String.format("id: %s\nname: %s\nbalance: %s\nroundUpEnabled: %s",
+                getAccountID(), getName(), getBalance(), isRoundUpEnabled());
     }
 
     public void UpdateBalance(BigDecimal b){
