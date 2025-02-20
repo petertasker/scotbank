@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.*;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.parsers.XmlParser;
@@ -178,6 +179,7 @@ public class DatabaseInitialiser {
             con.setRequestMethod("GET");
 
             XmlMapper mapper = new XmlMapper();
+            mapper.registerModule(new JodaModule());
             XmlParser pageResult = mapper.readValue(con.getInputStream(), XmlParser.class);
             return pageResult.getTransactions();
         }

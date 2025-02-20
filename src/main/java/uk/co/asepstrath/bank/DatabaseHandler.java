@@ -1,14 +1,12 @@
 package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +38,7 @@ public class DatabaseHandler {
     void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION);
-            preparedStatement.setString(1, transaction.getTimestamp());
+            preparedStatement.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             preparedStatement.setString(2, transaction.getAmount().toString());
             preparedStatement.setString(3, transaction.getFrom());
             preparedStatement.setString(4, transaction.getId());
@@ -146,13 +144,14 @@ public class DatabaseHandler {
 
             while (resultSet.next()) {
                 transactions.add(new Transaction(
-                        resultSet.getString("Timestamp"),
+                        new DateTime(resultSet.getTimestamp("Timestamp").getTime()),
                         resultSet.getInt("Amount"),
                         resultSet.getString("SenderID"),
                         resultSet.getString("TransactionID"),
                         resultSet.getString("ReceiverID"),
                         resultSet.getString("TransactionType")
                 ));
+
             }
             return transactions;
         }
