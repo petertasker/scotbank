@@ -112,6 +112,10 @@ class AccountTests {
     @Test
     void displayData(){
         Account a = new Account("4", "John Doe", BigDecimal.valueOf(5.45), false);
-        assertEquals("id: 4\nname: John Doe\nbalance: 5.45\nroundUpEnabled: false", a.toString());
+        String expected = "id: 4" + System.lineSeparator() +
+                          "name: John Doe" + System.lineSeparator() +
+                          "balance: 5.45" + System.lineSeparator() +
+                          "roundUpEnabled: false";
+        assertEquals(expected, a.toString());
     }
 }

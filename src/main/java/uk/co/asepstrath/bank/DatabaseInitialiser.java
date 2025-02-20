@@ -84,6 +84,8 @@ public class DatabaseInitialiser {
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         }
     }
 
