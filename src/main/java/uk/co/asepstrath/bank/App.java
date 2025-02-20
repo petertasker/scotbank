@@ -78,6 +78,7 @@ public class App extends Jooby {
         DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
         initialiser.initialise();
         initialiser.queryAccounts();
+        initialiser.queryBusinesses();
     }
 
     /*

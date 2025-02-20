@@ -41,6 +41,7 @@ public class DatabaseTests {
         databaseInitialiser.initialise();
 
         verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
+        verify(statement).executeUpdate(contains("CREATE TABLE Business"));
 //
 //        verify(preparedStatement, times(2)).executeUpdate();
 //        verify(preparedStatement).setString(1, "3232323");
