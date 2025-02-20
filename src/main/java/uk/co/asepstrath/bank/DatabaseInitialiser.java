@@ -6,8 +6,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -109,17 +108,31 @@ public class DatabaseInitialiser {
 
     List<Business> fetchBusinesses() {
         try{
-            URL url = new URL("https://api.asep-strath.co.uk/api/businesses?format=json");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json"); // Force JSON
+            URL url = new URL("https://api.asep-strath.co.uk/api/businesses");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
 
-            // since JSON sends a CSV file
-            try (InputStream input = conn.getInputStream();
-                 Scanner scanner = new Scanner(input)) {
-                String response = scanner.useDelimiter("\\A").next();
-                log.info("Received JSON: {}", response); // Log API response
-                return mapper.readValue(response, new TypeReference<List<Business>>() {});
+            List<Business> businesses = new ArrayList<>();
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            try(in){
+                String inputLine;
+                in.readLine();
+
+                while ((inputLine = in.readLine()) != null) {
+                    if (inputLine.trim().isEmpty())
+                        continue;
+
+                    String[] input_fields = inputLine.split(",");
+                    if (input_fields.length >= 4){
+                        String id = input_fields[0].trim();
+                        String name = input_fields[1].trim();
+                        String category = input_fields[2].trim();
+                        boolean Sanctioned = Boolean.parseBoolean(input_fields[3].trim());
+
+                        businesses.add(new Business(id, name, category, Sanctioned));
+                    }
+                }
+                return businesses;
             }
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -191,7 +204,8 @@ public class DatabaseInitialiser {
                         resultSet.getString("Business_Name"),
                         resultSet.getString("Category"),
                         resultSet.getBoolean("Sanctioned")));
-                log.info("Added business: {}", resultSet.getString("Business_Name"));
+                log.info("Added business: {}",
+                        resultSet.getString("BusinessID"));
             }
             return businesses;
 
