@@ -81,9 +81,6 @@ public class LoginController {
                     return new ModelAndView<>("login_user.hbs", model);
                 }
             }
-            catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
         }
         catch (SQLException e) {
             logger.error("Database error: " + e.getMessage(), e);
