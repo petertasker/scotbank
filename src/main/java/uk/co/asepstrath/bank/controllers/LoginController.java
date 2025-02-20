@@ -38,13 +38,14 @@ public class LoginController {
     @POST
     @Path("/process")
     public ModelAndView processLogin(Context ctx) {
-        try {
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM Accounts WHERE AccountID=?");
+             ResultSet rs = ps.executeQuery()) {
+
             String formID = ctx.form("accountid").value();
-            Connection con = dataSource.getConnection();
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM Accounts WHERE AccountID=?");
             ps.setString(1, formID);
             logger.info("Processing account login");
-            ResultSet rs = ps.executeQuery();
+
             Account account = null;
             while (rs.next()) {
                 logger.info("Found account ");
@@ -57,7 +58,7 @@ public class LoginController {
             }
 
             Map<String, Object> model = new HashMap<>();
-            rs.close();
+
             // Failed to log in
             if (account == null) {
                 model.put("message", "Account not found");
