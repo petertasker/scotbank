@@ -35,18 +35,18 @@ public class DatabaseTests {
         databaseInitialiser = spy(new DatabaseInitialiser(dataSource));
     }
 
-    // Ensure that accounts are being loaded into the database from the api
-//    @Test
-//    void testInitialiseAndInsertAccounts() throws SQLException {
-//        databaseInitialiser.initialise();
+    //Ensure that accounts are being loaded into the database from the api
+    @Test
+    void testInitialiseDatabase() throws SQLException {
+        databaseInitialiser.initialise();
+
+        verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
+        verify(statement).executeUpdate(contains("CREATE TABLE Business"));
+        verify(statement).executeUpdate(contains("CREATE TABLE Transactions"));
 //
-//        verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
-//        verify(statement).executeUpdate(contains("CREATE TABLE Business"));
-//        verify(statement).executeUpdate(contains("CREATE TABLE Transactions"));
-////
-////        verify(preparedStatement, times(2)).executeUpdate();
-////        verify(preparedStatement).setString(1, "3232323");
-////        verify(preparedStatement).setInt(2, 10);
-////        verify(preparedStatement).setBoolean(3, false);
-//    }
+//        verify(preparedStatement, times(2)).executeUpdate();
+//        verify(preparedStatement).setString(1, "3232323");
+//        verify(preparedStatement).setInt(2, 10);
+//        verify(preparedStatement).setBoolean(3, false);
+    }
 }
