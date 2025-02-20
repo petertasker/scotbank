@@ -30,6 +30,6 @@ public class AccountController {
        model.put("name", session.get("name"));
        model.put("accountid", session.get("accountid"));
        logger.info("Put name and accountid in model");
-       return new ModelAndView<>("account.hbs", model);
+       return new ModelAndView<>(UrlConstants.URL_PAGE_LOGIN, model);
    }
 }

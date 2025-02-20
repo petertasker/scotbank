@@ -20,6 +20,7 @@ import java.util.Map;
 @Path("/login")
 public class LoginController {
 
+
     private final DataSource dataSource;
     private final Logger logger;
     ContextManager contextManager = new ContextManager();
@@ -33,7 +34,7 @@ public class LoginController {
     @GET
     public ModelAndView<Map<String, Object>> displayLogin() {
         Map<String, Object> model = new HashMap<>();
-        return new ModelAndView<>("login_user.hbs", model);
+        return new ModelAndView<>(UrlConstants.URL_PAGE_LOGIN, model);
     }
 
     @POST
@@ -45,7 +46,7 @@ public class LoginController {
         String formID = ctx.form("accountid").valueOrNull();
         if (formID == null || formID.trim().isEmpty()) {
             model.put("error", "Account ID is required");
-            return new ModelAndView<>("login.hbs", model);
+            return new ModelAndView<>(UrlConstants.URL_PAGE_LOGIN, model);
         }
 
         try (Connection con = dataSource.getConnection();
@@ -72,19 +73,20 @@ public class LoginController {
                     model.put("accountid", contextManager.getAccountIdFromContext(ctx));
                     model.put("name", contextManager.getNameFromContext(ctx));
 
-                    return new ModelAndView<>("account.hbs", model);
+                    String URL_PAGE_ACCOUNT = "account.hbs";
+                    return new ModelAndView<>(UrlConstants.URL_PAGE_ACCOUNT, model);
                 }
                 else {
                     // Handle case where account not found
                     model.put("error", "Account not found");
-                    return new ModelAndView<>("login_user.hbs", model);
+                    return new ModelAndView<>(UrlConstants.URL_PAGE_LOGIN, model);
                 }
             }
         }
         catch (SQLException e) {
             logger.error("Database error: " + e.getMessage(), e);
             model.put("error", "Database error occurred");
-            return new ModelAndView<>("login_user.hbs", model);
+            return new ModelAndView<>(UrlConstants.URL_PAGE_LOGIN, model);
         }
     }
 
