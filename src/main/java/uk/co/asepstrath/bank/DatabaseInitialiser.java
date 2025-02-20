@@ -3,6 +3,7 @@ package uk.co.asepstrath.bank;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -153,19 +154,19 @@ public class DatabaseInitialiser {
         }
     }
 
-    List<Transaction> fetchTransactions() {
+    List<Transaction> fetchTransactions() throws XMLStreamException {
         try {
             URL url = new URL("https://api.asep-strath.co.uk/api/transactions");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            XmlMapper mapper = new XmlMapper();
-            mapper.registerModule(new JodaModule());
-            XmlParser pageResult = mapper.readValue(con.getInputStream(), XmlParser.class);
+            XmlMapper xmlMapper = new XmlMapper();
+            xmlMapper.registerModule(new JodaModule());
+            XmlParser pageResult = xmlMapper.readValue(con.getInputStream(), XmlParser.class);
             return pageResult.getTransactions();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new XMLStreamException("Failed to parse XML", e);
         }
     }
 

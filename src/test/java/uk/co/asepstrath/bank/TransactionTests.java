@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 
-public class TransactionTests {
+class TransactionTests {
 
     @Test
     void testGetters() {

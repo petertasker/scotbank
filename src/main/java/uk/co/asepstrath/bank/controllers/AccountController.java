@@ -17,9 +17,8 @@ import java.util.Map;
 public class AccountController {
 
     private final Logger logger;
-    private final ContextManager contextManager = new ContextManager();
 
-   public AccountController(DataSource dataSource, Logger logger) {
+   public AccountController(Logger logger) {
        this.logger = logger;
        logger.info("Account Controller initialised");
    }

@@ -1,14 +1,10 @@
 package uk.co.asepstrath.bank;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatabaseHandler {
 
@@ -23,12 +19,10 @@ public class DatabaseHandler {
             "INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType)\n" +
                                                          "VALUES (?, ?, ?, ?, ?, ?)";
 
-    private final DataSource dataSource;
     private final Logger log;
 
 
     public DatabaseHandler(DataSource dataSource) {
-        this.dataSource = dataSource;
         this.log = LoggerFactory.getLogger(DatabaseHandler.class);
     }
 
