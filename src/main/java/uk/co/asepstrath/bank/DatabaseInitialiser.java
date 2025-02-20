@@ -128,9 +128,7 @@ public class DatabaseInitialiser {
             List<Business> businesses = new ArrayList<>();
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             try(in) {
-                // Store the header line
                 String headerLine = in.readLine();
-                // You might want to validate the header format here
                 String[] headers = headerLine.split(",");
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -138,12 +136,12 @@ public class DatabaseInitialiser {
                         continue;
                     }
 
-                    String[] input_fields = inputLine.split(",");
-                    if (input_fields.length >= 4) {
-                        String id = input_fields[0].trim();
-                        String name = input_fields[1].trim();
-                        String category = input_fields[2].trim();
-                        boolean sanctioned = Boolean.parseBoolean(input_fields[3].trim());
+                    String[] inputFields = inputLine.split(",");
+                    if (inputFields.length >= 4) {
+                        String id = inputFields[0].trim();
+                        String name = inputFields[1].trim();
+                        String category = inputFields[2].trim();
+                        boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
 
                         businesses.add(new Business(id, name, category, sanctioned));
                     }

@@ -88,7 +88,8 @@ public class App extends Jooby {
     This function will be called when the application shuts down
      */
     public void onStop() {
-        System.out.println("Shutting Down...");
+        Logger log = getLog();
+        log.info("Shutting Down...");
     }
 
 }
