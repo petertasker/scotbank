@@ -8,12 +8,13 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 
-//import uk.co.asepstrath.bank.controllers.AccountController;
-//import uk.co.asepstrath.bank.controllers.DashboardController;
-//import uk.co.asepstrath.bank.controllers.CustomerController;
-//import uk.co.asepstrath.bank.controllers.AccountController_;
-//import uk.co.asepstrath.bank.controllers.DashboardController_;
-//import uk.co.asepstrath.bank.controllers.CustomerController_;
+import uk.co.asepstrath.bank.controllers.LoginController;
+import uk.co.asepstrath.bank.controllers.LoginController_;
+import uk.co.asepstrath.bank.controllers.AccountController;
+import uk.co.asepstrath.bank.controllers.AccountController_;
+
+
+
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -21,6 +22,20 @@ import java.sql.*;
 public class App extends Jooby {
 
     {
+        // Account page as landing page
+        get("/", ctx -> ctx.sendRedirect( "/account"));
+
+        // Ensure user is logged in
+        before(ctx -> {
+            Session session = ctx.sessionOrNull();
+            if (session == null || session.get("name") == null || session.get("accountid") == null) {
+                String path = ctx.getRequestPath();
+                if (!path.equals("/login") && !path.equals("/login/process")) {
+                    ctx.setResponseCode(401).sendRedirect("/login");
+                }
+            }
+        });
+
         /*
         This section is used for setting up the Jooby Framework modules
          */
@@ -41,9 +56,10 @@ public class App extends Jooby {
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
-//        mvc(new CustomerController_(ds,log));
-//        mvc(new DashboardController_(ds,log));
-//        mvc(new AccountController_(ds,log));
+        mvc(new AccountController_(ds,log));
+        mvc(new LoginController_(ds,log));
+
+
         /*
         Finally we register our application lifecycle methods
          */
