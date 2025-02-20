@@ -9,11 +9,11 @@
 <h1>Login</h1>
 <form action="/login/process" method="post">
     <label for="accountid">Enter Account ID</label>
-    <input type="text" id="accountid" name="accountid" required>
+    <input type="text" id="accountid" name="accountid">
     <input type="submit" value="Login">
 </form>
-{{#if message}}
-    <p style="color: red;">{{message}}</p>
+{{#if error}}
+    <p style="color: red;">{{error}}</p>
 {{/if}}
 </body>
 </html>

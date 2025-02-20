@@ -20,4 +20,20 @@ public class ContextManager {
         session.put("name", account.getName());
         log.info("Account name to context: {}", ctx);
     }
+
+    public String getAccountIdFromContext(Context ctx) throws JsonProcessingException {
+        log.info("Getting account id from context: {}", ctx);
+        Session session = ctx.session();
+        String accountID = String.valueOf(session.get("accountid"));
+        log.info("Found id from context: {}", ctx);
+        return accountID;
+    }
+
+    public String getNameFromContext(Context ctx) throws JsonProcessingException {
+        log.info("Getting name from context: {}", ctx);
+        Session session = ctx.session();
+        String name = String.valueOf(session.get("name"));
+        log.info("Found name from context: {}", ctx);
+        return name;
+    }
 }

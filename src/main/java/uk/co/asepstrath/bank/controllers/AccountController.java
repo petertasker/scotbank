@@ -25,12 +25,12 @@ public class AccountController {
    }
 
    @GET
-   public ModelAndView viewAccount(Context ctx) {
+   public ModelAndView<Map<String, Object>> viewAccount(Context ctx) {
        Map<String, Object> model = new HashMap<>();
        Session session = ctx.session();
        model.put("name", session.get("name"));
        model.put("accountid", session.get("accountid"));
        logger.info("Put name and accountid in model");
-       return new ModelAndView("account.hbs", model);
+       return new ModelAndView<>("account.hbs", model);
    }
 }

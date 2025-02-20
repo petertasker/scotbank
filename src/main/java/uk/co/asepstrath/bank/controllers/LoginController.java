@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
@@ -31,55 +32,64 @@ public class LoginController {
     }
 
     @GET
-    public ModelAndView displayLogin() {
+    public ModelAndView<Map<String, Object>> displayLogin() {
         Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("login_user.hbs", model);
+        return new ModelAndView<>("login_user.hbs", model);
     }
 
     @POST
     @Path("/process")
-    public ModelAndView processLogin(Context ctx) {
+    public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
+        Map<String, Object> model = new HashMap<>();
+
+        // Check if form value exists and is not empty
+        String formID = ctx.form("accountid").valueOrNull();
+        if (formID == null || formID.trim().isEmpty()) {
+            model.put("error", "Account ID is required");
+            return new ModelAndView<>("login.hbs", model);
+        }
+
         try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM Accounts WHERE AccountID=?");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement("SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
 
-            String formID = ctx.form("accountid").value();
             ps.setString(1, formID);
-            logger.info("Processing account login");
 
-            Account account = null;
-            while (rs.next()) {
-                logger.info("Found account ");
-                account = new Account(
-                        rs.getString("AccountID"),
-                        rs.getString("Name"),
-                        rs.getBigDecimal("Balance"),
-                        rs.getBoolean("RoundUpEnabled")
-                );
+            try (ResultSet rs = ps.executeQuery()) {
+                logger.info("Processing account login");
+
+                Account account = null;
+                if (rs.next()) {  // Changed while to if since we expect one result
+                    logger.info("Found account");
+                    account = new Account(
+                            rs.getString("AccountID"),
+                            rs.getString("Name"),
+                            rs.getBigDecimal("Balance"),
+                            rs.getBoolean("RoundUpEnabled")
+                    );
+                    // Add to model
+                    contextManager.addAccountDetailsToContext(account, ctx);
+
+                    // Get details from context manager (pedantic but is good form)
+                    model.put("accountid", contextManager.getAccountIdFromContext(ctx));
+                    model.put("name", contextManager.getNameFromContext(ctx));
+
+                    return new ModelAndView<>("account.hbs", model);
+                }
+                else {
+                    // Handle case where account not found
+                    model.put("error", "Account not found");
+                    return new ModelAndView<>("login_user.hbs", model);
+                }
             }
-
-            Map<String, Object> model = new HashMap<>();
-
-            // Failed to log in
-            if (account == null) {
-                model.put("message", "Account not found");
-                return new ModelAndView("login_user.hbs", model);
+            catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
-
-            contextManager.addAccountDetailsToContext(account, ctx);
-            ctx.sendRedirect("/account");
         }
         catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage());
+            logger.error("Database error: " + e.getMessage(), e);
+            model.put("error", "Database error occurred");
+            return new ModelAndView<>("login_user.hbs", model);
         }
-        catch (IllegalArgumentException e) {
-            logger.error("Invalid input: " + e.getMessage(), e);
-            throw e;
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Unexpecter error: " + e.getMessage());
-        }
-        return null;
     }
 
 }
