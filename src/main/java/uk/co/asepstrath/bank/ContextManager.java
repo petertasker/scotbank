@@ -1,13 +1,10 @@
 package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jooby.Context;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 
 public class ContextManager {

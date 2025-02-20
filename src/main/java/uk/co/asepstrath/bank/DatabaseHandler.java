@@ -29,7 +29,6 @@ public class DatabaseHandler {
 
     public DatabaseHandler(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.mapper = new ObjectMapper();
         this.log = LoggerFactory.getLogger(DatabaseHandler.class);
     }
 
