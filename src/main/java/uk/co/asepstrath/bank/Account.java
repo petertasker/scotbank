@@ -61,8 +61,8 @@ public class Account {
                 getAccountID(), getName(), getBalance(), isRoundUpEnabled());
     }
 
-    public void UpdateBalance(BigDecimal b){
-        this.balance = b;
+    public void updateBalance(BigDecimal balance){
+        this.balance = balance;
     }
 
 }

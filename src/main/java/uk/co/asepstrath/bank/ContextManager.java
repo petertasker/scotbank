@@ -11,7 +11,7 @@ public class ContextManager {
     private final Logger log = LoggerFactory.getLogger(ContextManager.class);
 
     // Do not put mutable variables in here, query them from the database
-    public void addAccountDetailsToContext(Account account, Context ctx) throws JsonProcessingException {
+    public void addAccountDetailsToContext(Account account, Context ctx) {
         log.info("Adding account to context: {}", ctx);
         // Put the account instance into the session
         Session session = ctx.session();
@@ -21,7 +21,7 @@ public class ContextManager {
         log.info("Account name to context: {}", ctx);
     }
 
-    public String getAccountIdFromContext(Context ctx) throws JsonProcessingException {
+    public String getAccountIdFromContext(Context ctx) {
         log.info("Getting account id from context: {}", ctx);
         Session session = ctx.session();
         String accountID = String.valueOf(session.get("accountid"));
@@ -29,7 +29,7 @@ public class ContextManager {
         return accountID;
     }
 
-    public String getNameFromContext(Context ctx) throws JsonProcessingException {
+    public String getNameFromContext(Context ctx) {
         log.info("Getting name from context: {}", ctx);
         Session session = ctx.session();
         String name = String.valueOf(session.get("name"));
