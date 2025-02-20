@@ -79,6 +79,7 @@ public class App extends Jooby {
         initialiser.initialise();
         initialiser.queryAccounts();
         initialiser.queryBusinesses();
+        initialiser.queryTransactions();
     }
 
     /*
