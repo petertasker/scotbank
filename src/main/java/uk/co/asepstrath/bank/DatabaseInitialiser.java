@@ -18,7 +18,7 @@ public class DatabaseInitialiser {
     private static final String SQL_CREATE_ACCOUNT = """
         CREATE TABLE Accounts (
             AccountID VARCHAR(255) NOT NULL,
-            Balance DECIMAL(10,2) NOT NULL,
+            Balance DECIMAL(12,2) NOT NULL,
             Name VARCHAR(255) NOT NULL,
             RoundUpEnabled BIT NOT NULL,
             PRIMARY KEY (AccountID)
@@ -38,7 +38,7 @@ public class DatabaseInitialiser {
     private static final String SQL_CREATE_TRANSACTION = """
         CREATE TABLE Transactions (
             Timestamp DATETIME NOT NULL,
-            Amount DECIMAL(10,2) NOT NULL,
+            Amount DECIMAL(12,2) NOT NULL,
             SenderID VARCHAR(255) NOT NULL,
             TransactionID VARCHAR(255) NOT NULL,
             ReceiverID VARCHAR(255) NOT NULL,
