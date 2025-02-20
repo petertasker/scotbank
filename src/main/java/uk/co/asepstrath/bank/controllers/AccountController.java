@@ -6,9 +6,7 @@ import io.jooby.Session;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.ContextManager;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 

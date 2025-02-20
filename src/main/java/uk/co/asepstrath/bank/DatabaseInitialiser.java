@@ -61,7 +61,7 @@ public class DatabaseInitialiser {
         this.mapper = new ObjectMapper();
 
         // Handle database operations
-        dbHandler = new DatabaseHandler(dataSource);
+        dbHandler = new DatabaseHandler();
     }
 
     public void initialise() throws SQLException {
