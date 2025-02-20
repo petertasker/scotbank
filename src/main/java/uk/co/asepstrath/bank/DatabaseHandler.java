@@ -36,8 +36,7 @@ public class DatabaseHandler {
 
 
     void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION)) {
             preparedStatement.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             preparedStatement.setString(2, transaction.getAmount().toString());
             preparedStatement.setString(3, transaction.getFrom());
@@ -54,8 +53,7 @@ public class DatabaseHandler {
 
     // Insert account into database
     void insertAccount(Connection connection, Account account) throws SQLException {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ACCOUNT);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             preparedStatement.setString(1, account.getAccountID());
             preparedStatement.setBigDecimal(2, account.getBalance());
             preparedStatement.setString(3, account.getName());
@@ -70,52 +68,49 @@ public class DatabaseHandler {
 
     // Insert business into database
     void insertBusiness(Connection connection, Business business) throws SQLException {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS)) {
             preparedStatement.setString(1, business.getID());
             preparedStatement.setString(2, business.getName());
             preparedStatement.setString(3, business.getCategory());
-            preparedStatement.setBoolean(4,business.isSanctioned());
+            preparedStatement.setBoolean(4, business.isSanctioned());
             preparedStatement.executeUpdate();
             log.info("Inserted Business: {}", business.getID());
         }
-        catch (SQLException e) {
-            throw new SQLException(e);
-        }
     }
+
 
     // Query all accounts
     public List<Account> queryAccounts() throws SQLException {
-        try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Accounts");
-            ResultSet resultSet = preparedStatement.executeQuery();
+        List<Account> accounts = new ArrayList<>();
+        String query = "SELECT * FROM Accounts";
 
-            List<Account> accounts = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 accounts.add(new Account(
-                    resultSet.getString("AccountID"),
-                    resultSet.getString("Name"),
-                    resultSet.getBigDecimal("Balance"),
-                    resultSet.getBoolean("RoundUpEnabled")));
+                        resultSet.getString("AccountID"),
+                        resultSet.getString("Name"),
+                        resultSet.getBigDecimal("Balance"),
+                        resultSet.getBoolean("RoundUpEnabled")
+                ));
             }
+        }
 
-            return accounts;
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
-        }
+        return accounts;
     }
+
 
     // Query all businesses
     public List<Business> queryBusinesses() throws SQLException {
-        try{
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Business");
-            ResultSet resultSet = preparedStatement.executeQuery();
+        List<Business> businesses = new ArrayList<>();
 
-            List<Business> businesses = new ArrayList<>();
+        String query = "SELECT * FROM Business";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 businesses.add(new Business(
@@ -124,23 +119,20 @@ public class DatabaseHandler {
                         resultSet.getString("Category"),
                         resultSet.getBoolean("Sanctioned")));
             }
-            return businesses;
+        }
 
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
-        }
+        return businesses;
     }
 
 
     // Query all transactions
     public List<Transaction> queryTransactions() throws SQLException {
-        try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Transactions");
-            ResultSet resultSet = preparedStatement.executeQuery();
+        List<Transaction> transactions = new ArrayList<>();
+        String query = "SELECT * FROM Transactions";
 
-            List<Transaction> transactions = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 transactions.add(new Transaction(
@@ -151,13 +143,11 @@ public class DatabaseHandler {
                         resultSet.getString("ReceiverID"),
                         resultSet.getString("TransactionType")
                 ));
-
             }
-            return transactions;
         }
-        catch (SQLException e) {
-            throw new SQLException(e);
-        }
+
+        return transactions;
     }
+
 
 }
