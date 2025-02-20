@@ -21,7 +21,7 @@ public class LoginController {
 
     private final DataSource dataSource;
     private final Logger logger;
-    private final ContextManager contextManager = new ContextManager();
+    ContextManager contextManager = new ContextManager();
 
     public LoginController(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
@@ -65,7 +65,6 @@ public class LoginController {
                 return new ModelAndView("login_user.hbs", model);
             }
 
-            ContextManager contextManager = new ContextManager();
             contextManager.addAccountDetailsToContext(account, ctx);
             ctx.sendRedirect("/account");
         }

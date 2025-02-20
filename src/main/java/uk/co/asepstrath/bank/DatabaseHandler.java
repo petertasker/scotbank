@@ -24,7 +24,6 @@ public class DatabaseHandler {
         VALUES (?, ?, ?, ?, ?, ?)""";
 
     private final DataSource dataSource;
-    private final ObjectMapper mapper;
     private final Logger log;
 
 
