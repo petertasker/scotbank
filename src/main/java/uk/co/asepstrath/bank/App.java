@@ -1,15 +1,11 @@
 package uk.co.asepstrath.bank;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.jooby.*;
 import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 
 //import uk.co.asepstrath.bank.controllers.AccountController;
@@ -20,15 +16,9 @@ import org.slf4j.Logger;
 //import uk.co.asepstrath.bank.controllers.CustomerController_;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class App extends Jooby {
-
 
     {
         /*
@@ -39,6 +29,7 @@ public class App extends Jooby {
         install(new HandlebarsModule());
         install(new HikariModule("mem"));
         install(new JacksonModule()); // Handle JSON requests
+
         /*
         This will host any files in src/main/resources/assets on <host>/assets
          */
@@ -77,7 +68,6 @@ public class App extends Jooby {
         // Create Database and tables with initial data
         DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
         initialiser.initialise();
-
     }
 
     /*

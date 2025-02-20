@@ -1,14 +1,12 @@
 package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,26 +17,28 @@ public class DatabaseHandler {
             INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)""";
 
     private static final String SQL_INSERT_BUSINESS = """
-            INSERT INTO Business (BusinessID, Business_Name, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
+            INSERT INTO Businesses (BusinessID, BusinessName, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
 
-    private static String SQL_INSERT_TRANSACTION = """
-        INSERT INTO Transactions (Timestamp, Amount, Sender, Id, Receiver, TransactionType) 
+    private static final String SQL_INSERT_TRANSACTION = """
+        INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType)
         VALUES (?, ?, ?, ?, ?, ?)""";
 
-
     private final DataSource dataSource;
-    Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
     private final ObjectMapper mapper;
+    private final Logger log;
+
 
     public DatabaseHandler(DataSource dataSource) {
         this.dataSource = dataSource;
         this.mapper = new ObjectMapper();
+        this.log = LoggerFactory.getLogger(DatabaseHandler.class);
     }
+
 
     void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION);
-            preparedStatement.setString(1, transaction.getTimestamp());
+            preparedStatement.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             preparedStatement.setString(2, transaction.getAmount().toString());
             preparedStatement.setString(3, transaction.getFrom());
             preparedStatement.setString(4, transaction.getId());
@@ -68,6 +68,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Insert business into database
     void insertBusiness(Connection connection, Business business) throws SQLException {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS);
@@ -83,6 +84,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Query all accounts
     public List<Account> queryAccounts() throws SQLException {
         try {
             Connection connection = dataSource.getConnection();
@@ -106,6 +108,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Query all businesses
     public List<Business> queryBusinesses() throws SQLException {
         try{
             Connection connection = dataSource.getConnection();
@@ -117,18 +120,20 @@ public class DatabaseHandler {
             while (resultSet.next()) {
                 businesses.add(new Business(
                         resultSet.getString("BusinessID"),
-                        resultSet.getString("Business_Name"),
+                        resultSet.getString("BusinessName"),
                         resultSet.getString("Category"),
                         resultSet.getBoolean("Sanctioned")));
             }
             return businesses;
 
-        }catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
 
+    // Query all transactions
     public List<Transaction> queryTransactions() throws SQLException {
         try {
             Connection connection = dataSource.getConnection();
@@ -139,13 +144,14 @@ public class DatabaseHandler {
 
             while (resultSet.next()) {
                 transactions.add(new Transaction(
-                        resultSet.getString("Timestamp"),
+                        new DateTime(resultSet.getTimestamp("Timestamp").getTime()),
                         resultSet.getInt("Amount"),
-                        resultSet.getString("Sender"),
-                        resultSet.getString("Id"),
-                        resultSet.getString("Receiver"),
+                        resultSet.getString("SenderID"),
+                        resultSet.getString("TransactionID"),
+                        resultSet.getString("ReceiverID"),
                         resultSet.getString("TransactionType")
                 ));
+
             }
             return transactions;
         }
@@ -153,4 +159,5 @@ public class DatabaseHandler {
             throw new SQLException(e);
         }
     }
+
 }

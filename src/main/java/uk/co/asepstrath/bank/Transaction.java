@@ -1,12 +1,17 @@
 package uk.co.asepstrath.bank;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
+
+
 public class Transaction {
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", shape = JsonFormat.Shape.STRING)
     @JacksonXmlProperty(localName = "timestamp")
-    private String timestamp;
+    private DateTime timestamp;
     @JacksonXmlProperty(localName = "amount")
     private BigDecimal amount;
     @JacksonXmlProperty(localName = "from")
@@ -22,7 +27,7 @@ public class Transaction {
         // For jackson mapper
     }
 
-    public Transaction(String timestamp, int amount, String from, String id, String to, String type) {
+    public Transaction(DateTime timestamp, int amount, String from, String id, String to, String type) {
         this.timestamp= timestamp;
         this.amount = BigDecimal.valueOf(amount);
         this.from = from;
@@ -31,7 +36,7 @@ public class Transaction {
         this.type = type;
     }
 
-    public String getTimestamp() {
+    public DateTime getTimestamp() {
         return timestamp;
     }
 

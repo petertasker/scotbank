@@ -1,33 +1,17 @@
 package uk.co.asepstrath.bank;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.print.Doc;
 import javax.sql.DataSource;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
-import javax.xml.parsers.*;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import uk.co.asepstrath.bank.parsers.XmlParser;
 
 public class DatabaseInitialiser {
@@ -35,7 +19,7 @@ public class DatabaseInitialiser {
     private static final String SQL_CREATE_ACCOUNT = """
         CREATE TABLE Accounts (
             AccountID VARCHAR(255) NOT NULL,
-            Balance DECIMAL(10,2) NOT NULL,
+            Balance DECIMAL(12,2) NOT NULL,
             Name VARCHAR(255) NOT NULL,
             RoundUpEnabled BIT NOT NULL,
             PRIMARY KEY (AccountID)
@@ -43,9 +27,9 @@ public class DatabaseInitialiser {
     """;
 
     private static final String SQL_CREATE_BUSINESS = """
-        CREATE TABLE Business (
+        CREATE TABLE Businesses (
             BusinessID VARCHAR(255) NOT NULL,
-            Business_Name VARCHAR(255) NOT NULL,
+            BusinessName VARCHAR(255) NOT NULL,
             Category VARCHAR(255) NOT NULL,
             Sanctioned BIT NOT NULL,
             PRIMARY KEY (BusinessID)
@@ -55,13 +39,13 @@ public class DatabaseInitialiser {
     private static final String SQL_CREATE_TRANSACTION = """
         CREATE TABLE Transactions (
             Timestamp DATETIME NOT NULL,
-            Amount DECIMAL(10,2) NOT NULL,
-            Sender VARCHAR(255) NOT NULL,
-            Id VARCHAR(255) NOT NULL,
-            Receiver VARCHAR(255) NOT NULL,
+            Amount DECIMAL(12,2) NOT NULL,
+            SenderID VARCHAR(255) NOT NULL,
+            TransactionID VARCHAR(255) NOT NULL,
+            ReceiverID VARCHAR(255) NOT NULL,
             TransactionType VARCHAR(255) NOT NULL,
-            PRIMARY KEY (Id),
-            FOREIGN KEY (Receiver) REFERENCES Business(BusinessID)
+            PRIMARY KEY (TransactionID),
+            FOREIGN KEY (ReceiverID) REFERENCES Businesses(BusinessID)
         )
     """;
 
@@ -195,6 +179,7 @@ public class DatabaseInitialiser {
             con.setRequestMethod("GET");
 
             XmlMapper mapper = new XmlMapper();
+            mapper.registerModule(new JodaModule());
             XmlParser pageResult = mapper.readValue(con.getInputStream(), XmlParser.class);
             return pageResult.getTransactions();
         }
