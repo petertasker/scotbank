@@ -26,7 +26,7 @@ public class Business {
         return category;
     }
 
-    public boolean getSanctioned(){
+    public boolean isSanctioned(){
         return sanctioned;
     }
 }

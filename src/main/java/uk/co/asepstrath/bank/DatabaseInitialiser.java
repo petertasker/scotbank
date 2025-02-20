@@ -146,7 +146,7 @@ public class DatabaseInitialiser {
             preparedStatement.setString(1, business.getID());
             preparedStatement.setString(2, business.getName());
             preparedStatement.setString(3, business.getCategory());
-            preparedStatement.setBoolean(4,business.getSanctioned());
+            preparedStatement.setBoolean(4,business.isSanctioned());
             preparedStatement.executeUpdate();
         }catch (SQLException e) {
             throw new SQLException(e);
