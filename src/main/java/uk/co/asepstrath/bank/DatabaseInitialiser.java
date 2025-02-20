@@ -64,8 +64,7 @@ public class DatabaseInitialiser {
     }
 
     public void initialise() throws SQLException {
-        try {
-            Connection connection = dataSource.getConnection();
+        try (Connection connection = dataSource.getConnection()) {
             createAccountTable(connection);
             createBusinessTable(connection);
             createTransactionTable(connection);
@@ -84,46 +83,25 @@ public class DatabaseInitialiser {
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
-
-
-
-            connection.close();
         }
-            catch (SQLException e) {
-                throw new SQLException(e);
-            }
     }
 
-    private void createAccountTable(Connection connection) throws SQLException {
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(SQL_CREATE_ACCOUNT);
 
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
+    private void createAccountTable(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(SQL_CREATE_ACCOUNT);
         }
     }
 
     private void createBusinessTable(Connection connection) throws SQLException {
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(SQL_CREATE_BUSINESS);
-
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
         }
     }
 
     private void createTransactionTable(Connection connection) throws SQLException {
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(SQL_CREATE_TRANSACTION);
-
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
         }
     }
 
@@ -139,35 +117,38 @@ public class DatabaseInitialiser {
     }
 
     List<Business> fetchBusinesses() {
-        try{
+        try {
             URL url = new URL("https://api.asep-strath.co.uk/api/businesses");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
             List<Business> businesses = new ArrayList<>();
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            try(in){
+            try(in) {
+                // Store the header line
+                String headerLine = in.readLine();
+                // You might want to validate the header format here
+                String[] headers = headerLine.split(",");
                 String inputLine;
-                in.readLine();
-
                 while ((inputLine = in.readLine()) != null) {
-                    if (inputLine.trim().isEmpty())
+                    if (inputLine.trim().isEmpty()) {
                         continue;
+                    }
 
                     String[] input_fields = inputLine.split(",");
-                    if (input_fields.length >= 4){
+                    if (input_fields.length >= 4) {
                         String id = input_fields[0].trim();
                         String name = input_fields[1].trim();
                         String category = input_fields[2].trim();
-                        boolean Sanctioned = Boolean.parseBoolean(input_fields[3].trim());
+                        boolean sanctioned = Boolean.parseBoolean(input_fields[3].trim());
 
-                        businesses.add(new Business(id, name, category, Sanctioned));
+                        businesses.add(new Business(id, name, category, sanctioned));
                     }
                 }
                 return businesses;
             }
         }
-        catch (IOException e){
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
