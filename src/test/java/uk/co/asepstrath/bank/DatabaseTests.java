@@ -21,7 +21,6 @@ public class DatabaseTests {
     private DatabaseInitialiser databaseInitialiser;
     private Statement statement;
     private PreparedStatement preparedStatement;
-    private ResultSet resultSet;
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -29,7 +28,7 @@ public class DatabaseTests {
         connection = mock(Connection.class);
         statement = mock(Statement.class);
         preparedStatement = mock(PreparedStatement.class);
-        resultSet = mock(ResultSet.class);
+        ResultSet resultSet = mock(ResultSet.class);
 
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.createStatement()).thenReturn(statement);
@@ -46,11 +45,6 @@ public class DatabaseTests {
         verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
         verify(statement).executeUpdate(contains("CREATE TABLE Business"));
         verify(statement).executeUpdate(contains("CREATE TABLE Transactions"));
-//
-//        verify(preparedStatement, times(2)).executeUpdate();
-//        verify(preparedStatement).setString(1, "3232323");
-//        verify(preparedStatement).setInt(2, 10);
-//        verify(preparedStatement).setBoolean(3, false);
     }
 
     @Test
