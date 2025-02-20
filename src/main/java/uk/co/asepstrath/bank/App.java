@@ -54,7 +54,7 @@ public class App extends Jooby {
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
-        mvc(new AccountController_(ds,log));
+        mvc(new AccountController_(log));
         mvc(new LoginController_(ds,log));
 
 
@@ -88,7 +88,8 @@ public class App extends Jooby {
     This function will be called when the application shuts down
      */
     public void onStop() {
-        System.out.println("Shutting Down...");
+        Logger log = getLog();
+        log.info("Shutting Down...");
     }
 
 }

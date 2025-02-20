@@ -57,7 +57,7 @@ public class Account {
     }
 
     public String toString() {
-        return String.format("id: %s\nname: %s\nbalance: %s\nroundUpEnabled: %s",
+        return String.format("id: %s%nname: %s%nbalance: %s%nroundUpEnabled: %s",
                 getAccountID(), getName(), getBalance(), isRoundUpEnabled());
     }
 

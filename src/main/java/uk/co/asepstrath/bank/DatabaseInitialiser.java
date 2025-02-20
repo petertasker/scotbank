@@ -3,6 +3,7 @@ package uk.co.asepstrath.bank;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -83,6 +84,8 @@ public class DatabaseInitialiser {
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -125,9 +128,7 @@ public class DatabaseInitialiser {
             List<Business> businesses = new ArrayList<>();
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             try(in) {
-                // Store the header line
                 String headerLine = in.readLine();
-                // You might want to validate the header format here
                 String[] headers = headerLine.split(",");
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -135,12 +136,12 @@ public class DatabaseInitialiser {
                         continue;
                     }
 
-                    String[] input_fields = inputLine.split(",");
-                    if (input_fields.length >= 4) {
-                        String id = input_fields[0].trim();
-                        String name = input_fields[1].trim();
-                        String category = input_fields[2].trim();
-                        boolean sanctioned = Boolean.parseBoolean(input_fields[3].trim());
+                    String[] inputFields = inputLine.split(",");
+                    if (inputFields.length >= 4) {
+                        String id = inputFields[0].trim();
+                        String name = inputFields[1].trim();
+                        String category = inputFields[2].trim();
+                        boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
 
                         businesses.add(new Business(id, name, category, sanctioned));
                     }
@@ -153,19 +154,19 @@ public class DatabaseInitialiser {
         }
     }
 
-    List<Transaction> fetchTransactions() {
+    List<Transaction> fetchTransactions() throws XMLStreamException {
         try {
             URL url = new URL("https://api.asep-strath.co.uk/api/transactions");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            XmlMapper mapper = new XmlMapper();
-            mapper.registerModule(new JodaModule());
-            XmlParser pageResult = mapper.readValue(con.getInputStream(), XmlParser.class);
+            XmlMapper xmlMapper = new XmlMapper();
+            xmlMapper.registerModule(new JodaModule());
+            XmlParser pageResult = xmlMapper.readValue(con.getInputStream(), XmlParser.class);
             return pageResult.getTransactions();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new XMLStreamException("Failed to parse XML", e);
         }
     }
 

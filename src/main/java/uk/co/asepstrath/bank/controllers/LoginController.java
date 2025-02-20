@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
