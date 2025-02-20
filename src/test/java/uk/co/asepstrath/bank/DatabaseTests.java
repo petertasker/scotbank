@@ -1,4 +1,7 @@
 package uk.co.asepstrath.bank;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,4 +52,31 @@ public class DatabaseTests {
 //        verify(preparedStatement).setInt(2, 10);
 //        verify(preparedStatement).setBoolean(3, false);
     }
+
+    @Test
+    void InsertIntoTables() throws SQLException {
+        DatabaseHandler dbHandler = new DatabaseHandler(dataSource);
+        Connection mockConnection = mock(Connection.class);
+
+        // Ensure connection and preparedStatement are mocked
+        when(mockConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(1); // Simulate successful insert
+
+        // Mock Account, Business, and Transaction objects
+        Account account = new Account("A123", "TestUser",new BigDecimal("100.50"),true);
+        Business business = new Business("B123", "Test Business", "Retail", false);
+
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTime timestamp = formatter.parseDateTime("2024-02-20T12:00:00");
+        Transaction transaction = new Transaction(timestamp, 50, "A123", "T123", "B123", "Purchase");
+
+        // insert into tables
+        dbHandler.insertAccount(mockConnection, account);
+        dbHandler.insertBusiness(mockConnection, business);
+        dbHandler.insertTransaction(mockConnection, transaction);
+
+        // Verify executeUpdate() was called for each statement
+        verify(preparedStatement, times(3)).executeUpdate();
+    }
+
 }
