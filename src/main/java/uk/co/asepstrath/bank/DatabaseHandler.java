@@ -1,0 +1,156 @@
+package uk.co.asepstrath.bank;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHandler {
+
+
+    private static final String SQL_INSERT_ACCOUNT = """
+            INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)""";
+
+    private static final String SQL_INSERT_BUSINESS = """
+            INSERT INTO Business (BusinessID, Business_Name, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
+
+    private static String SQL_INSERT_TRANSACTION = """
+        INSERT INTO Transactions (Timestamp, Amount, Sender, Id, Receiver, TransactionType) 
+        VALUES (?, ?, ?, ?, ?, ?)""";
+
+
+    private final DataSource dataSource;
+    Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
+    private final ObjectMapper mapper;
+
+    public DatabaseHandler(DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.mapper = new ObjectMapper();
+    }
+
+    void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION);
+            preparedStatement.setString(1, transaction.getTimestamp());
+            preparedStatement.setString(2, transaction.getAmount().toString());
+            preparedStatement.setString(3, transaction.getFrom());
+            preparedStatement.setString(4, transaction.getId());
+            preparedStatement.setString(5, transaction.getTo());
+            preparedStatement.setString(6, transaction.getType());
+            preparedStatement.executeUpdate();
+            log.info("Inserted Transaction {}", transaction.getId());
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    // Insert account into database
+    void insertAccount(Connection connection, Account account) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ACCOUNT);
+            preparedStatement.setString(1, account.getAccountID());
+            preparedStatement.setBigDecimal(2, account.getBalance());
+            preparedStatement.setString(3, account.getName());
+            preparedStatement.setBoolean(4, account.isRoundUpEnabled());
+            preparedStatement.executeUpdate();
+            log.info("Inserted Account: {}", account.getAccountID());
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    void insertBusiness(Connection connection, Business business) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS);
+            preparedStatement.setString(1, business.getID());
+            preparedStatement.setString(2, business.getName());
+            preparedStatement.setString(3, business.getCategory());
+            preparedStatement.setBoolean(4,business.isSanctioned());
+            preparedStatement.executeUpdate();
+            log.info("Inserted Business: {}", business.getID());
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    public List<Account> queryAccounts() throws SQLException {
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Accounts");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Account> accounts = new ArrayList<>();
+
+            while (resultSet.next()) {
+                accounts.add(new Account(
+                    resultSet.getString("AccountID"),
+                    resultSet.getString("Name"),
+                    resultSet.getBigDecimal("Balance"),
+                    resultSet.getBoolean("RoundUpEnabled")));
+            }
+
+            return accounts;
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    public List<Business> queryBusinesses() throws SQLException {
+        try{
+            Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Business");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Business> businesses = new ArrayList<>();
+
+            while (resultSet.next()) {
+                businesses.add(new Business(
+                        resultSet.getString("BusinessID"),
+                        resultSet.getString("Business_Name"),
+                        resultSet.getString("Category"),
+                        resultSet.getBoolean("Sanctioned")));
+            }
+            return businesses;
+
+        }catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+
+    public List<Transaction> queryTransactions() throws SQLException {
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Transactions");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Transaction> transactions = new ArrayList<>();
+
+            while (resultSet.next()) {
+                transactions.add(new Transaction(
+                        resultSet.getString("Timestamp"),
+                        resultSet.getInt("Amount"),
+                        resultSet.getString("Sender"),
+                        resultSet.getString("Id"),
+                        resultSet.getString("Receiver"),
+                        resultSet.getString("TransactionType")
+                ));
+            }
+            return transactions;
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+}

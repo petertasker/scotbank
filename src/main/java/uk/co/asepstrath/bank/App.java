@@ -74,12 +74,10 @@ public class App extends Jooby {
         //Fetch DB Source
         DataSource dataSource = require(DataSource.class);
 
-        // Create tables and populate with data via API
+        // Create Database and tables with initial data
         DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
         initialiser.initialise();
-        initialiser.queryAccounts();
-        initialiser.queryBusinesses();
-        initialiser.queryTransactions();
+
     }
 
     /*
