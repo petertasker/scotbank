@@ -1,14 +1,26 @@
 package uk.co.asepstrath.bank;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.math.BigDecimal;
 public class Transaction {
 
+    @JacksonXmlProperty(localName = "timestamp")
     private String timestamp;
+    @JacksonXmlProperty(localName = "amount")
     private BigDecimal amount;
+    @JacksonXmlProperty(localName = "from")
     private String from;
+    @JacksonXmlProperty(localName = "id")
     private String id;
+    @JacksonXmlProperty(localName = "to")
     private String to;
+    @JacksonXmlProperty(localName = "type")
     private String type;
+
+    public Transaction() {
+        // For jackson mapper
+    }
 
     public Transaction(String timestamp, int amount, String from, String id, String to, String type) {
         this.timestamp= timestamp;

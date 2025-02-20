@@ -5,55 +5,78 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.print.Doc;
 import javax.sql.DataSource;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
+import javax.xml.parsers.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import uk.co.asepstrath.bank.parsers.XmlParser;
 
 public class DatabaseInitialiser {
 
     private static final String SQL_CREATE_ACCOUNT = """
         CREATE TABLE Accounts (
-            AccountID varchar(255) NOT NULL,
-            Balance DECIMAL NOT NULL,
-            Name varchar(255) NOT NULL,
+            AccountID VARCHAR(255) NOT NULL,
+            Balance DECIMAL(10,2) NOT NULL,
+            Name VARCHAR(255) NOT NULL,
             RoundUpEnabled BIT NOT NULL,
             PRIMARY KEY (AccountID)
         )
     """;
 
     private static final String SQL_CREATE_BUSINESS = """
-            CREATE TABLE Business (
-            BusinessID varchar(255) NOT NULL,
-            Business_Name varchar(225) NOT NULL,
-            Category varchar(255) NOT NULL,
+        CREATE TABLE Business (
+            BusinessID VARCHAR(255) NOT NULL,
+            Business_Name VARCHAR(255) NOT NULL,
+            Category VARCHAR(255) NOT NULL,
             Sanctioned BIT NOT NULL,
             PRIMARY KEY (BusinessID)
-            )
-            """;
+        )
+    """;
 
-    private static final String SQL_INSERT_ACCOUNT = """
-        INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)""";
+    private static final String SQL_CREATE_TRANSACTION = """
+        CREATE TABLE Transactions (
+            Timestamp DATETIME NOT NULL,
+            Amount DECIMAL(10,2) NOT NULL,
+            Sender VARCHAR(255) NOT NULL,
+            Id VARCHAR(255) NOT NULL,
+            Receiver VARCHAR(255) NOT NULL,
+            TransactionType VARCHAR(255) NOT NULL,
+            PRIMARY KEY (Id),
+            FOREIGN KEY (Receiver) REFERENCES Business(BusinessID)
+        )
+    """;
 
-    private static final String SQL_INSERT_BUSINESS = """
-            INSERT INTO Business (BusinessID, Business_Name, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
 
     private final DataSource dataSource;
     Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
     private final ObjectMapper mapper;
+    private final DatabaseHandler dbHandler;
 
     public DatabaseInitialiser(DataSource dataSource) {
         this.dataSource = dataSource;
         this.mapper = new ObjectMapper();
+
+        // Handle database operations
+        dbHandler = new DatabaseHandler(dataSource);
     }
 
     public void initialise() throws SQLException {
@@ -61,6 +84,26 @@ public class DatabaseInitialiser {
             Connection connection = dataSource.getConnection();
             createAccountTable(connection);
             createBusinessTable(connection);
+            createTransactionTable(connection);
+
+            List<Account> accounts = fetchAccounts();
+            for (Account account : accounts) {
+                dbHandler.insertAccount(connection, account);
+            }
+
+            List<Business> businesses = fetchBusinesses();
+            for(Business business : businesses) {
+                dbHandler.insertBusiness(connection, business);
+            }
+
+            List<Transaction> transactions = fetchTransactions();
+            for (Transaction transaction : transactions) {
+                dbHandler.insertTransaction(connection, transaction);
+            }
+
+
+
+            connection.close();
         }
             catch (SQLException e) {
                 throw new SQLException(e);
@@ -71,10 +114,7 @@ public class DatabaseInitialiser {
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(SQL_CREATE_ACCOUNT);
-            List<Account> accounts = fetchAccounts();
-            for (Account account : accounts) {
-                insertAccount(connection, account);
-            }
+
         }
         catch (SQLException e) {
             throw new SQLException(e);
@@ -82,13 +122,21 @@ public class DatabaseInitialiser {
     }
 
     private void createBusinessTable(Connection connection) throws SQLException {
-        try{
+        try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(SQL_CREATE_BUSINESS);
-            List<Business> businesses = fetchBusinesses();
-            for(Business business : businesses) {
-                insertBusiness(connection, business);
-            }
+
+        }
+        catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    private void createTransactionTable(Connection connection) throws SQLException {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(SQL_CREATE_TRANSACTION);
+
         }
         catch (SQLException e) {
             throw new SQLException(e);
@@ -134,83 +182,26 @@ public class DatabaseInitialiser {
                 }
                 return businesses;
             }
-        }catch (IOException e){
+        }
+        catch (IOException e){
             throw new RuntimeException(e);
         }
     }
 
-    // Insert account into database
-    private void insertAccount(Connection connection, Account account) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ACCOUNT);
-            preparedStatement.setString(1, account.getAccountID());
-            preparedStatement.setBigDecimal(2, account.getBalance());
-            preparedStatement.setString(3, account.getName());
-            preparedStatement.setBoolean(4, account.isRoundUpEnabled());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
-
-    private void insertBusiness(Connection connection, Business business) throws SQLException {
-        try(Statement statement = connection.createStatement()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS);
-            preparedStatement.setString(1, business.getID());
-            preparedStatement.setString(2, business.getName());
-            preparedStatement.setString(3, business.getCategory());
-            preparedStatement.setBoolean(4,business.isSanctioned());
-            preparedStatement.executeUpdate();
-        }catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
-
-    public List<Account> queryAccounts() throws SQLException {
+    List<Transaction> fetchTransactions() {
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Accounts");
-            ResultSet resultSet = preparedStatement.executeQuery();
+            URL url = new URL("https://api.asep-strath.co.uk/api/transactions");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
 
-            List<Account> accounts = new ArrayList<>();
-
-            while (resultSet.next()) {
-                accounts.add(new Account(
-                        resultSet.getString("AccountID"),
-                        resultSet.getString("Name"),
-                        resultSet.getBigDecimal("Balance"),
-                        resultSet.getBoolean("RoundUpEnabled")));
-                log.info("Added account: {}", resultSet.getString("AccountID"));
-            }
-
-            return accounts;
+            XmlMapper mapper = new XmlMapper();
+            XmlParser pageResult = mapper.readValue(con.getInputStream(), XmlParser.class);
+            return pageResult.getTransactions();
         }
-        catch (SQLException e) {
-            throw new SQLException(e);
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public List<Business> queryBusinesses() throws SQLException {
-        try{
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Business");
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            List<Business> businesses = new ArrayList<>();
-
-            while (resultSet.next()) {
-                businesses.add(new Business(
-                        resultSet.getString("BusinessID"),
-                        resultSet.getString("Business_Name"),
-                        resultSet.getString("Category"),
-                        resultSet.getBoolean("Sanctioned")));
-                log.info("Added business: {}",
-                        resultSet.getString("BusinessID"));
-            }
-            return businesses;
-
-        }catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
 }
