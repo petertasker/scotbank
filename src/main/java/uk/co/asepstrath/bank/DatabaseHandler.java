@@ -19,10 +19,10 @@ public class DatabaseHandler {
             INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)""";
 
     private static final String SQL_INSERT_BUSINESS = """
-            INSERT INTO Business (BusinessID, Business_Name, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
+            INSERT INTO Businesses (BusinessID, BusinessName, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
 
     private static String SQL_INSERT_TRANSACTION = """
-        INSERT INTO Transactions (Timestamp, Amount, Sender, Id, Receiver, TransactionType) 
+        INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType)
         VALUES (?, ?, ?, ?, ?, ?)""";
 
 
@@ -117,7 +117,7 @@ public class DatabaseHandler {
             while (resultSet.next()) {
                 businesses.add(new Business(
                         resultSet.getString("BusinessID"),
-                        resultSet.getString("Business_Name"),
+                        resultSet.getString("BusinessName"),
                         resultSet.getString("Category"),
                         resultSet.getBoolean("Sanctioned")));
             }
@@ -141,9 +141,9 @@ public class DatabaseHandler {
                 transactions.add(new Transaction(
                         resultSet.getString("Timestamp"),
                         resultSet.getInt("Amount"),
-                        resultSet.getString("Sender"),
-                        resultSet.getString("Id"),
-                        resultSet.getString("Receiver"),
+                        resultSet.getString("SenderID"),
+                        resultSet.getString("TransactionID"),
+                        resultSet.getString("ReceiverID"),
                         resultSet.getString("TransactionType")
                 ));
             }

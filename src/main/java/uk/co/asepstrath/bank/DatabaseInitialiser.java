@@ -43,9 +43,9 @@ public class DatabaseInitialiser {
     """;
 
     private static final String SQL_CREATE_BUSINESS = """
-        CREATE TABLE Business (
+        CREATE TABLE Businesses (
             BusinessID VARCHAR(255) NOT NULL,
-            Business_Name VARCHAR(255) NOT NULL,
+            BusinessName VARCHAR(255) NOT NULL,
             Category VARCHAR(255) NOT NULL,
             Sanctioned BIT NOT NULL,
             PRIMARY KEY (BusinessID)
@@ -56,12 +56,12 @@ public class DatabaseInitialiser {
         CREATE TABLE Transactions (
             Timestamp DATETIME NOT NULL,
             Amount DECIMAL(10,2) NOT NULL,
-            Sender VARCHAR(255) NOT NULL,
-            Id VARCHAR(255) NOT NULL,
-            Receiver VARCHAR(255) NOT NULL,
+            SenderID VARCHAR(255) NOT NULL,
+            TransactionID VARCHAR(255) NOT NULL,
+            ReceiverID VARCHAR(255) NOT NULL,
             TransactionType VARCHAR(255) NOT NULL,
-            PRIMARY KEY (Id),
-            FOREIGN KEY (Receiver) REFERENCES Business(BusinessID)
+            PRIMARY KEY (TransactionID),
+            FOREIGN KEY (ReceiverID) REFERENCES Businesses(BusinessID)
         )
     """;
 

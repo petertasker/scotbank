@@ -77,6 +77,8 @@ public class App extends Jooby {
         // Create Database and tables with initial data
         DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
         initialiser.initialise();
+        DatabaseHandler databaseHandler = new DatabaseHandler(dataSource);
+        databaseHandler.queryTransactions();
 
     }
 
