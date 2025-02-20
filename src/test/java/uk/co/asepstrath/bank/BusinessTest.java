@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 public class BusinessTest {
 
     @Test
-    public void TestGetters_Business(){
+    void TestGetters_Business(){
         Business business = new Business("ALD","Aldi","Groceries",false);
         Assertions.assertEquals("ALD",business.getID());
         Assertions.assertEquals("Aldi",business.getName());

@@ -8,9 +8,7 @@ import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.controllers.LoginController;
 import uk.co.asepstrath.bank.controllers.LoginController_;
-import uk.co.asepstrath.bank.controllers.AccountController;
 import uk.co.asepstrath.bank.controllers.AccountController_;
 
 

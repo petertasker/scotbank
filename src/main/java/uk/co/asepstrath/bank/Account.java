@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
-import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -62,8 +61,8 @@ public class Account {
                 getAccountID(), getName(), getBalance(), isRoundUpEnabled());
     }
 
-    public void UpdateBalance(BigDecimal b){
-        this.balance = b;
+    public void updateBalance(BigDecimal balance){
+        this.balance = balance;
     }
 
 }
