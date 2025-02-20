@@ -12,7 +12,7 @@ import java.sql.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class DatabaseTests {
+class DatabaseTests {
 
     private DataSource dataSource;
     private Connection connection;
@@ -26,7 +26,6 @@ public class DatabaseTests {
         connection = mock(Connection.class);
         statement = mock(Statement.class);
         preparedStatement = mock(PreparedStatement.class);
-        ResultSet resultSet = mock(ResultSet.class);
 
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.createStatement()).thenReturn(statement);
@@ -47,7 +46,7 @@ public class DatabaseTests {
 
     @Test
     void InsertIntoTables() throws SQLException {
-        DatabaseHandler dbHandler = new DatabaseHandler(dataSource);
+        DatabaseHandler dbHandler = new DatabaseHandler();
         Connection mockConnection = mock(Connection.class);
 
         // Ensure connection and preparedStatement are mocked

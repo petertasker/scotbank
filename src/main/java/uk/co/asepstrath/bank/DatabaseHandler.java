@@ -22,7 +22,7 @@ public class DatabaseHandler {
     private final Logger log;
 
 
-    public DatabaseHandler(DataSource dataSource) {
+    public DatabaseHandler() {
         this.log = LoggerFactory.getLogger(DatabaseHandler.class);
     }
 

@@ -6,9 +6,7 @@ import io.jooby.Session;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.ContextManager;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +28,6 @@ public class AccountController {
        model.put("name", session.get("name"));
        model.put("accountid", session.get("accountid"));
        logger.info("Put name and accountid in model");
-       return new ModelAndView<>("account.hbs", model);
+       return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
    }
 }
