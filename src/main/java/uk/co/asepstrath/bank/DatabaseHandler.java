@@ -21,19 +21,21 @@ public class DatabaseHandler {
     private static final String SQL_INSERT_BUSINESS = """
             INSERT INTO Businesses (BusinessID, BusinessName, Category, Sanctioned ) VALUES (?, ?, ?, ?)""";
 
-    private static String SQL_INSERT_TRANSACTION = """
+    private static final String SQL_INSERT_TRANSACTION = """
         INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType)
         VALUES (?, ?, ?, ?, ?, ?)""";
 
-
     private final DataSource dataSource;
-    Logger log = LoggerFactory.getLogger(DatabaseInitialiser.class);
     private final ObjectMapper mapper;
+    private final Logger log;
+
 
     public DatabaseHandler(DataSource dataSource) {
         this.dataSource = dataSource;
         this.mapper = new ObjectMapper();
+        this.log = LoggerFactory.getLogger(DatabaseHandler.class);
     }
+
 
     void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
         try {
@@ -68,6 +70,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Insert business into database
     void insertBusiness(Connection connection, Business business) throws SQLException {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS);
@@ -83,6 +86,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Query all accounts
     public List<Account> queryAccounts() throws SQLException {
         try {
             Connection connection = dataSource.getConnection();
@@ -106,6 +110,7 @@ public class DatabaseHandler {
         }
     }
 
+    // Query all businesses
     public List<Business> queryBusinesses() throws SQLException {
         try{
             Connection connection = dataSource.getConnection();
@@ -123,12 +128,14 @@ public class DatabaseHandler {
             }
             return businesses;
 
-        }catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
 
+    // Query all transactions
     public List<Transaction> queryTransactions() throws SQLException {
         try {
             Connection connection = dataSource.getConnection();
@@ -153,4 +160,5 @@ public class DatabaseHandler {
             throw new SQLException(e);
         }
     }
+
 }
