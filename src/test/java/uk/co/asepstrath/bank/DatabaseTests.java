@@ -21,7 +21,7 @@ public class DatabaseTests {
     private PreparedStatement preparedStatement;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    void setUp() throws SQLException {
         dataSource = mock(DataSource.class);
         connection = mock(Connection.class);
         statement = mock(Statement.class);

@@ -8,40 +8,40 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AccountTests {
     /* A new Account should have a value of 0 */
     @Test
-    public void createAccount(){
+    void createAccount(){
         Account a = new Account("1", "John Smith", BigDecimal.valueOf(15), true);
         assertNotNull(a);
     }
 
     @Test
-    public void deposit(){
+    void deposit(){
         Account a = new Account("1", "Jacob", BigDecimal.valueOf(20), true);
         a.deposit(BigDecimal.valueOf(50)); // deposit a 50 in a 20
         assertEquals(BigDecimal.valueOf(70),a.getBalance());
     }
 
     @Test
-    public void Withdraw(){
+     void Withdraw(){
         Account a = new Account("1", "Simon", BigDecimal.valueOf(40), false);
         a.withdraw(BigDecimal.valueOf(20)); // withdraw 20 pounds
         assertEquals(BigDecimal.valueOf(20), a.getBalance());
     }
 
     @Test
-    public void TestArithmeticException(){
+     void TestArithmeticException(){
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
         a.deposit(BigDecimal.valueOf(30));
         Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(100)));
     }
 
     @Test
-    public void TestArithmeticException2() {
+     void TestArithmeticException2() {
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
         Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(-5)));
     }
 
     @Test
-    public void SuperSavingTest(){
+     void SuperSavingTest(){
         Account a = new Account("2", "Michael", BigDecimal.valueOf(20), false);
         for (int i=0; i<5; i++){
             a.deposit(BigDecimal.valueOf(10));
@@ -53,7 +53,7 @@ public class AccountTests {
     }
 
     @Test
-    public void TestForPennies(){
+     void TestForPennies(){
         Account a = new Account("50", "Jack", BigDecimal.valueOf(5.45), false);
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());

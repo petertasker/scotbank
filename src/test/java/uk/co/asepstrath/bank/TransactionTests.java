@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class TransactionTests {
 
     @Test
-    public void testGetters() {
+    void testGetters() {
         Transaction transaction = new Transaction(new DateTime(2025, 2, 14, 8, 30, 0), 21, "8f95782c-7c83-4dd7-8856-0e19a0e0a075", "0043d8d9-846d-49cb-9b04-8d3823e9d8c9", "TOP", "PAYMENT");
         assertEquals(new DateTime(2025, 2, 14, 8, 30, 0), transaction.getTimestamp());
         assertEquals(BigDecimal.valueOf(21), transaction.getAmount());
