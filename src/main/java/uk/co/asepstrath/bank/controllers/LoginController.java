@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,8 +69,15 @@ public class LoginController {
             contextManager.addAccountDetailsToContext(account, ctx);
             ctx.sendRedirect("/account");
         }
+        catch (SQLException e) {
+            throw new RuntimeException("Database error: " + e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
+            logger.error("Invalid input: " + e.getMessage(), e);
+            throw e;
+        }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unexpecter error: " + e.getMessage());
         }
         return null;
     }
