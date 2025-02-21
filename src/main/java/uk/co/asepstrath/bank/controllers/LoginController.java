@@ -8,7 +8,7 @@ import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.ContextManager;
-import static uk.co.asepstrath.bank.controllers.Constants.*;
+import static uk.co.asepstrath.bank.Constants.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

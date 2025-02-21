@@ -7,6 +7,7 @@ import io.jooby.Value;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.co.asepstrath.bank.controllers.AccountController;
 
 import javax.sql.DataSource;
@@ -22,24 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class AccountControllerTests {
+class AccountControllerTests {
+
+    @Mock
     private AccountController accountController;
+    @Mock
     private Context mockCtx;
+    @Mock
     private Session mockSession;
-    private DataSource mockDataSource;
-    private Logger mockLogger;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
+    @Mock
     private ResultSet mockResultSet;
 
     @BeforeEach
     void setUp() throws Exception {
         mockCtx = mock(Context.class);
         mockSession = mock(Session.class);
-        mockDataSource = mock(DataSource.class);
-        mockLogger = mock(Logger.class);
-        mockConnection = mock(Connection.class);
-        mockPreparedStatement = mock(PreparedStatement.class);
+        DataSource mockDataSource = mock(DataSource.class);
+        Logger mockLogger = mock(Logger.class);
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
 
         when(mockCtx.session()).thenReturn(mockSession);

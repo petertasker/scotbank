@@ -7,7 +7,6 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.ContextManager;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static uk.co.asepstrath.bank.controllers.Constants.*;
+import static uk.co.asepstrath.bank.Constants.*;
 
 
 @Path("/account")
