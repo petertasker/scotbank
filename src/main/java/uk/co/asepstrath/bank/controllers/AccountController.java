@@ -42,13 +42,15 @@ public class AccountController {
        // Get all transactions related to a users account
        try (Connection connection = dataSource.getConnection()) {
            List<Transaction> transactions = new ArrayList<>();
-           PreparedStatement preparedStatement = connection.prepareStatement(
+           ResultSet resultSet;
+           try (PreparedStatement preparedStatement = connection.prepareStatement(
                    "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType " +
                            "FROM Transactions " +
                            "WHERE SenderID = ?"
-           );
-           preparedStatement.setString(1, String.valueOf(session.get(URL_ACCOUNT_ID)));
-           ResultSet resultSet = preparedStatement.executeQuery();
+           )) {
+               preparedStatement.setString(1, String.valueOf(session.get(URL_ACCOUNT_ID)));
+               resultSet = preparedStatement.executeQuery();
+           }
            while (resultSet.next()) {
                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                DateTime dateTime = new DateTime(timestamp);

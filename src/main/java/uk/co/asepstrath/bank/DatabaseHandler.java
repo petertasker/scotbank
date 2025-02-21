@@ -3,7 +3,6 @@ package uk.co.asepstrath.bank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.*;
 
 public class DatabaseHandler {
