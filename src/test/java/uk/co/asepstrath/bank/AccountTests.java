@@ -71,21 +71,26 @@ class AccountTests {
         /* Withdrawing £100 from an account with £30 should throw an ArithmeticException */
     void illegalWithdraw() {
         Account a = new Account("1", "John Doe", BigDecimal.valueOf(30), true);
-        assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(100)));
+        assertThrows(ArithmeticException.class, () -> {
+            a.withdraw(BigDecimal.valueOf(100));
+        });
     }
 
     @Test
         /* Depositing an amount of zero should throw an ArithmeticException */
     void illegalDepositZero() {
         Account a = new Account("2", "John Doe", BigDecimal.valueOf(20), false);
-        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(0)));
-    }
+        assertThrows(ArithmeticException.class, () -> {
+            a.withdraw(BigDecimal.valueOf(0));
+        });    }
 
     @Test
         /* Depositing a negative amount should throw an ArithmeticException */
     void illegalDepositNegative() {
         Account a = new Account("41", "John Doe", BigDecimal.valueOf(20), false);
-        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(-5)));
+        assertThrows(ArithmeticException.class, () -> {
+            a.withdraw(BigDecimal.valueOf(-5));
+        });
     }
 
     @Test

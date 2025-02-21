@@ -1,6 +1,11 @@
 package uk.co.asepstrath.bank;
 
-public class Constants {
+public final class Constants {
+
+    private Constants() {
+
+    }
+
     public static final String URL_PAGE_LOGIN = "login_user.hbs";
     public static final String URL_PAGE_ACCOUNT = "account.hbs";
     public static final String URL_ERROR = "error";
