@@ -69,5 +69,4 @@ class DatabaseTests {
         // Verify executeUpdate() was called for each statement
         verify(preparedStatement, times(3)).executeUpdate();
     }
-
 }
