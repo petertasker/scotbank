@@ -36,7 +36,7 @@ public class DatabaseHandler {
             preparedStatement.setString(5, transaction.getTo());
             preparedStatement.setString(6, transaction.getType());
             preparedStatement.executeUpdate();
-            log.info("Inserted Transaction {}", transaction.getId());
+            log.info("Inserted Transaction {} from {} to {}", transaction.getId(), transaction.getFrom(), transaction.getTo());
         }
         catch (SQLException e) {
             throw new SQLException(e);
