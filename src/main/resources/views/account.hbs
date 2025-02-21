@@ -9,5 +9,22 @@
 <body>
 <h1>Welcome, {{name}}</h1>
 Your account ID is {{accountid}}
+
+{{#if hastransactions}}
+    <div class="transactions-section">
+        {{#each transactions}}
+            <div class="transaction">
+                <p>Timestamp: {{timestamp}}</p>
+                <p>Transaction ID: {{id}}</p>
+                <p>Amount: ${{amount}}</p>
+                <p>From: {{from}}</p>
+                <p>To: {{to}}</p>
+                <p>Type: {{type}}</p>
+            </div>
+        {{/each}}
+    </div>
+{{else}}
+    <p>No transactions found.</p>
+{{/if}}
 </body>
 </html>
