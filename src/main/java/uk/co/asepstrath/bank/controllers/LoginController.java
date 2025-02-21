@@ -67,12 +67,8 @@ public class LoginController {
                             rs.getBigDecimal("Balance"),
                             rs.getBoolean("RoundUpEnabled")
                     );
-                    // Add to model
+                    // Add to session
                     contextManager.addAccountDetailsToContext(account, ctx);
-
-                    // Get details from context manager (pedantic but is good form)
-                    model.put(URL_ACCOUNT_ID, contextManager.getAccountIdFromContext(ctx));
-                    model.put(URL_ACCOUNT_NAME, contextManager.getNameFromContext(ctx));
                     ctx.sendRedirect("/account");
                     return null;
                 }
