@@ -1,4 +1,6 @@
 package uk.co.asepstrath.bank;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -6,9 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.*;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -70,4 +76,10 @@ class DatabaseTests {
         verify(preparedStatement, times(3)).executeUpdate();
     }
 
+
+//    @Test
+//    void throwHandlerExceptions() {
+//        DatabaseHandler mockDatabaseInitialiser = mock(DatabaseHandler.class);
+//
+//    }
 }
