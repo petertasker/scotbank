@@ -8,6 +8,7 @@ import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.ContextManager;
+import static uk.co.asepstrath.bank.controllers.Constants.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -34,7 +35,7 @@ public class LoginController {
     @GET
     public ModelAndView<Map<String, Object>> displayLogin() {
         Map<String, Object> model = new HashMap<>();
-        return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
+        return new ModelAndView<>(URL_PAGE_LOGIN, model);
     }
 
     @POST
@@ -45,8 +46,8 @@ public class LoginController {
         // Check if form value exists and is not empty
         String formID = ctx.form("accountid").valueOrNull();
         if (formID == null || formID.trim().isEmpty()) {
-            model.put(Constants.URL_ERROR, "Account ID is required");
-            return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
+            model.put(URL_ERROR, "Account ID is required");
+            return new ModelAndView<>(URL_PAGE_LOGIN, model);
         }
 
         try (Connection con = dataSource.getConnection();
@@ -70,23 +71,22 @@ public class LoginController {
                     contextManager.addAccountDetailsToContext(account, ctx);
 
                     // Get details from context manager (pedantic but is good form)
-                    model.put(Constants.URL_ACCOUNT_ID, contextManager.getAccountIdFromContext(ctx));
-                    model.put(Constants.URL_ACCOUNT_NAME, contextManager.getNameFromContext(ctx));
-
-                    String URL_PAGE_ACCOUNT = "account.hbs";
-                    return new ModelAndView<>(Constants.URL_PAGE_ACCOUNT, model);
+                    model.put(URL_ACCOUNT_ID, contextManager.getAccountIdFromContext(ctx));
+                    model.put(URL_ACCOUNT_NAME, contextManager.getNameFromContext(ctx));
+                    ctx.sendRedirect("/account");
+                    return null;
                 }
                 else {
                     // Handle case where account not found
-                    model.put(Constants.URL_ERROR, "Account not found");
-                    return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
+                    model.put(URL_ERROR, "Account not found");
+                    return new ModelAndView<>(URL_PAGE_LOGIN, model);
                 }
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
-            model.put(Constants.URL_ERROR, "Database error occurred");
-            return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
+            model.put(URL_ERROR, "Database error occurred");
+            return new ModelAndView<>(URL_PAGE_LOGIN, model);
         }
     }
 

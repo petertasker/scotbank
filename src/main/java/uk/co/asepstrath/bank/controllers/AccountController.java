@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
+import static uk.co.asepstrath.bank.controllers.Constants.*;
+
 
 @Path("/account")
 public class AccountController {
@@ -25,9 +27,9 @@ public class AccountController {
    public ModelAndView<Map<String, Object>> viewAccount(Context ctx) {
        Map<String, Object> model = new HashMap<>();
        Session session = ctx.session();
-       model.put("name", session.get("name"));
-       model.put("accountid", session.get("accountid"));
+       model.put(URL_ACCOUNT_NAME, session.get("name"));
+       model.put(URL_ACCOUNT_ID, session.get("accountid"));
        logger.info("Put name and accountid in model");
-       return new ModelAndView<>(Constants.URL_PAGE_LOGIN, model);
+       return new ModelAndView<>(Constants.URL_PAGE_ACCOUNT, model);
    }
 }
