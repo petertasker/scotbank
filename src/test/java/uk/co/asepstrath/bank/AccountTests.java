@@ -31,13 +31,15 @@ class AccountTests {
      void TestArithmeticException(){
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
         a.deposit(BigDecimal.valueOf(30));
-        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(100)));
+        BigDecimal amount = BigDecimal.valueOf(100);
+        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
      void TestArithmeticException2() {
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
-        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(BigDecimal.valueOf(-5)));
+        BigDecimal amount = BigDecimal.valueOf(-5);
+        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
@@ -71,26 +73,24 @@ class AccountTests {
         /* Withdrawing £100 from an account with £30 should throw an ArithmeticException */
     void illegalWithdraw() {
         Account a = new Account("1", "John Doe", BigDecimal.valueOf(30), true);
-        assertThrows(ArithmeticException.class, () -> {
-            a.withdraw(BigDecimal.valueOf(100));
-        });
+       BigDecimal amount = BigDecimal.valueOf(100);
+        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
         /* Depositing an amount of zero should throw an ArithmeticException */
     void illegalDepositZero() {
         Account a = new Account("2", "John Doe", BigDecimal.valueOf(20), false);
-        assertThrows(ArithmeticException.class, () -> {
-            a.withdraw(BigDecimal.valueOf(0));
-        });    }
+        BigDecimal amount = BigDecimal.valueOf(0);
+        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
+    }
 
     @Test
-        /* Depositing a negative amount should throw an ArithmeticException */
+    /* Depositing a negative amount should throw an ArithmeticException */
     void illegalDepositNegative() {
         Account a = new Account("41", "John Doe", BigDecimal.valueOf(20), false);
-        assertThrows(ArithmeticException.class, () -> {
-            a.withdraw(BigDecimal.valueOf(-5));
-        });
+        BigDecimal amount = BigDecimal.valueOf(-5);
+        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test

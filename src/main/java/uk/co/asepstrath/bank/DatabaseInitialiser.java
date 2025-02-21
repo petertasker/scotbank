@@ -2,20 +2,16 @@ package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
-import java.text.ParseException;
 import java.util.*;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import org.h2.expression.function.table.CSVReadFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.parsers.XmlParser;
@@ -90,10 +86,8 @@ public class DatabaseInitialiser {
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
-        } catch (XMLStreamException | JsonParseException e) {
+        } catch (XMLStreamException | IOException e) {
             throw new SQLException("Fetching failed somewhere", e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
