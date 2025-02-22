@@ -45,19 +45,19 @@ public class DatabaseHandler {
     }
 
     void updateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
-        Account senderAccount = FetchAccount(connection, transaction.getFrom());
+        Account senderAccount = fetchAccount(connection, transaction.getFrom());
         if (senderAccount == null) {
             throw new SQLException("Account not found" + transaction.getFrom());
         }
         try {
             senderAccount.withdraw(transaction.getAmount());
-            UpdateAccountDB(connection, senderAccount);
+            updateAccountBalanceDatabase(connection, senderAccount);
         }catch (ArithmeticException e) {
             log.info("{}", e.getMessage());
         }
     }
 
-    private Account FetchAccount(Connection connection, String accountID) throws SQLException {
+    private Account fetchAccount(Connection connection, String accountID) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance, Name, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
             preparedStatement.setString(1, accountID);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -71,7 +71,7 @@ public class DatabaseHandler {
         return null; // if account was not found
     }
 
-    private void UpdateAccountDB(Connection connection, Account account) throws SQLException {
+    private void updateAccountBalanceDatabase(Connection connection, Account account) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             preparedStatement.setBigDecimal(1, account.getBalance());
             preparedStatement.setString(2, account.getAccountID());
