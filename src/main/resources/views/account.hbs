@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+    <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
 <h1>Welcome, {{name}}</h1>
 Your account ID is {{accountid}}
 
+<button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
+<button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
+
+
 {{#if hastransactions}}
     <div class="transactions-section">
+        <hr style="border-top: 1px solid black;">
         {{#each transactions}}
             <div class="transaction">
                 <p>Timestamp: {{timestamp}}</p>
@@ -21,6 +24,7 @@ Your account ID is {{accountid}}
                 <p>To: {{to}}</p>
                 <p>Type: {{type}}</p>
             </div>
+            <hr style="border-top: 1px solid black;">
         {{/each}}
     </div>
 {{else}}
