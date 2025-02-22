@@ -1,26 +1,21 @@
 package uk.co.asepstrath.bank;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.jooby.test.JoobyTest;
-import jakarta.inject.Inject;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.*;
 
+import io.jooby.test.JoobyTest;
 import io.jooby.test.MockRouter;
+
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.*;
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.*;
 
 @JoobyTest(App.class)
 class DatabaseTests {

@@ -37,16 +37,16 @@ public class DatabaseHandler {
             preparedStatement.executeUpdate();
             log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount());
 
-            String Sender_Account_ID = transaction.getFrom();
-            BigDecimal Transaction_amount = transaction.getAmount();
+            String senderAccountID = transaction.getFrom();
+            BigDecimal transactionAmount = transaction.getAmount();
 
-            BigDecimal Current_Balance = FetchAccountBalance(connection, Sender_Account_ID);
-            if (Current_Balance == null) {
-                throw new SQLException("Sender ID not found: " + Sender_Account_ID);
+            BigDecimal currentBalance = fetchAccountBalance(connection, senderAccountID);
+            if (currentBalance == null) {
+                throw new SQLException("Sender ID not found: " + senderAccountID);
             }
 
-            BigDecimal New_Balance = Current_Balance.subtract(Transaction_amount);
-            UpdateAccountBalance(connection,Sender_Account_ID,New_Balance);
+            BigDecimal newBalance = currentBalance.subtract(transactionAmount);
+            updateAccountBalance(connection, senderAccountID, newBalance);
         }
         catch (SQLException e) {
             throw new SQLException(e);
@@ -80,29 +80,28 @@ public class DatabaseHandler {
         }
     }
 
-    void UpdateAccountBalance(Connection connection, String account_Id, BigDecimal newBalance) throws SQLException {
-        String SELECT_ACCOUNT_SQL = "UPDATE Accounts SET Balance = ? WHERE AccountID = ?";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ACCOUNT_SQL)) {
+    void updateAccountBalance(Connection connection, String accountID, BigDecimal newBalance) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             preparedStatement.setBigDecimal(1,newBalance);
-            preparedStatement.setString(2, account_Id);
+            preparedStatement.setString(2, accountID);
             preparedStatement.executeUpdate();
-            log.info("Updated Account Balance: ID {}, New Balance £{}", account_Id, newBalance);
-        }catch (SQLException e) {
+            log.info("Updated Account Balance: ID {}, New Balance £{}", accountID, newBalance);
+        }
+        catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
-    BigDecimal FetchAccountBalance(Connection connection, String account_Id) throws SQLException {
-        String SELECT_ACCOUNT_SQL = "SELECT Balance FROM Accounts WHERE AccountID = ?";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ACCOUNT_SQL)) {
+    BigDecimal fetchAccountBalance(Connection connection, String account_Id) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance FROM Accounts WHERE AccountID = ?")) {
             preparedStatement.setString(1, account_Id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getBigDecimal("Balance");
-                }else
+                }
+                else {
                     return BigDecimal.ZERO;
+                }
             }
         } catch (SQLException e) {
             throw new SQLException(e);

@@ -78,7 +78,7 @@ public class AccountController {
 
     @GET
     @Path("/deposit")
-    public ModelAndView<Map<String, Object>> deposit(Context ctx) throws SQLException {
+    public ModelAndView<Map<String, Object>> deposit(Context ctx) {
        Map<String, Object> model = new HashMap<>();
        return new ModelAndView<>(URL_PAGE_ACCOUNT_DEPOSIT, model);
     }
@@ -86,7 +86,7 @@ public class AccountController {
 
     @GET
     @Path("/withdraw")
-    public ModelAndView<Map<String, Object>> withdraw(Context ctx) throws SQLException {
+    public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
        Map<String, Object> model = new HashMap<>();
        return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW, model);
     }
