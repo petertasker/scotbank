@@ -22,6 +22,7 @@ class DatabaseTests {
     @Inject
     private DataSource dataSource;
     private DatabaseInitialiser databaseInitialiser;
+    private DatabaseHandler databaseHandler;
     private Connection connection;
 
     @BeforeAll
