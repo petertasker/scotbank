@@ -8,7 +8,6 @@ import java.sql.*;
 
 public class DatabaseHandler {
 
-
     private static final String SQL_INSERT_ACCOUNT =
             "INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)";
 

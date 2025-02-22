@@ -22,10 +22,10 @@ class DatabaseTests {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dataSource = mock(DataSource.class);
-        connection = mock(Connection.class);
-        statement = mock(Statement.class);
-        preparedStatement = mock(PreparedStatement.class);
+        dataSource = spy(DataSource.class);
+        connection = spy(Connection.class);
+        statement = spy(Statement.class);
+        preparedStatement = spy(PreparedStatement.class);
 
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.createStatement()).thenReturn(statement);
@@ -40,7 +40,7 @@ class DatabaseTests {
         databaseInitialiser.initialise();
 
         verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
-        verify(statement).executeUpdate(contains("CREATE TABLE Business"));
+        verify(statement).executeUpdate(contains("CREATE TABLE Businesses"));
         verify(statement).executeUpdate(contains("CREATE TABLE Transactions"));
     }
 
