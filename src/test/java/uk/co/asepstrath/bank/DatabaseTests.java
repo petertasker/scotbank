@@ -11,10 +11,6 @@ import org.junit.jupiter.api.*;
 import javax.sql.DataSource;
 import java.sql.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @JoobyTest(App.class)

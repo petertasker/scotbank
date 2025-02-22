@@ -37,19 +37,46 @@ public class DatabaseHandler {
             preparedStatement.executeUpdate();
             log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount());
 
-            String senderAccountID = transaction.getFrom();
-            BigDecimal transactionAmount = transaction.getAmount();
-
-            BigDecimal currentBalance = fetchAccountBalance(connection, senderAccountID);
-            if (currentBalance == null) {
-                throw new SQLException("Sender ID not found: " + senderAccountID);
-            }
-
-            BigDecimal newBalance = currentBalance.subtract(transactionAmount);
-            updateAccountBalance(connection, senderAccountID, newBalance);
+            updateAccountBalance(connection, transaction);
         }
         catch (SQLException e) {
-            throw new SQLException(e);
+            log.info("Transaction Declined: {}", e.getMessage());
+        }
+    }
+
+    void updateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
+        Account senderAccount = fetchAccount(connection, transaction.getFrom());
+        if (senderAccount == null) {
+            throw new SQLException("Account not found" + transaction.getFrom());
+        }
+        try {
+            senderAccount.withdraw(transaction.getAmount());
+            updateAccountBalanceDatabase(connection, senderAccount);
+        }catch (ArithmeticException e) {
+            log.info("{}", e.getMessage());
+        }
+    }
+
+    private Account fetchAccount(Connection connection, String accountID) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance, Name, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
+            preparedStatement.setString(1, accountID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                BigDecimal balance = resultSet.getBigDecimal("Balance");
+                String name = resultSet.getString("Name");
+                boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
+                return new Account(accountID, name, balance, roundUpEnabled);
+            }
+        }
+        return null; // if account was not found
+    }
+
+    private void updateAccountBalanceDatabase(Connection connection, Account account) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
+            preparedStatement.setBigDecimal(1, account.getBalance());
+            preparedStatement.setString(2, account.getAccountID());
+            preparedStatement.executeUpdate();
+            log.info("Updated Account : {}, New Balance: £{}", account.getAccountID(), account.getBalance());
         }
     }
 
@@ -77,34 +104,6 @@ public class DatabaseHandler {
             preparedStatement.setBoolean(4, business.isSanctioned());
             preparedStatement.executeUpdate();
             log.info("Inserted Business: {}", business.getID());
-        }
-    }
-
-    void updateAccountBalance(Connection connection, String accountID, BigDecimal newBalance) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
-            preparedStatement.setBigDecimal(1,newBalance);
-            preparedStatement.setString(2, accountID);
-            preparedStatement.executeUpdate();
-            log.info("Updated Account Balance: ID {}, New Balance £{}", accountID, newBalance);
-        }
-        catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
-
-    BigDecimal fetchAccountBalance(Connection connection, String accountID) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance FROM Accounts WHERE AccountID = ?")) {
-            preparedStatement.setString(1, accountID);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getBigDecimal("Balance");
-                }
-                else {
-                    return BigDecimal.ZERO;
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLException(e);
         }
     }
 }

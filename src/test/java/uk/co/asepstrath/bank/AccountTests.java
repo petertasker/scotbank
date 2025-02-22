@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,17 +28,21 @@ class AccountTests {
 
     @Test
      void TestArithmeticException(){
+
+        assertDoesNotThrow(() -> new Account("1", "John Smith",BigDecimal.valueOf(20), false));
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
+
         a.deposit(BigDecimal.valueOf(30));
         BigDecimal amount = BigDecimal.valueOf(100);
-        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
+        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
      void TestArithmeticException2() {
+        assertDoesNotThrow(() -> new Account("1", "John Smith",BigDecimal.valueOf(20), false));
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
         BigDecimal amount = BigDecimal.valueOf(-5);
-        Assertions.assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
+        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
@@ -72,14 +75,16 @@ class AccountTests {
     @Test
         /* Withdrawing £100 from an account with £30 should throw an ArithmeticException */
     void illegalWithdraw() {
+        assertDoesNotThrow(() -> new Account("1", "John Doe", BigDecimal.valueOf(30), true));
         Account a = new Account("1", "John Doe", BigDecimal.valueOf(30), true);
-       BigDecimal amount = BigDecimal.valueOf(100);
+        BigDecimal amount = BigDecimal.valueOf(100);
         assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
     }
 
     @Test
         /* Depositing an amount of zero should throw an ArithmeticException */
     void illegalDepositZero() {
+        assertDoesNotThrow(() -> new Account("2", "John Doe", BigDecimal.valueOf(20), false));
         Account a = new Account("2", "John Doe", BigDecimal.valueOf(20), false);
         BigDecimal amount = BigDecimal.valueOf(0);
         assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
@@ -88,6 +93,7 @@ class AccountTests {
     @Test
     /* Depositing a negative amount should throw an ArithmeticException */
     void illegalDepositNegative() {
+        assertDoesNotThrow(() -> new Account("41", "John Doe", BigDecimal.valueOf(20), false));
         Account a = new Account("41", "John Doe", BigDecimal.valueOf(20), false);
         BigDecimal amount = BigDecimal.valueOf(-5);
         assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
