@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class LoginControllerTests {
+class LoginControllerTests {
 
     @Mock
     private DataSource mockDataSource = mock(DataSource.class);

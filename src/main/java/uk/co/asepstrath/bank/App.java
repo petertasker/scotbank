@@ -19,7 +19,8 @@ import java.sql.*;
 
 public class App extends Jooby {
 
-    {
+
+    public App() {
         // Account page as landing page
         get("/", ctx -> ctx.sendRedirect( "/account"));
 
