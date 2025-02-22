@@ -22,9 +22,7 @@ class DatabaseTests {
     @Inject
     private DataSource dataSource;
     private DatabaseInitialiser databaseInitialiser;
-    private DatabaseHandler databaseHandler;
     private Connection connection;
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseTests.class);
 
     @BeforeAll
     static void setupClass() {

@@ -92,9 +92,9 @@ public class DatabaseHandler {
         }
     }
 
-    BigDecimal fetchAccountBalance(Connection connection, String account_Id) throws SQLException {
+    BigDecimal fetchAccountBalance(Connection connection, String accountID) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance FROM Accounts WHERE AccountID = ?")) {
-            preparedStatement.setString(1, account_Id);
+            preparedStatement.setString(1, accountID);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getBigDecimal("Balance");
