@@ -46,7 +46,7 @@ public class LoginController {
         // Check if form value exists and is not empty
         String formID = ctx.form("accountid").valueOrNull();
         if (formID == null || formID.trim().isEmpty()) {
-            model.put(URL_ERROR, "Account ID is required");
+            model.put(URL_ERROR_MESSAGE, "Account ID is required");
             return new ModelAndView<>(URL_PAGE_LOGIN, model);
         }
 
@@ -74,14 +74,14 @@ public class LoginController {
                 }
                 else {
                     // Handle case where account not found
-                    model.put(URL_ERROR, "Account not found");
+                    model.put(URL_ERROR_MESSAGE, "Account not found");
                     return new ModelAndView<>(URL_PAGE_LOGIN, model);
                 }
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
-            model.put(URL_ERROR, "Database error occurred");
+            model.put(URL_ERROR_MESSAGE, "Database error occurred");
             return new ModelAndView<>(URL_PAGE_LOGIN, model);
         }
     }
