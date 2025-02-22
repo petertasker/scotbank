@@ -15,6 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.parsers.XmlParser;
 
+import kong.unirest.*;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
+
 public class DatabaseInitialiser {
 
     private static final String SQL_CREATE_ACCOUNT = """
@@ -110,66 +115,58 @@ public class DatabaseInitialiser {
     }
 
     // Fetch accounts from API in JSON form
+
+    /*
+     * Replaced Deprecated package (java.net.URL.URL) with UniRest instead 
+     */
+    
     List<Account> fetchAccounts() {
         try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/accounts");
-            return mapper.readValue(url, new TypeReference<List<Account>>() {});
+            HttpResponse<JsonNode> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asJson();
+            String accountsBody = response.getBody().toString();
+            return mapper.readValue(accountsBody, new TypeReference<List<Account>>() {});
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    List<Business> fetchBusinesses() {
-        try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/businesses");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+    List<Business> fetchBusinesses() throws IOException {
+        HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/businesses").asString();
+        List<Business> businesses = new ArrayList<>();
+        String[] lines = response.getBody().split("\n");
+        boolean skipHeader = true;
 
-            List<Business> businesses = new ArrayList<>();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            try(in) {
-                String headerLine = in.readLine();
-                String[] headers = headerLine.split(",");
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    if (inputLine.trim().isEmpty()) {
-                        continue;
-                    }
+        for(String inputLine : lines){
+            if (skipHeader){
+                skipHeader = false;
+                continue;
+            }
 
-                    String[] inputFields = inputLine.split(",");
-                    if (inputFields.length >= 4) {
-                        String id = inputFields[0].trim();
-                        String name = inputFields[1].trim();
-                        String category = inputFields[2].trim();
-                        boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
+            String[]inputFields = inputLine.split(",");
+            if (inputFields.length >= 4) {
+                String id = inputFields[0].trim();
+                String name = inputFields[1].trim();
+                String category = inputFields[2].trim();
+                boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
 
-                        businesses.add(new Business(id, name, category, sanctioned));
-                    }
-                }
-                return businesses;
+                businesses.add(new Business(id, name, category, sanctioned));
             }
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return businesses;
     }
 
     List<Transaction> fetchTransactions() throws XMLStreamException {
         try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/transactions");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions").asString();
 
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new JodaModule());
-            XmlParser pageResult = xmlMapper.readValue(con.getInputStream(), XmlParser.class);
+            XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
             return pageResult.getTransactions();
         }
         catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
     }
-
-
 }
