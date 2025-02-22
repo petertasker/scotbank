@@ -37,14 +37,14 @@ public class DatabaseHandler {
             preparedStatement.executeUpdate();
             log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount());
 
-            UpdateAccountBalance(connection, transaction);
+            updateAccountBalance(connection, transaction);
         }
         catch (SQLException e) {
             log.info("Transaction Declined: {}", e.getMessage());
         }
     }
 
-    void UpdateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
+    void updateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
         Account senderAccount = FetchAccount(connection, transaction.getFrom());
         if (senderAccount == null) {
             throw new SQLException("Account not found" + transaction.getFrom());
@@ -58,24 +58,21 @@ public class DatabaseHandler {
     }
 
     private Account FetchAccount(Connection connection, String accountID) throws SQLException {
-        String SQL_FETCH_ACCOUNT = "SELECT * FROM Accounts WHERE AccountID = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_FETCH_ACCOUNT)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance, Name, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
             preparedStatement.setString(1, accountID);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String AccountID = resultSet.getString("AccountID");
-                BigDecimal Balance = resultSet.getBigDecimal("Balance");
-                String Name = resultSet.getString("Name");
-                boolean RoundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
-                return new Account(AccountID,Name,Balance,RoundUpEnabled);
+                BigDecimal balance = resultSet.getBigDecimal("Balance");
+                String name = resultSet.getString("Name");
+                boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
+                return new Account(accountID, name, balance, roundUpEnabled);
             }
         }
         return null; // if account was not found
     }
 
     private void UpdateAccountDB(Connection connection, Account account) throws SQLException {
-        String UPDATE_ACCCOUNT_SQL = "UPDATE Accounts SET Balance = ? WHERE AccountID = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ACCCOUNT_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             preparedStatement.setBigDecimal(1, account.getBalance());
             preparedStatement.setString(2, account.getAccountID());
             preparedStatement.executeUpdate();
