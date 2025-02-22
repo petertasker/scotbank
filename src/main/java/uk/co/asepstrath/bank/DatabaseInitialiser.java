@@ -92,7 +92,7 @@ public class DatabaseInitialiser {
         catch (XMLStreamException | JsonParseException e) {
             throw new SQLException("Fetching failed somewhere", e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Database creation failed", e);
         }
     }
 
