@@ -46,6 +46,7 @@ public class DatabaseInitialiser {
             TransactionID VARCHAR(255) NOT NULL,
             ReceiverID VARCHAR(255) NOT NULL,
             TransactionType VARCHAR(255) NOT NULL,
+            TransactionAccepted BIT NOT NULL,
             PRIMARY KEY (TransactionID),
             FOREIGN KEY (ReceiverID) REFERENCES Businesses(BusinessID),
             FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID)

@@ -15,8 +15,8 @@ public class DatabaseHandler {
             "INSERT INTO Businesses (BusinessID, BusinessName, Category, Sanctioned ) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_INSERT_TRANSACTION =
-            "INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType)\n" +
-                                                         "VALUES (?, ?, ?, ?, ?, ?)";
+            "INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType, TransactionAccepted)\n" +
+                                                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private final Logger log;
 
@@ -27,6 +27,21 @@ public class DatabaseHandler {
 
 
     void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
+
+        // Determine whether transaction succeeds or declines
+        Account senderAccount = fetchAccount(connection, transaction.getFrom());
+        boolean accepted = true;
+        if (senderAccount == null) {
+            log.info("Transaction Declined: Sender account not found {}", transaction.getFrom());
+            return;
+        }
+        try {
+            senderAccount.withdraw(transaction.getAmount());
+        } catch (ArithmeticException e) {
+            log.info("Transaction Declined: {}", e.getMessage());
+            accepted = false;
+        }
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION)) {
             preparedStatement.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             preparedStatement.setString(2, transaction.getAmount().toString());
@@ -34,29 +49,13 @@ public class DatabaseHandler {
             preparedStatement.setString(4, transaction.getId());
             preparedStatement.setString(5, transaction.getTo());
             preparedStatement.setString(6, transaction.getType());
+            preparedStatement.setBoolean(7, accepted);
             preparedStatement.executeUpdate();
-            log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount());
 
-            updateAccountBalance(connection, transaction);
-        }
-        catch (SQLException e) {
-            log.info("Transaction Declined: {}", e.getMessage());
-        }
-    }
-
-    // create Deposit and Update the Balance in DB
-
-    void updateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
-        Account senderAccount = fetchAccount(connection, transaction.getFrom());
-        if (senderAccount == null) {
-            log.info("Transaction Declined: Sender account not found {}", transaction.getFrom());
-            return;
-        }
-        try {
-            senderAccount.withdraw(transaction.getAmount());
-            updateAccountBalanceDatabase(connection, senderAccount);
-        }catch (ArithmeticException e) {
-            log.info("{}", e.getMessage());
+            log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}, accepted: {}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount(), accepted);
+            if (accepted) {
+                updateAccountBalance(connection, senderAccount);
+            }
         }
     }
 
@@ -74,7 +73,7 @@ public class DatabaseHandler {
         return null; // if account was not found
     }
 
-    private void updateAccountBalanceDatabase(Connection connection, Account account) throws SQLException {
+    private void updateAccountBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             preparedStatement.setBigDecimal(1, account.getBalance());
             preparedStatement.setString(2, account.getAccountID());
