@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,22 @@ public class AccountController {
         model.put(SESSION_ACCOUNT_NAME, session.get("name"));
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
+
+        // get the balance from the account
+        BigDecimal balance = BigDecimal.ZERO;
+        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where Name = ?")) {
+            statement.setString(1, String.valueOf(model.get(SESSION_ACCOUNT_NAME)));
+            ResultSet rs = statement.executeQuery();
+            try(rs){
+                if (rs.next()) {
+                    balance = rs.getBigDecimal("Balance");
+                    logger.info("Account balance is: {} " , balance);
+                }else{
+                    logger.info("Account balance is empty");
+                }
+            }
+        }
+        model.put("balance", balance);
 
         // Get all transactions related to a user's account
         try (Connection connection = dataSource.getConnection()) {
