@@ -10,8 +10,9 @@
 <form action="/process" method="post">
     <label for="depositamount">Amount: </label>
     <input type="number" id="depositamount" name="depositamount" step="0.01" min = "0.01" required>
-    <input type="submit" value="Withdraw">
+        <input type="submit" value="Deposit">
 </form>
+Current balance is: £{{balance}}
 {{#if error}}
     <p style="color: red;">{{error}}</p>
 {{/if}}
