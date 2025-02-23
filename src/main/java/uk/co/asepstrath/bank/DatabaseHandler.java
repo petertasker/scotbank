@@ -44,10 +44,13 @@ public class DatabaseHandler {
         }
     }
 
+    // create Deposit and Update the Balance in DB
+
     void updateAccountBalance(Connection connection, Transaction transaction) throws SQLException {
         Account senderAccount = fetchAccount(connection, transaction.getFrom());
         if (senderAccount == null) {
-            throw new SQLException("Account not found" + transaction.getFrom());
+            log.info("Transaction Declined: Sender account not found {}", transaction.getFrom());
+            return;
         }
         try {
             senderAccount.withdraw(transaction.getAmount());

@@ -10,7 +10,7 @@ Your account ID is {{accountid}}
 
 <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
 <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
-
+<br>Current balance is: £{{balance}}
 
 {{#if hastransactions}}
     <div class="transactions-section">
@@ -19,7 +19,7 @@ Your account ID is {{accountid}}
             <div class="transaction">
                 <p>Timestamp: {{timestamp}}</p>
                 <p>Transaction ID: {{id}}</p>
-                <p>Amount: ${{amount}}</p>
+                <p>Amount: £{{amount}}</p>
                 <p>From: {{from}}</p>
                 <p>To: {{to}}</p>
                 <p>Type: {{type}}</p>
