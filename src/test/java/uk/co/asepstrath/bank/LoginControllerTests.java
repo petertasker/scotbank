@@ -101,7 +101,6 @@ class LoginControllerTests {
         verify(mockContext).sendRedirect("/account");
         assertNull(result); // Should be null because of redirect
 
-        // Verify only the session attributes that ContextManager actually sets
         verify(mockSession).put("accountid", accountId);
         verify(mockSession).put("name", name);
 

@@ -2,12 +2,13 @@ package uk.co.asepstrath.bank.controllers;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;
+import io.jooby.Session;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.ContextManager;
+
 import static uk.co.asepstrath.bank.Constants.*;
 
 import javax.sql.DataSource;
@@ -24,7 +25,6 @@ public class LoginController {
 
     private final DataSource dataSource;
     private final Logger logger;
-    ContextManager contextManager = new ContextManager();
 
     public LoginController(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
@@ -67,8 +67,11 @@ public class LoginController {
                             rs.getBigDecimal("Balance"),
                             rs.getBoolean("RoundUpEnabled")
                     );
-                    // Add to session
-                    contextManager.addAccountDetailsToContext(account, ctx);
+
+                    // Add accountID to session
+                    Session session = ctx.session();
+                    session.put("accountid", account.getAccountID());
+                    session.put("name", account.getName());
                     ctx.sendRedirect("/account");
                     return null;
                 }
