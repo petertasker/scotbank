@@ -94,7 +94,7 @@ public class DatabaseHandler {
             log.info("Inserted Account: {}, Balance: £{}", account.getAccountID(), account.getBalance());
         }
         catch (SQLException e) {
-            throw new SQLException(e);
+            log.info("Insert Account Failed: {}", e.getMessage());
         }
     }
 
