@@ -40,21 +40,7 @@ public class AccountController {
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
 
-        // get the balance from the account
-        BigDecimal balance = BigDecimal.ZERO;
-        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where Name = ?")) {
-            statement.setString(1, String.valueOf(model.get(SESSION_ACCOUNT_NAME)));
-            ResultSet rs = statement.executeQuery();
-            try(rs){
-                if (rs.next()) {
-                    balance = rs.getBigDecimal("Balance");
-                    logger.info("Account balance is: {} " , balance);
-                }else{
-                    logger.info("Account balance is empty");
-                }
-            }
-        }
-        model.put("balance", balance);
+        getBalance(model, String.valueOf(session.get("name")));
 
         // Get all transactions related to a user's account
         try (Connection connection = dataSource.getConnection()) {
@@ -97,6 +83,11 @@ public class AccountController {
     @Path("/deposit")
     public ModelAndView<Map<String, Object>> deposit(Context ctx) {
        Map<String, Object> model = new HashMap<>();
+       Session session = ctx.session();
+       String accName = String.valueOf(session.get("name"));
+       model.put(SESSION_ACCOUNT_NAME, accName);
+
+       getBalance(model,accName);
        return new ModelAndView<>(URL_PAGE_ACCOUNT_DEPOSIT, model);
     }
 
@@ -105,6 +96,35 @@ public class AccountController {
     @Path("/withdraw")
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
        Map<String, Object> model = new HashMap<>();
+       Session session = ctx.session();
+       String accName = String.valueOf(session.get("name"));
+
+       getBalance(model,accName);
        return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW, model);
+    }
+
+    private void getBalance(Map<String, Object> model, String name) {
+        BigDecimal balance = BigDecimal.ZERO;
+
+        if (name == null) {
+            logger.info("Account balance is empty");
+            model.put("balance", "N/a");
+            return;
+        }
+        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where Name = ?")) {
+            statement.setString(1, name);
+            ResultSet rs = statement.executeQuery();
+            try(rs){
+                if (rs.next()) {
+                    balance = rs.getBigDecimal("Balance");
+                    logger.info("Account balance: {}" , balance);
+                }else{
+                    logger.info("Account balance is empty");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        model.put("balance", balance);
     }
 }
