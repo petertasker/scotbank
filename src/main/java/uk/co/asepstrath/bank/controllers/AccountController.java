@@ -123,7 +123,7 @@ public class AccountController {
 
     @POST
     @Path("/withdraw/process")
-    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws Exception {
+    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
        try (Connection connection = dataSource.getConnection()) {
            Session session = ctx.session();
            String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
@@ -168,11 +168,12 @@ public class AccountController {
     }
 
     private void updateDatabaseBalance(Account account) throws SQLException {
-       try (Connection connection = dataSource.getConnection()) {
-           PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?");
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
+
             statement.setBigDecimal(1, account.getBalance());
             statement.setString(2, account.getAccountID());
             statement.executeUpdate();
-       }
+        }
     }
 }
