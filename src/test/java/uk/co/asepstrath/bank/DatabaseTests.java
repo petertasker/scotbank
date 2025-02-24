@@ -26,6 +26,7 @@ class DatabaseTests {
     @Inject
     private DataSource dataSource;
     private DatabaseInitialiser databaseInitialiser;
+    private DatabaseHandler databaseHandler; // SonarQube says to remove <- but code doesn't compile without it
     private Connection connection;
 
     @BeforeAll
@@ -48,6 +49,7 @@ class DatabaseTests {
         databaseHandler = new DatabaseHandler();
 
         cleanDatabase();
+        // Moved databaseInitialiser so the database is cleaned properly
     }
 
     @AfterEach
