@@ -162,7 +162,7 @@ public class DatabaseInitialiser {
             }
             return businesses;
             
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new IOException("Failed to parse business data: ", e);
         }
     }
