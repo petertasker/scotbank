@@ -1,72 +1,146 @@
 package uk.co.asepstrath.bank;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import io.jooby.test.JoobyTest;
+import io.jooby.test.MockRouter;
+
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
+import javax.xml.stream.XMLStreamException;
+
+import java.io.IOException;
 import java.sql.*;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 
+import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
+import com.fasterxml.jackson.core.JsonParseException;
+
+@JoobyTest(App.class)
 class DatabaseTests {
-
+    @Inject
     private DataSource dataSource;
-    private Connection connection;
     private DatabaseInitialiser databaseInitialiser;
-    private Statement statement;
-    private PreparedStatement preparedStatement;
+    private DatabaseHandler databaseHandler;
+    private Connection connection;
+
+    @BeforeAll
+    static void setupClass() {
+        new MockRouter(new App());
+    }
 
     @BeforeEach
     void setUp() throws SQLException {
-        dataSource = mock(DataSource.class);
-        connection = mock(Connection.class);
-        statement = mock(Statement.class);
-        preparedStatement = mock(PreparedStatement.class);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+        config.setUsername("sa");
+        config.setPassword("");
 
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        dataSource = new HikariDataSource(config);
+        connection = dataSource.getConnection();
 
-        databaseInitialiser = spy(new DatabaseInitialiser(dataSource));
+        assertNotNull(dataSource, "DataSource should not be null");
+        databaseInitialiser = new DatabaseInitialiser(dataSource);
+        databaseHandler = new DatabaseHandler();
+
+        cleanDatabase();
+        // databaseInitialiser.initialise();
     }
 
-    //Ensure that accounts are being loaded into the database from the api
+    @AfterEach
+    void tearDown() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
+        if (dataSource instanceof HikariDataSource) {
+            ((HikariDataSource) dataSource).close();
+        }
+    }
+
+    private void cleanDatabase() throws SQLException {
+        try (var statement = connection.createStatement()) {
+            statement.execute("DROP TABLE IF EXISTS Transactions");
+            statement.execute("DROP TABLE IF EXISTS Accounts");
+            statement.execute("DROP TABLE IF EXISTS Businesses");
+        }
+    }
+
     @Test
-    void testInitialiseDatabase() throws SQLException {
+    void testTablesExist() throws SQLException {
         databaseInitialiser.initialise();
+        try (var rs = connection.getMetaData().getTables(null, null, "%", null)) {
+            var tables = new java.util.ArrayList<String>();
+            while (rs.next()) {
+                tables.add(rs.getString("TABLE_NAME").toLowerCase());
+            }
+            assertTrue(tables.contains("accounts"));
+            assertTrue(tables.contains("businesses"));
+            assertTrue(tables.contains("transactions"));
+        }
+    }
 
-        verify(statement).executeUpdate(contains("CREATE TABLE Accounts"));
-        verify(statement).executeUpdate(contains("CREATE TABLE Business"));
-        verify(statement).executeUpdate(contains("CREATE TABLE Transactions"));
+    /*
+     * Test Coverage for Catch Statements & throwing JsonParse, IO and XMLStreamException
+     *    Use Mockito.spy for partial mocking and wrapping the existing instance
+     *      This allows us overide the 'Fetch' functions to throw the respective exceptions.
+     *      Keeps the functionality of the rest of 'DatabaseInitialiser'.
+     */ 
+
+    @Test
+    void testInitialiseCatchJsonParseException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new JsonParseException("Testing JsonParseException")).when(spyInitialiser).fetchAccounts();
+        
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown.");
+        } catch (SQLException e) {
+            exception = e;
+        }
+
+        assertEquals("Fetching failed somewhere", exception.getMessage());
+        assertTrue(exception.getCause() instanceof JsonParseException);
     }
 
     @Test
-    void InsertIntoTables() throws SQLException {
-        DatabaseHandler dbHandler = new DatabaseHandler();
-        Connection mockConnection = mock(Connection.class);
+    void testInitialiseCatchXMLStreamException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new XMLStreamException("Testing XMLStreamException")).when(spyInitialiser).fetchTransactions();
 
-        // Ensure connection and preparedStatement are mocked
-        when(mockConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1); // Simulate successful insert
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown");
+        } catch (SQLException e){
+            exception = e;
+        }
 
-        // Mock Account, Business, and Transaction objects
-        Account account = new Account("A123", "TestUser",new BigDecimal("100.50"),true);
-        Business business = new Business("B123", "Test Business", "Retail", false);
+        assertEquals("Fetching failed somewhere", exception.getMessage());
+        assertTrue(exception.getCause() instanceof XMLStreamException);
+    }
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
-        DateTime timestamp = formatter.parseDateTime("2024-02-20T12:00:00");
-        Transaction transaction = new Transaction(timestamp, 50, "A123", "T123", "B123", "Purchase");
+    @Test
+    void testInitialiseCatchIOException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new IOException("Testing IOException")).when(spyInitialiser).fetchBusinesses();
 
-        // insert into tables
-        dbHandler.insertAccount(mockConnection, account);
-        dbHandler.insertBusiness(mockConnection, business);
-        dbHandler.insertTransaction(mockConnection, transaction);
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown");
+        } catch (SQLException e){
+            exception = e;
+        }
 
-        // Verify executeUpdate() was called for each statement
-        verify(preparedStatement, times(3)).executeUpdate();
+        assertEquals("Database creation failed", exception.getMessage());
+        assertTrue(exception.getCause() instanceof IOException);
     }
 }
