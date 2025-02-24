@@ -19,8 +19,6 @@ import java.sql.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doThrow;
 
-import javax.sql.DataSource;
-import javax.xml.stream.XMLStreamException;
 import com.fasterxml.jackson.core.JsonParseException;
 
 @JoobyTest(App.class)
@@ -28,7 +26,6 @@ class DatabaseTests {
     @Inject
     private DataSource dataSource;
     private DatabaseInitialiser databaseInitialiser;
-    private DatabaseHandler databaseHandler;
     private Connection connection;
 
     @BeforeAll
@@ -51,7 +48,6 @@ class DatabaseTests {
         databaseHandler = new DatabaseHandler();
 
         cleanDatabase();
-        // databaseInitialiser.initialise();
     }
 
     @AfterEach
