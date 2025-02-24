@@ -6,7 +6,6 @@ import io.jooby.Session;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
-import org.h2.engine.Mode;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
@@ -43,7 +42,7 @@ public class AccountController {
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
 
-        getBalance(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
 
 
         // Get all transactions related to a user's account
@@ -85,13 +84,11 @@ public class AccountController {
     @GET
     @Path("/deposit")
     public ModelAndView<Map<String, Object>> deposit(Context ctx) {
-       Map<String, Object> model = new HashMap<>();
-       Session session = ctx.session();
-       String accName = String.valueOf(session.get("name"));
-       model.put(SESSION_ACCOUNT_NAME, accName);
+        Map<String, Object> model = new HashMap<>();
+        Session session = ctx. session();
 
-       getBalance(model,accName);
-       return new ModelAndView<>(URL_PAGE_ACCOUNT_DEPOSIT, model);
+        putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        return new ModelAndView<>(URL_PAGE_ACCOUNT_DEPOSIT, model);
     }
 
 
@@ -99,12 +96,13 @@ public class AccountController {
     @Path("/withdraw")
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
        Map<String, Object> model = new HashMap<>();
-       Session session = ctx.session();
-        getBalance(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+       Session session = ctx. session();
+
+       putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
        return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW, model);
     }
 
-    private void getBalance(Map<String, Object> model, String accountId) {
+    private void putBalanceInModel(Map<String, Object> model, String accountId) {
         BigDecimal balance = BigDecimal.ZERO;
         try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where AccountID = ?")) {
             statement.setString(1, accountId);
@@ -125,7 +123,7 @@ public class AccountController {
 
     @POST
     @Path("/withdraw/process")
-    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) {
+    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws Exception {
        try (Connection connection = dataSource.getConnection()) {
            Session session = ctx.session();
            String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
@@ -134,22 +132,47 @@ public class AccountController {
            Map<String, Object> model = new HashMap<>();
            try {
                account.withdraw(amount);
-               try (PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
-                   statement.setBigDecimal(1, account.getBalance());
-                   statement.setString(2, account.getAccountID());
-                   statement.executeUpdate();
-               }
-
+               updateDatabaseBalance(account);
                ctx.sendRedirect("/account");
            } catch (ArithmeticException e) {
                logger.error(e.getMessage());
                model.put(URL_ERROR_MESSAGE, e.getMessage());
-               getBalance(model,accountId);
+               putBalanceInModel(model,accountId);
                return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW,model);
            }
-       } catch (SQLException e) {
-           throw new RuntimeException(e);
        }
-        return null;
+       return null;
+    }
+
+    @POST
+    @Path("/deposit/process")
+    public ModelAndView<Map<String, Object>> depositProcess(Context ctx) throws SQLException {
+       try (Connection connection = dataSource.getConnection()) {
+           Session session = ctx.session();
+           String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+           BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(ctx.form("depositamount").value()));
+           Account account = databaseHandler.fetchAccount(connection, accountId);
+           Map<String, Object> model = new HashMap<>();
+           try {
+               account.deposit(amount);
+               updateDatabaseBalance(account);
+               ctx.sendRedirect("/account");
+           } catch (ArithmeticException e) {
+               logger.error(e.getMessage());
+               model.put(URL_ERROR_MESSAGE, e.getMessage());
+               putBalanceInModel(model,accountId);
+               return new ModelAndView<>(URL_PAGE_ACCOUNT_DEPOSIT,model);
+           }
+       }
+       return null;
+    }
+
+    private void updateDatabaseBalance(Account account) throws SQLException {
+       try (Connection connection = dataSource.getConnection()) {
+           PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?");
+            statement.setBigDecimal(1, account.getBalance());
+            statement.setString(2, account.getAccountID());
+            statement.executeUpdate();
+       }
     }
 }

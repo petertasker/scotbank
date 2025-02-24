@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 
 import java.sql.*;
-import java.util.Objects;
 
 public class DatabaseHandler {
 
