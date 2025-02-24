@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -15,6 +13,9 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.parsers.XmlParser;
+
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
 
 public class DatabaseInitialiser {
 
@@ -87,8 +88,11 @@ public class DatabaseInitialiser {
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
-        } catch (XMLStreamException | IOException e) {
+        }
+        catch (XMLStreamException | JsonParseException e) {
             throw new SQLException("Fetching failed somewhere", e);
+        } catch (IOException e) {
+            throw new SQLException("Database creation failed", e);
         }
     }
 
@@ -114,62 +118,67 @@ public class DatabaseInitialiser {
     // Fetch accounts from API in JSON form
     List<Account> fetchAccounts() throws JsonParseException {
         try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/accounts");
-            return mapper.readValue(url, new TypeReference<List<Account>>() {});
-        }
-        catch (IOException e) {
-            throw new JsonParseException("Failed to fetch accounts");
+            HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asString();
+            
+            if (response.isSuccess()) {
+                return mapper.readValue(response.getBody(), new TypeReference<List<Account>>() {});
+            } else {
+                throw new JsonParseException(null, "Failed to fetch accounts: " + response.getStatus());
+            }
+        } catch (IOException e) {
+            throw new JsonParseException(null, "Failed to parse account data");
         }
     }
 
     List<Business> fetchBusinesses() throws IOException {
         try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/businesses");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/businesses").asString();
+
+            if (!response.isSuccess()) {
+                throw new IOException("Failed to fetch businesses: " + response.getStatus());
+            }
 
             List<Business> businesses = new ArrayList<>();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            try(in) {
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    if (inputLine.trim().isEmpty()) {
-                        continue;
-                    }
-
-                    String[] inputFields = inputLine.split(",");
-                    if (inputFields.length >= 4) {
-                        String id = inputFields[0].trim();
-                        String name = inputFields[1].trim();
-                        String category = inputFields[2].trim();
-                        boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
-
-                        businesses.add(new Business(id, name, category, sanctioned));
-                    }
+            String[] lines = response.getBody().split("\n");
+            boolean skipHeader = true;
+            
+            for (String inputLine : lines) {
+                if (skipHeader){
+                    skipHeader = false;
+                    continue;
                 }
-                return businesses;
+
+                String[] inputFields = inputLine.split(",");
+                if (inputFields.length >= 4) {
+                    String id = inputFields[0].trim();
+                    String name = inputFields[1].trim();
+                    String category = inputFields[2].trim();
+                    boolean sanctioned = Boolean.parseBoolean(inputFields[3].trim());
+
+                    businesses.add(new Business(id, name, category, sanctioned));
+                }
             }
-        }
-        catch (IOException e) {
-            throw new IOException ("Failed to parse business data: ", e);
+            return businesses;
+            
+        } catch (IOException e) {
+            throw new IOException("Failed to parse business data: ", e);
         }
     }
 
     List<Transaction> fetchTransactions() throws XMLStreamException {
         try {
-            URL url = new URL("https://api.asep-strath.co.uk/api/transactions");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions").asString();
+
+            if (!response.isSuccess()) {
+                throw new XMLStreamException("Failed to fetch transactions: " + response.getStatus());
+            }
 
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new JodaModule());
-            XmlParser pageResult = xmlMapper.readValue(con.getInputStream(), XmlParser.class);
+            XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
             return pageResult.getTransactions();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
     }
-
-
 }

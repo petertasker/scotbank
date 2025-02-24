@@ -8,17 +8,27 @@ import io.jooby.test.MockRouter;
 
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
+
 import javax.sql.DataSource;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import javax.xml.stream.XMLStreamException;
+
+import java.io.IOException;
+
+import static org.mockito.Mockito.doThrow;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 @JoobyTest(App.class)
 class DatabaseTests {
     @Inject
     private DataSource dataSource;
     private DatabaseInitialiser databaseInitialiser;
-    private DatabaseHandler databaseHandler;
+    private DatabaseHandler databaseHandler; // SonarQube says to remove <- but code doesn't compile without it
     private Connection connection;
 
     @BeforeAll
@@ -39,9 +49,8 @@ class DatabaseTests {
         assertNotNull(dataSource, "DataSource should not be null");
         databaseInitialiser = new DatabaseInitialiser(dataSource);
         databaseHandler = new DatabaseHandler();
-
         cleanDatabase();
-        databaseInitialiser.initialise();
+        // Moved databaseInitialiser so the database is cleaned properly
     }
 
     @AfterEach
@@ -64,6 +73,7 @@ class DatabaseTests {
 
     @Test
     void testTablesExist() throws SQLException {
+        databaseInitialiser.initialise();
         try (var rs = connection.getMetaData().getTables(null, null, "%", null)) {
             var tables = new java.util.ArrayList<String>();
             while (rs.next()) {
@@ -73,5 +83,63 @@ class DatabaseTests {
             assertTrue(tables.contains("businesses"));
             assertTrue(tables.contains("transactions"));
         }
+    }
+
+    /*
+     * Test Coverage for Catch Statements & throwing JsonParse, IO and XMLStreamException
+     *    Use Mockito.spy for partial mocking and wrapping the existing instance
+     *      This allows us overide the 'Fetch' functions to throw the respective exceptions.
+     *      Keeps the functionality of the rest of 'DatabaseInitialiser'.
+     */ 
+
+    @Test
+    void testInitialiseCatchJsonParseException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new JsonParseException("Testing JsonParseException")).when(spyInitialiser).fetchAccounts();
+        
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown.");
+        } catch (SQLException e) {
+            exception = e;
+        }
+
+        assertEquals("Fetching failed somewhere", exception.getMessage());
+        assertInstanceOf(JsonParseException.class, exception.getCause());
+    }
+
+    @Test
+    void testInitialiseCatchXMLStreamException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new XMLStreamException("Testing XMLStreamException")).when(spyInitialiser).fetchTransactions();
+
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown");
+        } catch (SQLException e){
+            exception = e;
+        }
+
+        assertEquals("Fetching failed somewhere", exception.getMessage());
+        assertInstanceOf(XMLStreamException.class, exception.getCause());
+    }
+
+    @Test
+    void testInitialiseCatchIOException() throws Exception {
+        DatabaseInitialiser spyInitialiser = Mockito.spy(databaseInitialiser);
+        doThrow(new IOException("Testing IOException")).when(spyInitialiser).fetchBusinesses();
+
+        SQLException exception = null;
+        try{
+            spyInitialiser.initialise();
+            fail("SQLException was not thrown");
+        } catch (SQLException e){
+            exception = e;
+        }
+
+        assertEquals("Database creation failed", exception.getMessage());
+        assertInstanceOf(IOException.class, exception.getCause());
     }
 }
