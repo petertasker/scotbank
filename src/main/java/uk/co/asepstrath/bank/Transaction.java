@@ -27,9 +27,9 @@ public class Transaction {
         // For jackson mapper
     }
 
-    public Transaction(DateTime timestamp, int amount, String from, String id, String to, String type) {
+    public Transaction(DateTime timestamp, BigDecimal amount, String from, String id, String to, String type) {
         this.timestamp= timestamp;
-        this.amount = BigDecimal.valueOf(amount);
+        this.amount = amount;
         this.from = from;
         this.id = id;
         this.to = to;

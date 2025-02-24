@@ -4,18 +4,19 @@ import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
 import io.jooby.annotation.GET;
+import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
+import org.h2.engine.Mode;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.DatabaseHandler;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -25,10 +26,12 @@ public class AccountController {
 
     private final Logger logger;
     private final DataSource dataSource;
+    private final DatabaseHandler databaseHandler;
 
    public AccountController(DataSource datasource, Logger logger) {
        this.dataSource = datasource;
        this.logger = logger;
+       databaseHandler = new DatabaseHandler();
        logger.info("Account Controller initialised");
    }
 
@@ -40,13 +43,13 @@ public class AccountController {
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
 
-        getBalance(model, String.valueOf(session.get("name")));
+        getBalance(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+
 
         // Get all transactions related to a user's account
         try (Connection connection = dataSource.getConnection()) {
             List<Transaction> transactions = new ArrayList<>();
 
-            // Using try-with-resources to ensure ResultSet is closed properly
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType " +
                             "FROM Transactions " +
@@ -61,7 +64,7 @@ public class AccountController {
 
                         Transaction transaction = new Transaction(
                                 dateTime,
-                                resultSet.getInt("Amount"),
+                                resultSet.getBigDecimal("Amount"),
                                 resultSet.getString("SenderID"),
                                 resultSet.getString("TransactionID"),
                                 resultSet.getString("ReceiverID"),
@@ -97,22 +100,14 @@ public class AccountController {
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
        Map<String, Object> model = new HashMap<>();
        Session session = ctx.session();
-       String accName = String.valueOf(session.get("name"));
-
-       getBalance(model,accName);
+        getBalance(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
        return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW, model);
     }
 
-    private void getBalance(Map<String, Object> model, String name) {
+    private void getBalance(Map<String, Object> model, String accountId) {
         BigDecimal balance = BigDecimal.ZERO;
-
-        if (name == null) {
-            logger.info("Account balance is empty");
-            model.put("balance", "N/a");
-            return;
-        }
-        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where Name = ?")) {
-            statement.setString(1, name);
+        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where AccountID = ?")) {
+            statement.setString(1, accountId);
             ResultSet rs = statement.executeQuery();
             try(rs){
                 if (rs.next()) {
@@ -126,5 +121,35 @@ public class AccountController {
             logger.error(e.getMessage());
         }
         model.put("balance", balance);
+    }
+
+    @POST
+    @Path("/withdraw/process")
+    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) {
+       try (Connection connection = dataSource.getConnection()) {
+           Session session = ctx.session();
+           String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+           BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(ctx.form("withdrawlamount").value()));
+           Account account = databaseHandler.fetchAccount(connection, accountId);
+           Map<String, Object> model = new HashMap<>();
+           try {
+               account.withdraw(amount);
+               try (PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
+                   statement.setBigDecimal(1, account.getBalance());
+                   statement.setString(2, account.getAccountID());
+                   statement.executeUpdate();
+               }
+
+               ctx.sendRedirect("/account");
+           } catch (ArithmeticException e) {
+               logger.error(e.getMessage());
+               model.put(URL_ERROR_MESSAGE, e.getMessage());
+               getBalance(model,accountId);
+               return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW,model);
+           }
+       } catch (SQLException e) {
+           throw new RuntimeException(e);
+       }
+        return null;
     }
 }

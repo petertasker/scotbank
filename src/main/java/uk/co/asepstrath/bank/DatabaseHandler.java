@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 
 import java.sql.*;
+import java.util.Objects;
 
 public class DatabaseHandler {
 
@@ -27,7 +28,7 @@ public class DatabaseHandler {
     }
 
 
-    void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
+    public void insertTransaction(Connection connection, Transaction transaction) throws SQLException {
 
         // Determine whether transaction succeeds or declines
         Account senderAccount = fetchAccount(connection, transaction.getFrom());
@@ -60,7 +61,7 @@ public class DatabaseHandler {
         }
     }
 
-    private Account fetchAccount(Connection connection, String accountID) throws SQLException {
+    public Account fetchAccount(Connection connection, String accountID) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT Balance, Name, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
             preparedStatement.setString(1, accountID);
             ResultSet resultSet = preparedStatement.executeQuery();
