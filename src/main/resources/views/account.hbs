@@ -10,6 +10,11 @@ Your account ID is {{accountid}}
 
 <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
 <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
+
+{{#if success}}
+    <p style="color: green">{{success}}</p>
+{{/if}}
+
 <br>Current balance is: £{{balance}}
 
 {{#if hastransactions}}
