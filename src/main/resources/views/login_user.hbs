@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/loginstyle.css">
+    <meta name = "viewport" content=" width-device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>Log in</title>
 </head>
 
 <body>
-<h1>Login</h1>
-<form action="/login/process" method="post">
-    <label for="accountid">Enter Account ID</label>
-    <input type="text" id="accountid" name="accountid">
-    <input type="submit" value="Login">
-</form>
+<div class = "wrapper">
+    <form action="/login/process" method="post">
+        <h1>Login</h1>
+        <div class = "input-box">
+            <input type="text" placeholder= "Account ID" id="accountid" name="accountid">
+            <i class='bx bxs-user'></i>
+        </div>
+        <button type = "submit" class="btn">Login</button>
+    </form>
+</div>
 {{#if error}}
     <p style="color: red;">{{error}}</p>
 {{/if}}

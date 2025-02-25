@@ -44,7 +44,7 @@ public class App extends Jooby {
         /*
         This will host any files in src/main/resources/assets on <host>/assets
          */
-        assets("/css/styles.css", "/css/styles.css");
+        assets("/css/*", "/css");
         assets("/assets/*", "/assets");
         assets("/service_worker.js","/service_worker.js");
 
