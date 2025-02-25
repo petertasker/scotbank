@@ -50,7 +50,7 @@ public class AccountController {
             List<Transaction> transactions = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType " +
+                    "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType, TransactionAccepted " +
                             "FROM Transactions " +
                             "WHERE SenderID = ?"
             )) {
@@ -67,7 +67,8 @@ public class AccountController {
                                 resultSet.getString("SenderID"),
                                 resultSet.getString("TransactionID"),
                                 resultSet.getString("ReceiverID"),
-                                resultSet.getString("TransactionType")
+                                resultSet.getString("TransactionType"),
+                                resultSet.getBoolean("TransactionAccepted")
                         );
                         logger.info("Found a transaction for this account: {}", transaction);
                         transactions.add(transaction);
