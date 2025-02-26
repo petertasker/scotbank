@@ -7,19 +7,21 @@ import io.jooby.test.JoobyTest;
 import io.jooby.test.MockRouter;
 
 import jakarta.inject.Inject;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-
-import static org.mockito.Mockito.doThrow;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
@@ -47,6 +49,7 @@ class DatabaseTests {
 
         assertNotNull(dataSource, "DataSource should not be null");
         databaseInitialiser = new DatabaseInitialiser(dataSource);
+
         cleanDatabase();
         // Moved databaseInitialiser so the database is cleaned properly
     }
@@ -139,5 +142,60 @@ class DatabaseTests {
 
         assertEquals("Database creation failed", exception.getMessage());
         assertInstanceOf(IOException.class, exception.getCause());
+    }
+
+    /* Test Coverage for inserting into tables
+       Using Mockito Mock
+    */
+
+    @Test
+    void testInsertDataInTables() throws Exception {
+        Connection mockConnection = Mockito.mock(Connection.class);
+        PreparedStatement mockPreparedStatement = Mockito.mock(PreparedStatement.class);
+        ResultSet mockResultSet = Mockito.mock(ResultSet.class);
+
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getString("Name")).thenReturn("John Doe");
+        when(mockResultSet.getBigDecimal("Balance")).thenReturn(new BigDecimal("1000.00"));
+        when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(true);
+
+        DatabaseHandler dbHandler = Mockito.spy(new DatabaseHandler());
+
+        // insert into Accounts Table
+        Account account = new Account("ABC123","John Doe",new BigDecimal("1000.00"),true);
+        dbHandler.insertAccount(mockConnection, account);
+        verify(mockConnection).prepareStatement(contains("INSERT INTO Accounts"));
+        verify(mockPreparedStatement).setString(1, "ABC123");
+        verify(mockPreparedStatement).setBigDecimal(2, new BigDecimal("1000.00"));
+        verify(mockPreparedStatement).setString(3, "John Doe");
+        verify(mockPreparedStatement).setBoolean(4, true);
+
+
+        // insert into Business Table
+
+        Business business = new Business("XYZ123","Something", "Retail",false);
+        dbHandler.insertBusiness(mockConnection, business);
+        verify(mockConnection).prepareStatement(contains("INSERT INTO Businesses"));
+        verify(mockPreparedStatement).setString(1, "XYZ123");
+        verify(mockPreparedStatement).setString(2, "Something");
+        verify(mockPreparedStatement).setString(3, "Retail");
+        verify(mockPreparedStatement).setBoolean(4, false);
+
+        // insert into Transaction Table
+        DateTime time = new DateTime(2025,5,11,22,20);
+        BigDecimal Amount = new BigDecimal("1000.00");
+        Transaction transaction =new Transaction(time, Amount,"ABC123","T123","XYZ123","PAYMENT",true);
+        dbHandler.insertTransaction(mockConnection, transaction);
+        verify(mockConnection).prepareStatement(contains("INSERT INTO Transactions"));
+        verify(mockPreparedStatement).setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
+        verify(mockPreparedStatement).setBigDecimal(2, new BigDecimal("1000.00"));
+        verify(mockPreparedStatement).setString(3, "ABC123");
+        verify(mockPreparedStatement).setString(4, "T123");
+        verify(mockPreparedStatement).setString(5, "XYZ123");
+        verify(mockPreparedStatement).setString(6, "PAYMENT");
+        verify(mockPreparedStatement).setBoolean(7, true);
     }
 }
