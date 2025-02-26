@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
@@ -18,10 +17,12 @@ import static uk.co.asepstrath.bank.Constants.*;
 public class ViewAccount {
     private final Logger logger;
     private final DataSource dataSource;
+    private final ReuseServices reuseServices;
 
     public ViewAccount(DataSource datasource, Logger logger){
         this.dataSource = datasource;
         this.logger = logger;
+        this.reuseServices = new ReuseServices(datasource, logger);
         logger.info("ViewAccount initialised");
     }
 
@@ -33,7 +34,7 @@ public class ViewAccount {
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
 
-        putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        reuseServices.putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
 
         // Get all transactions related to a user's account
         try (Connection connection = dataSource.getConnection()) {
@@ -69,24 +70,5 @@ public class ViewAccount {
             model.put(TRANSACTION_OBJECT_EXISTS, !transactions.isEmpty());
         }
         return new ModelAndView<>(URL_PAGE_ACCOUNT, model);
-    }
-
-    private void putBalanceInModel(Map<String, Object> model, String accountId) {
-        BigDecimal balance = BigDecimal.ZERO;
-        try(PreparedStatement statement = dataSource.getConnection().prepareStatement("select Balance from Accounts where AccountID = ?")) {
-            statement.setString(1, accountId);
-            ResultSet rs = statement.executeQuery();
-            try(rs){
-                if (rs.next()) {
-                    balance = rs.getBigDecimal("Balance");
-                    logger.info("Account balance: {}" , balance);
-                }else{
-                    logger.info("Account balance is empty");
-                }
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-        model.put("balance", balance);
     }
 }
