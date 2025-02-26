@@ -53,7 +53,7 @@ public class DatabaseHandler {
             preparedStatement.setBoolean(7, accepted);
             preparedStatement.executeUpdate();
 
-            log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}, accepted: {}", transaction.getId(), transaction.getFrom(), transaction.getTo(), transaction.getAmount(), accepted);
+            log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}, accepted: {}, Payment Type: {}", transaction.getId(), transaction.getFrom(),transaction.getTo(), transaction.getAmount(), accepted, transaction.getType());
             if (accepted) {
                 updateAccountBalance(connection, senderAccount);
             }

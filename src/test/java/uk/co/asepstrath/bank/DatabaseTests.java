@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
@@ -51,7 +50,6 @@ class DatabaseTests {
         databaseInitialiser = new DatabaseInitialiser(dataSource);
 
         cleanDatabase();
-        // Moved databaseInitialiser so the database is cleaned properly
     }
 
     @AfterEach
