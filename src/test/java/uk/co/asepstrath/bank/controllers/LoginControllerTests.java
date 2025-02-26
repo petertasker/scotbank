@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank;
+package uk.co.asepstrath.bank.controllers;
 
 import io.jooby.*;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.controllers.LoginController;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;

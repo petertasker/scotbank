@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank;
+package uk.co.asepstrath.bank.controllers;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;
@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import uk.co.asepstrath.bank.controllers.AccountController;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

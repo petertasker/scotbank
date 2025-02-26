@@ -116,7 +116,7 @@ public class DatabaseInitialiser {
     }
 
     // Fetch accounts from API in JSON form
-    List<Account> fetchAccounts() throws JsonParseException {
+    public List<Account> fetchAccounts() throws JsonParseException {
         try {
             HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/accounts").asString();
             
@@ -130,7 +130,7 @@ public class DatabaseInitialiser {
         }
     }
 
-    List<Business> fetchBusinesses() throws IOException {
+    public List<Business> fetchBusinesses() throws IOException {
         try {
             HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/businesses").asString();
 
@@ -165,7 +165,7 @@ public class DatabaseInitialiser {
         }
     }
 
-    List<Transaction> fetchTransactions() throws XMLStreamException {
+    public List<Transaction> fetchTransactions() throws XMLStreamException {
         try {
             HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions").asString();
 

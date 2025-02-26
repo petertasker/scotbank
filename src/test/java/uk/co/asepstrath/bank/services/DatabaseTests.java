@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank;
+package uk.co.asepstrath.bank.services;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -22,6 +22,8 @@ import java.io.IOException;
 import static org.mockito.Mockito.doThrow;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import uk.co.asepstrath.bank.App;
+import uk.co.asepstrath.bank.DatabaseInitialiser;
 
 @JoobyTest(App.class)
 class DatabaseTests {

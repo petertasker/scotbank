@@ -1,10 +1,16 @@
-package uk.co.asepstrath.bank;
+/**
+ * Unit testing for the account Class
+ */
+
+package uk.co.asepstrath.bank.services;
 
 import org.junit.jupiter.api.Test;
+import uk.co.asepstrath.bank.Account;
+
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
-class AccountTests {
+class AccountClassTests {
     /* A new Account should have a value of 0 */
     @Test
     void createAccount(){
@@ -20,14 +26,14 @@ class AccountTests {
     }
 
     @Test
-     void Withdraw(){
+    void Withdraw(){
         Account a = new Account("1", "Simon", BigDecimal.valueOf(40), false);
         a.withdraw(BigDecimal.valueOf(20)); // withdraw 20 pounds
         assertEquals(BigDecimal.valueOf(20), a.getBalance());
     }
 
     @Test
-     void TestArithmeticException(){
+    void TestArithmeticException(){
 
         assertDoesNotThrow(() -> new Account("1", "John Smith",BigDecimal.valueOf(20), false));
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
@@ -38,7 +44,7 @@ class AccountTests {
     }
 
     @Test
-     void TestArithmeticException2() {
+    void TestArithmeticException2() {
         assertDoesNotThrow(() -> new Account("1", "John Smith",BigDecimal.valueOf(20), false));
         Account a = new Account("1", "John Smith",BigDecimal.valueOf(20), false);
         BigDecimal amount = BigDecimal.valueOf(-5);
@@ -46,7 +52,7 @@ class AccountTests {
     }
 
     @Test
-     void SuperSavingTest(){
+    void SuperSavingTest(){
         Account a = new Account("2", "Michael", BigDecimal.valueOf(20), false);
         for (int i=0; i<5; i++){
             a.deposit(BigDecimal.valueOf(10));
@@ -58,7 +64,7 @@ class AccountTests {
     }
 
     @Test
-     void TestForPennies(){
+    void TestForPennies(){
         Account a = new Account("50", "Jack", BigDecimal.valueOf(5.45), false);
         a.deposit(BigDecimal.valueOf(17.56));
         assertEquals(BigDecimal.valueOf(23.01), a.getBalance());
