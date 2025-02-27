@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class AccountControllerTests {
 
     @Mock
-    private ControllerAccount accountController;
+    private AccountController accountController;
     @Mock
     private Context mockCtx;
     @Mock
@@ -48,7 +48,7 @@ class AccountControllerTests {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        accountController = new ControllerAccount(mockDataSource, mockLogger);
+        accountController = new AccountController(mockDataSource, mockLogger);
     }
 
     @Test

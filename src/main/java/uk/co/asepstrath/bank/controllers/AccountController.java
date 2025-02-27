@@ -6,9 +6,9 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.account.ViewAccount;
-import uk.co.asepstrath.bank.services.account.ServiceAccountDeposit;
-import uk.co.asepstrath.bank.services.account.ServiceAccountWithdraw;
+import uk.co.asepstrath.bank.services.account.AccountViewService;
+import uk.co.asepstrath.bank.services.account.AccountDepositService;
+import uk.co.asepstrath.bank.services.account.AccountWithdrawService;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -16,17 +16,17 @@ import java.util.*;
 
 
 @Path("/account")
-public class ControllerAccount extends Controller {
+public class AccountController extends BaseController {
 
-    private final ViewAccount viewAccountService;
-    private final ServiceAccountDeposit depositService;
-    private final ServiceAccountWithdraw withdrawService;
+    private final AccountViewService viewAccountService;
+    private final AccountDepositService depositService;
+    private final AccountWithdrawService withdrawService;
 
-   public ControllerAccount(DataSource datasource, Logger logger) {
+   public AccountController(DataSource datasource, Logger logger) {
        super(logger);
-       viewAccountService = new ViewAccount(datasource, logger);
-       depositService = new ServiceAccountDeposit(datasource, logger);
-       withdrawService = new ServiceAccountWithdraw(datasource, logger);
+       viewAccountService = new AccountViewService(datasource, logger);
+       depositService = new AccountDepositService(datasource, logger);
+       withdrawService = new AccountWithdrawService(datasource, logger);
    }
 
    @GET
