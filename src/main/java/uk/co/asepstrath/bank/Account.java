@@ -20,7 +20,7 @@ public class Account {
         this.accountID = accountID;
         this.balance = startingBalance;
         this.name = name;
-        this.roundUpEnabled = false;
+        this.roundUpEnabled = roundUpEnabled;
     }
 
     public void deposit(BigDecimal amount) throws ArithmeticException{

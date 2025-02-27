@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
@@ -36,12 +37,13 @@ public class ViewAccount {
 
         reuseServices.putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
 
+
         // Get all transactions related to a user's account
         try (Connection connection = dataSource.getConnection()) {
             List<Transaction> transactions = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverID, TransactionType " +
+                    "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, ReceiverBusinessID, TransactionType, TransactionAccepted " +
                             "FROM Transactions " +
                             "WHERE SenderID = ?"
             )) {
@@ -51,16 +53,22 @@ public class ViewAccount {
                     while (resultSet.next()) {
                         Timestamp timestamp = resultSet.getTimestamp("Timestamp");
                         DateTime dateTime = new DateTime(timestamp);
-
-                        Transaction transaction = new Transaction(
-                                dateTime,
-                                resultSet.getBigDecimal("Amount"),
-                                resultSet.getString("SenderID"),
-                                resultSet.getString("TransactionID"),
-                                resultSet.getString("ReceiverID"),
-                                resultSet.getString("TransactionType")
-                        );
-                        logger.info("Found a transaction for this account: {}", transaction);
+                        BigDecimal amount = resultSet.getBigDecimal("Amount");
+                        String senderID = resultSet.getString("SenderID");
+                        String transactionID = resultSet.getString("TransactionID");
+                        String receiverAccountID = resultSet.getString("ReceiverAccountID");
+                        String receiverBusinessID = resultSet.getString("ReceiverBusinessID");
+                        String receiverID;
+                        if (receiverAccountID != null) {
+                            receiverID = receiverAccountID;
+                        }
+                        else {
+                            receiverID = receiverBusinessID;
+                        }
+                        String transactionType = resultSet.getString("TransactionType");
+                        boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
+                        Transaction transaction = new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType, transactionAccepted);
+                        // logger.info("Found a transaction for this account: {}", transaction.toString());
                         transactions.add(transaction);
                     }
                 }

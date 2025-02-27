@@ -6,12 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-<<<<<<< HEAD:src/test/java/uk/co/asepstrath/bank/controllers/LoginControllerTests.java
-=======
+
 import uk.co.asepstrath.bank.controllers.LoginController;
 import uk.co.asepstrath.bank.services.login.DisplayLogin;
 import uk.co.asepstrath.bank.services.login.ProcessLogin;
->>>>>>> 5ee7a31 (Finished LoginController, modified testLoginProcessSuccess to test for ProcessLogin, added test for LoginController):src/test/java/uk/co/asepstrath/bank/LoginControllerTests.java
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;

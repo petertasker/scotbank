@@ -7,7 +7,6 @@ import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
-
 import uk.co.asepstrath.bank.controllers.LoginController_;
 import uk.co.asepstrath.bank.services.login.DisplayLogin;
 import uk.co.asepstrath.bank.services.login.ProcessLogin;
@@ -24,9 +23,11 @@ public class App extends Jooby {
 
         // Ensure user is logged in
         before(ctx -> {
+            String path = ctx.getRequestPath();
+            // add any JS/ CSS files here
+            if (path.startsWith("/css")) return;
             Session session = ctx.sessionOrNull();
             if (session == null || session.get("name") == null || session.get("accountid") == null) {
-                String path = ctx.getRequestPath();
                 if (!path.equals("/login") && !path.equals("/login/process")) {
                     ctx.setResponseCode(401).sendRedirect("/login");
                 }
@@ -41,10 +42,10 @@ public class App extends Jooby {
         install(new HandlebarsModule());
         install(new HikariModule("mem"));
         install(new JacksonModule()); // Handle JSON requests
-
         /*
         This will host any files in src/main/resources/assets on <host>/assets
          */
+        assets("/css/*", "/css");
         assets("/assets/*", "/assets");
         assets("/service_worker.js","/service_worker.js");
 

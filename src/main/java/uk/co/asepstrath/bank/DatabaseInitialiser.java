@@ -40,19 +40,23 @@ public class DatabaseInitialiser {
     """;
 
     private static final String SQL_CREATE_TRANSACTION = """
-        CREATE TABLE Transactions (
-            Timestamp DATETIME NOT NULL,
-            Amount DECIMAL(12,2) NOT NULL,
-            SenderID VARCHAR(255) NOT NULL,
-            TransactionID VARCHAR(255) NOT NULL,
-            ReceiverID VARCHAR(255) NOT NULL,
-            TransactionType VARCHAR(255) NOT NULL,
-            TransactionAccepted BIT NOT NULL,
-            PRIMARY KEY (TransactionID),
-            FOREIGN KEY (ReceiverID) REFERENCES Businesses(BusinessID),
-            FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID)
-        )
+    CREATE TABLE Transactions (
+        Timestamp DATETIME NOT NULL,
+        Amount DECIMAL(12,2) NOT NULL,
+        SenderID VARCHAR(255) NULL,
+        TransactionID VARCHAR(255) NOT NULL,
+        ReceiverAccountID VARCHAR(255) NULL,
+        ReceiverBusinessID VARCHAR(255) NULL,
+        TransactionType VARCHAR(255) NOT NULL,
+        TransactionAccepted BIT NOT NULL,
+        PRIMARY KEY (TransactionID),
+        FOREIGN KEY (ReceiverAccountID) REFERENCES Accounts(AccountID),
+        FOREIGN KEY (ReceiverBusinessID) REFERENCES Businesses(BusinessID),
+        FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID),
+        CONSTRAINT CHK_Receiver CHECK (ReceiverAccountID IS NOT NULL OR ReceiverBusinessID IS NOT NULL OR SenderID IS NOT NULL)
+    )
     """;
+
 
 
     private final DataSource dataSource;
@@ -78,16 +82,19 @@ public class DatabaseInitialiser {
             for (Account account : accounts) {
                 dbHandler.insertAccount(connection, account);
             }
+            log.info("Accounts inserted");
 
             List<Business> businesses = fetchBusinesses();
             for(Business business : businesses) {
                 dbHandler.insertBusiness(connection, business);
             }
+            log.info("Businesses inserted");
 
             List<Transaction> transactions = fetchTransactions();
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
+            log.info("Transactions inserted");
         }
         catch (XMLStreamException | JsonParseException e) {
             throw new SQLException("Fetching failed somewhere", e);
@@ -166,6 +173,8 @@ public class DatabaseInitialiser {
     }
 
     public List<Transaction> fetchTransactions() throws XMLStreamException {
+        List<Transaction> allTransactions = new ArrayList<>();
+        int page = 0;
         try {
             HttpResponse<String> response = Unirest.get("https://api.asep-strath.co.uk/api/transactions").asString();
 
@@ -175,10 +184,27 @@ public class DatabaseInitialiser {
 
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new JodaModule());
-            XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
-            return pageResult.getTransactions();
+            while (true) {
+                response = Unirest.get("https://api.asep-strath.co.uk/api/transactions?page=" + page).asString();
+                XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
+                List<Transaction> pageTransactions = pageResult.getTransactions();
+                if (pageTransactions == null || pageTransactions.isEmpty()) {
+                    break;
+                }
+                allTransactions.addAll(pageTransactions);
+                page = pageResult.getPage();
+
+                pageResult.setPage(++page);
+                log.info("Going to next page");
+                if (!response.isSuccess()) {
+                    break;
+//                    throw new XMLStreamException("Failed to fetch transactions: " + response.getStatus());
+                }
+                System.out.println("Fetched page " + pageResult.getPage() + " of " + pageResult.getTotalPages());
+            }
         } catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
+        return allTransactions;
     }
 }
