@@ -25,14 +25,9 @@ public class ServiceAccountWithdraw extends Service {
 
     public ModelAndView<Map<String, Object>> renderWithdraw(Context ctx) {
         Map<String, Object> model = createModel();
-        try {
-            String accountId = getAccountIdFromSession(ctx);
-            putBalanceInModel(model, accountId);
-            return render(URL_PAGE_ACCOUNT_WITHDRAW, model);
-        } catch (SQLException e) {
-            addErrorMessage(model, "Something went wrong displaying withdraw page");
-            return render(URL_PAGE_ACCOUNT, model);
-        }
+        String accountId = getAccountIdFromSession(ctx);
+        putBalanceInModel(model, accountId);
+        return render(URL_PAGE_ACCOUNT_WITHDRAW, model);
     }
 
     public ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
