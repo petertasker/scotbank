@@ -9,10 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DisplayLogin {
-    private final Logger logger;
 
     public DisplayLogin(Logger logger) {
-        this.logger = logger;
         logger.info("Display Login Handler initialised");
     }
 

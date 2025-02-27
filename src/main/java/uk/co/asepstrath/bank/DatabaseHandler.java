@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank;
 
-import com.typesafe.config.ConfigException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +33,12 @@ public class DatabaseHandler {
         Account senderAccount = fetchAccount(connection, transaction.getFrom());
         boolean accepted = true;
         if (senderAccount == null) {
-            // log.info("Transaction Declined: Sender account not found {}", transaction.getFrom());
             accepted = false;
         }
         else {
             try {
                 senderAccount.withdraw(transaction.getAmount());
             } catch (ArithmeticException e) {
-                // log.info("Transaction Declined: {}", e.getMessage());
                 accepted = false;
             }}
         //log.info("Inserting transaction {}: ", transaction);
@@ -68,7 +65,6 @@ public class DatabaseHandler {
             preparedStatement.executeUpdate();
         }
 
-        //log.info("Inserted Transaction: ID: {}, from {}, to {}, amount £{}, accepted: {}, Payment Type: {}", transaction.getId(), transaction.getFrom(),transaction.getTo(), transaction.getAmount(), accepted, transaction.getType());
         if (accepted) {
             updateAccountBalance(connection, senderAccount);
         }
@@ -94,7 +90,6 @@ public class DatabaseHandler {
             preparedStatement.setBigDecimal(1, account.getBalance());
             preparedStatement.setString(2, account.getAccountID());
             preparedStatement.executeUpdate();
-//            log.info("Updated Account : {}, New Balance: £{}", account.getAccountID(), account.getBalance());
         }
     }
 
@@ -106,7 +101,6 @@ public class DatabaseHandler {
             preparedStatement.setString(3, account.getName());
             preparedStatement.setBoolean(4, account.isRoundUpEnabled());
             preparedStatement.executeUpdate();
-//            log.info("Inserted Account: {}, Balance: £{}", account.getAccountID(), account.getBalance());
         }
         catch (SQLException e) {
             log.info("Insert Account Failed: {}", e.getMessage());
@@ -121,7 +115,6 @@ public class DatabaseHandler {
             preparedStatement.setString(3, business.getCategory());
             preparedStatement.setBoolean(4, business.isSanctioned());
             preparedStatement.executeUpdate();
-//            log.info("Inserted Business: {}", business.getID());
         }
     }
 }

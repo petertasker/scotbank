@@ -68,7 +68,6 @@ public class ViewAccount {
                         String transactionType = resultSet.getString("TransactionType");
                         boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
                         Transaction transaction = new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType, transactionAccepted);
-                        // logger.info("Found a transaction for this account: {}", transaction.toString());
                         transactions.add(transaction);
                     }
                 }

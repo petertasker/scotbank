@@ -16,12 +16,10 @@ import uk.co.asepstrath.bank.services.login.ProcessLogin;
 public class LoginController {
     private final DisplayLogin displayLoginService;
     private final ProcessLogin processLoginService;
-    private final Logger logger;
 
     public LoginController(DisplayLogin displayLogin, ProcessLogin processLogin, Logger logger) {
         this.displayLoginService =  displayLogin;
         this.processLoginService = processLogin;
-        this.logger = logger;
         logger.info("Login Controller initialised");
     }
 

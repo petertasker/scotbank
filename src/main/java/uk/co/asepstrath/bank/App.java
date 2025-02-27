@@ -27,11 +27,11 @@ public class App extends Jooby {
             // add any JS/ CSS files here
             if (path.startsWith("/css")) return;
             Session session = ctx.sessionOrNull();
-            if (session == null || session.get("name") == null || session.get("accountid") == null) {
-                if (!path.equals("/login") && !path.equals("/login/process")) {
-                    ctx.setResponseCode(401).sendRedirect("/login");
-                }
+            if ((session == null || session.get("name") == null || session.get("accountid") == null)
+                    && !path.equals("/login") && !path.equals("/login/process")) {
+                ctx.setResponseCode(401).sendRedirect("/login");
             }
+
         });
 
         /*
