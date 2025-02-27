@@ -41,7 +41,6 @@ public class DatabaseHandler {
             } catch (ArithmeticException e) {
                 accepted = false;
             }}
-        //log.info("Inserting transaction {}: ", transaction);
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_TRANSACTION)) {
             preparedStatement.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             preparedStatement.setString(2, transaction.getAmount().toString());

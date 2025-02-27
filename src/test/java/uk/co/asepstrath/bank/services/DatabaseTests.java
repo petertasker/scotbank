@@ -185,8 +185,8 @@ class DatabaseTests {
 
         // insert into Transaction Table
         DateTime time = new DateTime(2025,5,11,22,20);
-        BigDecimal Amount = new BigDecimal("1000.00");
-        Transaction transaction =new Transaction(time, Amount,"ABC123","T123","XYZ123","PAYMENT",true);
+        BigDecimal amount = new BigDecimal("1000.00");
+        Transaction transaction =new Transaction(time, amount,"ABC123","T123","XYZ123","PAYMENT",true);
         dbHandler.insertTransaction(mockConnection, transaction);
         verify(mockConnection).prepareStatement(contains("INSERT INTO Transactions"));
         verify(mockPreparedStatement).setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));

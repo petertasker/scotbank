@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.controllers.LoginController;
 import uk.co.asepstrath.bank.services.login.DisplayLogin;
 import uk.co.asepstrath.bank.services.login.ProcessLogin;
 
@@ -42,7 +41,6 @@ class LoginControllerTests {
     private Value mockValue = mock(Value.class);
     @Mock
     private Session mockSession = mock(Session.class);
-    // New mocks for refactored logincontroller
     @Mock
     private DisplayLogin mockDisplayLogin = mock(DisplayLogin.class);
     @Mock
@@ -89,7 +87,7 @@ class LoginControllerTests {
 
     // Test that the logincontroller was succesful in calling loginProcess
     @Test
-    void testLoginProcessCall() throws SQLException {
+    void testLoginProcessCall() {
         // Mock ProcessLogin
         when(mockProcessLogin.processLogin(mockContext)).thenReturn(mockModelAndView);
 
