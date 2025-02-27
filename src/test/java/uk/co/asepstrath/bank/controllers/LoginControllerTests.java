@@ -6,6 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+<<<<<<< HEAD:src/test/java/uk/co/asepstrath/bank/controllers/LoginControllerTests.java
+=======
+import uk.co.asepstrath.bank.controllers.LoginController;
+import uk.co.asepstrath.bank.services.login.DisplayLogin;
+import uk.co.asepstrath.bank.services.login.ProcessLogin;
+>>>>>>> 5ee7a31 (Finished LoginController, modified testLoginProcessSuccess to test for ProcessLogin, added test for LoginController):src/test/java/uk/co/asepstrath/bank/LoginControllerTests.java
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -16,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -37,12 +44,16 @@ class LoginControllerTests {
     private Value mockValue = mock(Value.class);
     @Mock
     private Session mockSession = mock(Session.class);
+    // New mocks for refactored logincontroller
+    @Mock
+    private DisplayLogin mockDisplayLogin = mock(DisplayLogin.class);
+    @Mock
+    private ProcessLogin mockProcessLogin = mock(ProcessLogin.class);
+    @Mock
+    private ModelAndView<Map<String, Object>> mockModelAndView;
 
-    private static final String URL_PAGE_LOGIN = "login_user.hbs";
-
-
-    LoginController loginController = new LoginController(mockDataSource, mockLogger);
-
+    LoginController loginController = new LoginController(mockDisplayLogin, mockProcessLogin, mockLogger);
+    private ProcessLogin processLogin;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -58,24 +69,47 @@ class LoginControllerTests {
         when(mockContext.session()).thenReturn(mockSession);
 
         // Initialize controller with mocked dependencies
-        loginController = new LoginController(mockDataSource, mockLogger);
-
-
+        loginController = new LoginController(mockDisplayLogin, mockProcessLogin, mockLogger);
+        processLogin = new ProcessLogin(mockDataSource, mockLogger);
     }
+
+    /*
+     * Changing testing from testing the entire controller to just testing each class.
+    */
 
     @Test
     void testDisplayLogin() {
+        // Mock DisplayLogin
+        when(mockDisplayLogin.displayLogin()).thenReturn(mockModelAndView);
+        // Act
         ModelAndView<Map<String, Object>> result = loginController.displayLogin();
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
-        assertNotNull(result.getModel());
-        assertTrue(result.getModel().isEmpty());
+        assertEquals(mockModelAndView, result);
+        verify(mockDisplayLogin).displayLogin(); 
+    }
+
+    // Test that the logincontroller was succesful in calling loginProcess
+    @Test
+    void testLoginProcessCall() throws SQLException {
+        // Mock ProcessLogin
+        when(mockProcessLogin.processLogin(mockContext)).thenReturn(mockModelAndView);
+
+        // Act
+        ModelAndView<Map<String, Object>> result = loginController.processLogin(mockContext);
+        // Assert
+        assertNotNull(result);
+        assertEquals(mockModelAndView, result);
+        
+        verify(mockProcessLogin).processLogin(mockContext);
+        // Verify no other interactions 
+        verifyNoMoreInteractions(mockProcessLogin);   
+        // Verify no unexpected interactions with the session
+        verifyNoMoreInteractions(mockSession);        
     }
 
     @Test
     void testLoginProcessSuccess() throws SQLException {
-
         String accountId = "12";
         String name = "Peter Tasker";
         BigDecimal balance = new BigDecimal("1000.00");
@@ -94,17 +128,16 @@ class LoginControllerTests {
         when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(roundUpEnabled);
 
         // Act
-        ModelAndView<Map<String, Object>> result = loginController.processLogin(mockContext);
+        ModelAndView<Map<String, Object>> result = processLogin.processLogin(mockContext);
 
         // Assert
-        verify(mockContext).sendRedirect("/account");
         assertNull(result); // Should be null because of redirect
 
         verify(mockSession).put("accountid", accountId);
         verify(mockSession).put("name", name);
 
         // Verify no other interactions with session.put()
+        verify(mockContext).sendRedirect("/account");
         verify(mockSession, times(2)).put(anyString(), (String) any());
     }
-
 }
