@@ -92,8 +92,8 @@ class AccountClassTests {
     void illegalDepositZero() {
         assertDoesNotThrow(() -> new Account("2", "John Doe", BigDecimal.valueOf(20), false));
         Account a = new Account("2", "John Doe", BigDecimal.valueOf(20), false);
-        BigDecimal amount = BigDecimal.valueOf(0);
-        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
+        BigDecimal amount = BigDecimal.valueOf(-12);
+        assertThrows(ArithmeticException.class, () -> a.deposit(amount));
     }
 
     @Test
@@ -102,7 +102,15 @@ class AccountClassTests {
         assertDoesNotThrow(() -> new Account("41", "John Doe", BigDecimal.valueOf(20), false));
         Account a = new Account("41", "John Doe", BigDecimal.valueOf(20), false);
         BigDecimal amount = BigDecimal.valueOf(-5);
-        assertThrows(ArithmeticException.class, () -> a.withdraw(amount));
+        assertThrows(ArithmeticException.class, () -> a.deposit(amount));
+    }
+
+    @Test
+    void updatingBalanceTset(){
+        Account a = new Account("1", "John Smith", BigDecimal.valueOf(20), false);
+        BigDecimal bal = BigDecimal.valueOf(10);
+        a.updateBalance(bal);
+        assertEquals(BigDecimal.valueOf(10),a.getBalance());
     }
 
     @Test

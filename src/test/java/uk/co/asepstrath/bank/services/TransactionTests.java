@@ -18,5 +18,9 @@ class TransactionTests {
         assertEquals("TOP", transaction.getTo());
         assertEquals("PAYMENT", transaction.getType());
         assertTrue(transaction.getStatus());
+        assertEquals("Transaction [timestamp=2025-02-14T08:30:00.000Z,"+
+                " amount=21, from=8f95782c-7c83-4dd7-8856-0e19a0e0a075,"+
+                " id=0043d8d9-846d-49cb-9b04-8d3823e9d8c9, to=TOP, type=PAYMENT,"+
+                " transactionStatus=true]", transaction.toString());
     }
 }
