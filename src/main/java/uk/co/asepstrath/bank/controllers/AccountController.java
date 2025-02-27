@@ -16,17 +16,17 @@ import java.util.*;
 
 
 @Path("/account")
-public class AccountController {
+public class AccountController extends Controller {
 
     private final ViewAccount viewAccountService;
     private final Deposit depositService;
     private final Withdraw withdrawService;
 
    public AccountController(DataSource datasource, Logger logger) {
+       super(logger);
        viewAccountService = new ViewAccount(datasource, logger);
        depositService = new Deposit(datasource, logger);
        withdrawService = new Withdraw(datasource, logger);
-       logger.info("Account Controller initialised");
    }
 
    @GET

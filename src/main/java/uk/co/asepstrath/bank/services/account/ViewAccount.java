@@ -7,6 +7,7 @@ import io.jooby.annotation.GET;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.services.Service;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -15,16 +16,10 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ViewAccount {
-    private final Logger logger;
-    private final DataSource dataSource;
-    private final ReuseServices reuseServices;
+public class ViewAccount extends Service {
 
     public ViewAccount(DataSource datasource, Logger logger){
-        this.dataSource = datasource;
-        this.logger = logger;
-        this.reuseServices = new ReuseServices(datasource, logger);
-        logger.info("ViewAccount initialised");
+        super(datasource, logger);
     }
 
     @GET
@@ -35,7 +30,7 @@ public class ViewAccount {
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
 
-        reuseServices.putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
 
 
         // Get all transactions related to a user's account

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Account {
 
-    private String accountID;
+    private final String accountID;
     private BigDecimal balance;
-    private boolean roundUpEnabled;
-    private String name;
+    private final boolean roundUpEnabled;
+    private final String name;
 
     @JsonCreator
     public Account(
