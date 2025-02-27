@@ -192,8 +192,8 @@ class DatabaseTests {
         verify(mockPreparedStatement).setBigDecimal(2, new BigDecimal("1000.00"));
         verify(mockPreparedStatement).setString(3, "ABC123");
         verify(mockPreparedStatement).setString(4, "T123");
-        verify(mockPreparedStatement).setString(5, "XYZ123");
-        verify(mockPreparedStatement).setString(6, "PAYMENT");
-        verify(mockPreparedStatement).setBoolean(7, true);
+        verify(mockPreparedStatement).setString(6, "XYZ123");
+        verify(mockPreparedStatement).setString(7, "PAYMENT");
+        verify(mockPreparedStatement).setBoolean(8, true);
     }
 }

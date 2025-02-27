@@ -22,20 +22,21 @@ public class Transaction {
     private String to;
     @JacksonXmlProperty(localName = "type")
     private String type;
-    private boolean TransactionStatus;
+    @JacksonXmlProperty(localName = "status")
+    private boolean transactionStatus;
 
     public Transaction() {
         // For jackson mapper
     }
 
-    public Transaction(DateTime timestamp, BigDecimal amount, String from, String id, String to, String type, boolean TransactionStatus) {
+    public Transaction(DateTime timestamp, BigDecimal amount, String from, String id, String to, String type, boolean transactionStatus) {
         this.timestamp= timestamp;
         this.amount = amount;
         this.from = from;
         this.id = id;
         this.to = to;
         this.type = type;
-        this.TransactionStatus = TransactionStatus;
+        this.transactionStatus = transactionStatus;
     }
 
     public DateTime getTimestamp() {
@@ -62,5 +63,9 @@ public class Transaction {
         return type;
     }
 
-    public boolean getStatus() {return TransactionStatus;}
+    public boolean getStatus() {return transactionStatus;}
+
+    public String toString() {
+        return "Transaction [timestamp=" + timestamp + ", amount=" + amount + ", from=" + from + ", id=" + id + ", to=" + to + ", type=" + type + ", transactionStatus=" + transactionStatus + "]";
+    }
 }

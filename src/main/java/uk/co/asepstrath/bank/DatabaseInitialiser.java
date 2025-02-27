@@ -40,19 +40,23 @@ public class DatabaseInitialiser {
     """;
 
     private static final String SQL_CREATE_TRANSACTION = """
-        CREATE TABLE Transactions (
-            Timestamp DATETIME NOT NULL,
-            Amount DECIMAL(12,2) NOT NULL,
-            SenderID VARCHAR(255) NOT NULL,
-            TransactionID VARCHAR(255) NOT NULL,
-            ReceiverID VARCHAR(255) NOT NULL,
-            TransactionType VARCHAR(255) NOT NULL,
-            TransactionAccepted BIT NOT NULL,
-            PRIMARY KEY (TransactionID),
-            FOREIGN KEY (ReceiverID) REFERENCES Businesses(BusinessID),
-            FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID)
-        )
+    CREATE TABLE Transactions (
+        Timestamp DATETIME NOT NULL,
+        Amount DECIMAL(12,2) NOT NULL,
+        SenderID VARCHAR(255) NULL,
+        TransactionID VARCHAR(255) NOT NULL,
+        ReceiverAccountID VARCHAR(255) NULL,
+        ReceiverBusinessID VARCHAR(255) NULL,
+        TransactionType VARCHAR(255) NOT NULL,
+        TransactionAccepted BIT NOT NULL,
+        PRIMARY KEY (TransactionID),
+        FOREIGN KEY (ReceiverAccountID) REFERENCES Accounts(AccountID),
+        FOREIGN KEY (ReceiverBusinessID) REFERENCES Businesses(BusinessID),
+        FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID),
+        CONSTRAINT CHK_Receiver CHECK (ReceiverAccountID IS NOT NULL OR ReceiverBusinessID IS NOT NULL OR SenderID IS NOT NULL)
+    )
     """;
+
 
 
     private final DataSource dataSource;
@@ -78,16 +82,19 @@ public class DatabaseInitialiser {
             for (Account account : accounts) {
                 dbHandler.insertAccount(connection, account);
             }
+            log.info("Accounts inserted");
 
             List<Business> businesses = fetchBusinesses();
             for(Business business : businesses) {
                 dbHandler.insertBusiness(connection, business);
             }
+            log.info("Businesses inserted");
 
             List<Transaction> transactions = fetchTransactions();
             for (Transaction transaction : transactions) {
                 dbHandler.insertTransaction(connection, transaction);
             }
+            log.info("Transactions inserted");
         }
         catch (XMLStreamException | JsonParseException e) {
             throw new SQLException("Fetching failed somewhere", e);
