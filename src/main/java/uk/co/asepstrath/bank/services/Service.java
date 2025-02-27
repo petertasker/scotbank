@@ -59,7 +59,7 @@ public abstract class Service {
         return ctx.form(name).valueOrNull();
     }
 
-    protected BigDecimal getFormBigDecimal(Context ctx, String name) {
+    public BigDecimal getFormBigDecimal(Context ctx, String name) {
         return BigDecimal.valueOf(Double.parseDouble(Objects.requireNonNull(ctx.form(name).valueOrNull())));
     }
 
@@ -86,7 +86,7 @@ public abstract class Service {
         model.put("balance", balance);
     }
 
-    protected void updateDatabaseBalance(Account account) throws SQLException {
+    public void updateDatabaseBalance(Account account) throws SQLException {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
 

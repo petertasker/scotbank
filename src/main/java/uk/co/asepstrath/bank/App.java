@@ -7,10 +7,10 @@ import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.controllers.LoginController_;
-import uk.co.asepstrath.bank.services.login.DisplayLogin;
-import uk.co.asepstrath.bank.services.login.ProcessLogin;
-import uk.co.asepstrath.bank.controllers.AccountController_;
+import uk.co.asepstrath.bank.controllers.ControllerLogin_;
+import uk.co.asepstrath.bank.services.login.ServiceLoginDisplay;
+import uk.co.asepstrath.bank.services.login.ServiceLoginProcess;
+import uk.co.asepstrath.bank.controllers.ControllerAccount_;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -55,11 +55,11 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        DisplayLogin displayLogin = new DisplayLogin(log);
-        ProcessLogin processLogin = new ProcessLogin(ds, log);
+        ServiceLoginDisplay serviceLoginDisplay = new ServiceLoginDisplay(log);
+        ServiceLoginProcess serviceLoginProcess = new ServiceLoginProcess(ds, log);
 
-        mvc(new AccountController_(ds, log));
-        mvc(new LoginController_(displayLogin, processLogin,  log));
+        mvc(new ControllerAccount_(ds, log));
+        mvc(new ControllerLogin_(serviceLoginDisplay, serviceLoginProcess,  log));
 
 
         /*
