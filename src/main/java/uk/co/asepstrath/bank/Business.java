@@ -2,10 +2,10 @@ package uk.co.asepstrath.bank;
 
 public class Business {
 
-    private String id;
-    private String name;
-    private String category;
-    private boolean sanctioned;
+    private final String id;
+    private final String name;
+    private final String category;
+    private final boolean sanctioned;
 
     public Business(String id, String name, String category, boolean sanctioned) {
         this.id = id;

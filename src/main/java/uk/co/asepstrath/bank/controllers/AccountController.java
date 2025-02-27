@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank.controllers;
 
 import io.jooby.Context;
+import io.jooby.Jooby;
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
@@ -16,17 +17,17 @@ import java.util.*;
 
 
 @Path("/account")
-public class AccountController {
+public class AccountController extends Controller {
 
     private final ViewAccount viewAccountService;
     private final Deposit depositService;
     private final Withdraw withdrawService;
 
    public AccountController(DataSource datasource, Logger logger) {
+       super(logger);
        viewAccountService = new ViewAccount(datasource, logger);
        depositService = new Deposit(datasource, logger);
        withdrawService = new Withdraw(datasource, logger);
-       logger.info("Account Controller initialised");
    }
 
    @GET

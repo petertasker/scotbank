@@ -5,6 +5,7 @@ import io.jooby.ModelAndView;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.services.Service;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -16,28 +17,23 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProcessLogin {
-
-    private final DataSource dataSource;
-    private final Logger logger;
+public class ProcessLogin extends Service {
 
     public ProcessLogin(DataSource dataSource, Logger logger) {
-        this.dataSource = dataSource;
-        this.logger = logger;
-        logger.info("Process Login Handler initialised");
+        super(dataSource, logger);
     }
 
     public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
-        Map<String, Object> model = new HashMap<>();
+        Map<String, Object> model = createModel();
 
         // Check if form value exists and is not empty
-        String formID = ctx.form("accountid").valueOrNull();
+        String formID = getFormValue(ctx, "accountid");
         if (formID == null || formID.trim().isEmpty()) {
-            model.put(URL_ERROR_MESSAGE, "Account ID is required");
-            return new ModelAndView<>(URL_PAGE_LOGIN, model);
+            addErrorMessage(model, "Account ID is required");
+            return render(URL_PAGE_LOGIN, model);
         }
 
-        try (Connection con = dataSource.getConnection();
+        try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement("SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
 
             ps.setString(1, formID);
@@ -59,20 +55,20 @@ public class ProcessLogin {
                     Session session = ctx.session();
                     session.put("accountid", account.getAccountID());
                     session.put("name", account.getName());
-                    ctx.sendRedirect("/account");
+                    redirect(ctx, "/account");
                     return null;
                 }
                 else {
                     // Handle case where account not found
-                    model.put(URL_ERROR_MESSAGE, "Account not found");
-                    return new ModelAndView<>(URL_PAGE_LOGIN, model);
+                    addErrorMessage(model, "Account not found");
+                    return render(URL_PAGE_LOGIN, model);
                 }
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
-            model.put(URL_ERROR_MESSAGE, "Database error occurred");
-            return new ModelAndView<>(URL_PAGE_LOGIN, model);
+            addErrorMessage(model, "Database error!");
+            return render(URL_PAGE_LOGIN, model);
         }
     }
 }

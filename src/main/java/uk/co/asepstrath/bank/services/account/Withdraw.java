@@ -3,59 +3,58 @@ package uk.co.asepstrath.bank.services.account;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
-
 import org.slf4j.Logger;
-
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DatabaseHandler;
+import uk.co.asepstrath.bank.services.Service;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class Withdraw {
-    private final Logger logger;
-    private final DataSource dataSource;
-    private final DatabaseHandler databaseHandler;
-    private final ReuseServices reuseServices;
+public class Withdraw extends Service {
 
-    public Withdraw(DataSource datasource, Logger logger){
-        this.dataSource = datasource;
-        this.logger = logger;
-        this.databaseHandler = new DatabaseHandler();
-        this.reuseServices = new ReuseServices(datasource, logger);
-        logger.info("Withdrawal Service initialised");
+    private static DatabaseHandler databaseHandler;
+
+    public Withdraw(DataSource datasource, Logger logger) {
+        super(datasource, logger);
+        databaseHandler = new DatabaseHandler();
     }
 
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
-        Map<String, Object> model = new HashMap<>();
-        Session session = ctx.session();
- 
-        reuseServices.putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
-        return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW, model);
-     }
+        Map<String, Object> model = createModel();
+        try {
+            String accountId = getAccountIdFromSession(ctx);
+            putBalanceInModel(model, accountId);
+            return render(URL_PAGE_ACCOUNT_WITHDRAW, model);
+        } catch (SQLException e) {
+            addErrorMessage(model, "Something went wrong displaying withdraw page");
+            return render(URL_PAGE_ACCOUNT, model);
+        }
+    }
 
     public ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
-       try (Connection connection = dataSource.getConnection()) {
-           Session session = ctx.session();
-           String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
-           BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(ctx.form("withdrawlamount").value()));
-           Account account = databaseHandler.fetchAccount(connection, accountId);
-           Map<String, Object> model = new HashMap<>();
-           try {
-               account.withdraw(amount);
-               reuseServices.updateDatabaseBalance(account);
-               ctx.sendRedirect("/account");
-           } catch (ArithmeticException e) {
-               logger.error(e.getMessage());
-               model.put(URL_ERROR_MESSAGE, e.getMessage());
-               reuseServices.putBalanceInModel(model,accountId);
-               return new ModelAndView<>(URL_PAGE_ACCOUNT_WITHDRAW,model);
-           }
-       }
-       return null;
+        Map<String, Object> model = createModel();
+        try (Connection connection = getConnection()) {
+            String accountId = getAccountIdFromSession(ctx);
+            BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
+            Account account = databaseHandler.fetchAccount(connection, accountId);
+            try {
+                account.withdraw(amount);
+                updateDatabaseBalance(account);
+                redirect(ctx, "/account");
+                return null;
+            } catch (ArithmeticException e) {
+                logger.error(e.getMessage());
+                addErrorMessage(model, "Error while withdrawing amount");
+                putBalanceInModel(model, accountId);
+                return render("/account/withdraw", model);
+            }
+        }
     }
 }

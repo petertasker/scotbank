@@ -13,14 +13,14 @@ import uk.co.asepstrath.bank.services.login.DisplayLogin;
 import uk.co.asepstrath.bank.services.login.ProcessLogin;
 
 @Path("/login")
-public class LoginController {
+public class LoginController extends Controller {
     private final DisplayLogin displayLoginService;
     private final ProcessLogin processLoginService;
 
     public LoginController(DisplayLogin displayLogin, ProcessLogin processLogin, Logger logger) {
+        super(logger);
         this.displayLoginService =  displayLogin;
         this.processLoginService = processLogin;
-        logger.info("Login Controller initialised");
     }
 
     @GET
