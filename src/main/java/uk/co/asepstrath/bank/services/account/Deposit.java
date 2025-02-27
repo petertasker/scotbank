@@ -2,7 +2,6 @@ package uk.co.asepstrath.bank.services.account;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;
-import io.jooby.Session;
 import org.slf4j.Logger;
 
 import uk.co.asepstrath.bank.Account;

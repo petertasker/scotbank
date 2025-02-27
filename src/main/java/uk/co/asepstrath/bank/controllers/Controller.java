@@ -9,7 +9,7 @@ public abstract class Controller {
 
     protected final Logger logger;
 
-    public Controller(Logger logger) {
+    protected Controller(Logger logger) {
         this.logger = logger;
         this.logger.info("{} created", this.getClass().getName());
     }

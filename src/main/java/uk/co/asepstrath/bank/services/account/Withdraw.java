@@ -2,7 +2,6 @@ package uk.co.asepstrath.bank.services.account;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;
-import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DatabaseHandler;
@@ -12,18 +11,16 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
 public class Withdraw extends Service {
 
-    private static DatabaseHandler databaseHandler;
+    private static final DatabaseHandler databaseHandler = new DatabaseHandler();
 
     public Withdraw(DataSource datasource, Logger logger) {
         super(datasource, logger);
-        databaseHandler = new DatabaseHandler();
     }
 
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {

@@ -5,7 +5,6 @@ import io.jooby.ModelAndView;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.DatabaseHandler;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -25,12 +24,12 @@ public abstract class Service {
     protected final DataSource dataSource;
     protected final Logger logger;
 
-    public Service(DataSource dataSource, Logger logger) {
+    protected Service(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
 
-    public Service(Logger logger) {
+    protected Service(Logger logger) {
         this.logger = logger;
         this.dataSource = null;
     }
@@ -48,10 +47,11 @@ public abstract class Service {
     }
 
     protected Connection getConnection() throws SQLException {
+        assert dataSource != null;
         return dataSource.getConnection();
     }
 
-    protected Session getSession(Context ctx) throws SQLException {
+    protected Session getSession(Context ctx) {
         return ctx.session();
     }
 
