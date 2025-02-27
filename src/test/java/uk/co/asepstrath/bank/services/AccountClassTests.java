@@ -108,8 +108,8 @@ class AccountClassTests {
     @Test
     void updatingBalanceTset(){
         Account a = new Account("1", "John Smith", BigDecimal.valueOf(20), false);
-        BigDecimal new_bal = BigDecimal.valueOf(10);
-        a.updateBalance(new_bal);
+        BigDecimal bal = BigDecimal.valueOf(10);
+        a.updateBalance(bal);
         assertEquals(BigDecimal.valueOf(10),a.getBalance());
     }
 
