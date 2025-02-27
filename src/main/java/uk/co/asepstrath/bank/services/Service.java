@@ -96,7 +96,7 @@ public abstract class Service {
         }
     }
 
-    protected String getAccountIdFromSession(Context ctx) throws SQLException {
+    protected String getAccountIdFromSession(Context ctx) {
         Session session = getSession(ctx);
         return String.valueOf(session.get(SESSION_ACCOUNT_ID));
     }
