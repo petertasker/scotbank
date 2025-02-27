@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.services.login.DisplayLogin;
-import uk.co.asepstrath.bank.services.login.ProcessLogin;
+import uk.co.asepstrath.bank.services.login.ServiceLoginDisplay;
+import uk.co.asepstrath.bank.services.login.ServiceLoginProcess;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -42,14 +42,14 @@ class LoginControllerTests {
     @Mock
     private Session mockSession = mock(Session.class);
     @Mock
-    private DisplayLogin mockDisplayLogin = mock(DisplayLogin.class);
+    private ServiceLoginDisplay mockServiceLoginDisplay = mock(ServiceLoginDisplay.class);
     @Mock
-    private ProcessLogin mockProcessLogin = mock(ProcessLogin.class);
+    private ServiceLoginProcess mockServiceLoginProcess = mock(ServiceLoginProcess.class);
     @Mock
     private ModelAndView<Map<String, Object>> mockModelAndView;
 
-    LoginController loginController = new LoginController(mockDisplayLogin, mockProcessLogin, mockLogger);
-    private ProcessLogin processLogin;
+    ControllerLogin controllerLogin = new ControllerLogin(mockServiceLoginDisplay, mockServiceLoginProcess, mockLogger);
+    private ServiceLoginProcess serviceLoginProcess;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -65,8 +65,8 @@ class LoginControllerTests {
         when(mockContext.session()).thenReturn(mockSession);
 
         // Initialize controller with mocked dependencies
-        loginController = new LoginController(mockDisplayLogin, mockProcessLogin, mockLogger);
-        processLogin = new ProcessLogin(mockDataSource, mockLogger);
+        controllerLogin = new ControllerLogin(mockServiceLoginDisplay, mockServiceLoginProcess, mockLogger);
+        serviceLoginProcess = new ServiceLoginProcess(mockDataSource, mockLogger);
     }
 
     /*
@@ -76,30 +76,30 @@ class LoginControllerTests {
     @Test
     void testDisplayLogin() {
         // Mock DisplayLogin
-        when(mockDisplayLogin.displayLogin()).thenReturn(mockModelAndView);
+        when(mockServiceLoginDisplay.displayLogin()).thenReturn(mockModelAndView);
         // Act
-        ModelAndView<Map<String, Object>> result = loginController.displayLogin();
+        ModelAndView<Map<String, Object>> result = controllerLogin.displayLogin();
 
         assertNotNull(result);
         assertEquals(mockModelAndView, result);
-        verify(mockDisplayLogin).displayLogin(); 
+        verify(mockServiceLoginDisplay).displayLogin();
     }
 
     // Test that the logincontroller was succesful in calling loginProcess
     @Test
     void testLoginProcessCall() {
         // Mock ProcessLogin
-        when(mockProcessLogin.processLogin(mockContext)).thenReturn(mockModelAndView);
+        when(mockServiceLoginProcess.processLogin(mockContext)).thenReturn(mockModelAndView);
 
         // Act
-        ModelAndView<Map<String, Object>> result = loginController.processLogin(mockContext);
+        ModelAndView<Map<String, Object>> result = controllerLogin.processLogin(mockContext);
         // Assert
         assertNotNull(result);
         assertEquals(mockModelAndView, result);
         
-        verify(mockProcessLogin).processLogin(mockContext);
+        verify(mockServiceLoginProcess).processLogin(mockContext);
         // Verify no other interactions 
-        verifyNoMoreInteractions(mockProcessLogin);   
+        verifyNoMoreInteractions(mockServiceLoginProcess);
         // Verify no unexpected interactions with the session
         verifyNoMoreInteractions(mockSession);        
     }
@@ -124,7 +124,7 @@ class LoginControllerTests {
         when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(roundUpEnabled);
 
         // Act
-        ModelAndView<Map<String, Object>> result = processLogin.processLogin(mockContext);
+        ModelAndView<Map<String, Object>> result = serviceLoginProcess.processLogin(mockContext);
 
         // Assert
         assertNull(result); // Should be null because of redirect

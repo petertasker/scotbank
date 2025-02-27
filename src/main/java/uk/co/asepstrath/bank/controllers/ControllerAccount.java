@@ -7,8 +7,8 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.account.ViewAccount;
-import uk.co.asepstrath.bank.services.account.Deposit;
-import uk.co.asepstrath.bank.services.account.Withdraw;
+import uk.co.asepstrath.bank.services.account.ServiceAccountDeposit;
+import uk.co.asepstrath.bank.services.account.ServiceAccountWithdraw;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -16,17 +16,17 @@ import java.util.*;
 
 
 @Path("/account")
-public class AccountController extends Controller {
+public class ControllerAccount extends Controller {
 
     private final ViewAccount viewAccountService;
-    private final Deposit depositService;
-    private final Withdraw withdrawService;
+    private final ServiceAccountDeposit depositService;
+    private final ServiceAccountWithdraw withdrawService;
 
-   public AccountController(DataSource datasource, Logger logger) {
+   public ControllerAccount(DataSource datasource, Logger logger) {
        super(logger);
        viewAccountService = new ViewAccount(datasource, logger);
-       depositService = new Deposit(datasource, logger);
-       withdrawService = new Withdraw(datasource, logger);
+       depositService = new ServiceAccountDeposit(datasource, logger);
+       withdrawService = new ServiceAccountWithdraw(datasource, logger);
    }
 
    @GET
@@ -37,14 +37,14 @@ public class AccountController extends Controller {
     @GET
     @Path("/deposit")
     public ModelAndView<Map<String, Object>> deposit(Context ctx) {
-        return depositService.displayDeposit(ctx);
+        return depositService.renderDeposit(ctx);
     }
 
 
     @GET
     @Path("/withdraw")
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
-       return withdrawService.withdraw(ctx);
+       return withdrawService.renderWithdraw(ctx);
     }
 
     @POST
@@ -56,6 +56,6 @@ public class AccountController extends Controller {
     @POST
     @Path("/deposit/process")
     public ModelAndView<Map<String, Object>> depositProcess(Context ctx) throws SQLException {
-        return depositService.depositProcess(ctx);
+        return depositService.processDeposit(ctx);
     }
 }

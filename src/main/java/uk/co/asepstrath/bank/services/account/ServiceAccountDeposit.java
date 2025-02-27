@@ -15,29 +15,23 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class Deposit extends Service {
+public class ServiceAccountDeposit extends Service {
 
-    private final DatabaseHandler databaseHandler;
+    DatabaseHandler databaseHandler;
 
-    public Deposit(DataSource datasource, Logger logger) {
+    public ServiceAccountDeposit(DataSource datasource, Logger logger) {
         super(datasource, logger);
         databaseHandler = new DatabaseHandler();
     }
 
-    public ModelAndView<Map<String, Object>> displayDeposit(Context ctx) {
+    public ModelAndView<Map<String, Object>> renderDeposit(Context ctx) {
         Map<String, Object> model = createModel();
-        try {
-            String accountId = getAccountIdFromSession(ctx);
-            putBalanceInModel(model, accountId);
-            return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-            addErrorMessage(model, "Error while loading deposit page.");
-            return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
-        }
+        String accountId = getAccountIdFromSession(ctx);
+        putBalanceInModel(model, accountId);
+        return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
     }
 
-    public ModelAndView<Map<String, Object>> depositProcess(Context ctx) throws SQLException {
+    public ModelAndView<Map<String, Object>> processDeposit(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {

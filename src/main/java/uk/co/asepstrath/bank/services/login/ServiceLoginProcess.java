@@ -16,9 +16,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class ProcessLogin extends Service {
+public class ServiceLoginProcess extends Service {
 
-    public ProcessLogin(DataSource dataSource, Logger logger) {
+    public ServiceLoginProcess(DataSource dataSource, Logger logger) {
         super(dataSource, logger);
     }
 
