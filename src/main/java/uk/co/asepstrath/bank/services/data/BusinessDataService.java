@@ -12,13 +12,16 @@ import java.util.List;
 
 public class BusinessDataService implements DataService<Business> {
 
-    private final UnirestWrapper unirestWrapper;
+    private UnirestWrapper unirestWrapper;
 
 
     public BusinessDataService() {
         Logger logger = LoggerFactory.getLogger(BusinessDataService.class);
         this.unirestWrapper = new UnirestWrapper();
+    }
 
+    public void setUnirestWrapper(UnirestWrapper wrapper) {
+        this.unirestWrapper = wrapper;
     }
 
     @Override

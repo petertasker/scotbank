@@ -1,11 +1,9 @@
 package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.co.asepstrath.bank.Account;
 
 import java.io.IOException;
@@ -30,7 +28,7 @@ class AccountDataServiceTest {
     }
 
     @Test
-    void testFetchData_Success() throws IOException {
+    void testFetchDataSuccess() throws IOException {
         // Create mock response for successful API call
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
@@ -52,7 +50,7 @@ class AccountDataServiceTest {
     }
 
     @Test
-    void testFetchData_Failure() throws IOException {
+    void testFetchDataFailure() {
         // Create mock response for failed API call
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(false);

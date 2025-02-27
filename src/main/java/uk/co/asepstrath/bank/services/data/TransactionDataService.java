@@ -18,13 +18,18 @@ import java.util.List;
 public class TransactionDataService implements DataService<Transaction> {
 
     private final Logger logger;
-    private final UnirestWrapper unirestWrapper;
+    private UnirestWrapper unirestWrapper;
 
 
     public TransactionDataService() {
         this.logger = LoggerFactory.getLogger(TransactionDataService.class);
         this.unirestWrapper = new UnirestWrapper();
     }
+
+    public void setUnirestWrapper(UnirestWrapper wrapper) {
+        this.unirestWrapper = wrapper;
+    }
+
 
     @Override
     public List<Transaction> fetchData() throws IOException, XMLStreamException {
