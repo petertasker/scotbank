@@ -4,8 +4,8 @@ import io.jooby.Context;
 import io.jooby.ModelAndView;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.DatabaseHandler;
-import uk.co.asepstrath.bank.services.Service;
+import uk.co.asepstrath.bank.services.BaseService;
+import uk.co.asepstrath.bank.services.repositories.AccountRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -15,12 +15,13 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ServiceAccountWithdraw extends Service {
+public class AccountWithdrawService extends BaseService {
 
-    private static final DatabaseHandler databaseHandler = new DatabaseHandler();
+    private static AccountRepository accountRepository;
 
-    public ServiceAccountWithdraw(DataSource datasource, Logger logger) {
+    public AccountWithdrawService(DataSource datasource, Logger logger) {
         super(datasource, logger);
+        accountRepository = new AccountRepository(logger);
     }
 
     public ModelAndView<Map<String, Object>> renderWithdraw(Context ctx) {
@@ -35,7 +36,7 @@ public class ServiceAccountWithdraw extends Service {
         try (Connection connection = getConnection()) {
             String accountId = getAccountIdFromSession(ctx);
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
-            Account account = databaseHandler.fetchAccount(connection, accountId);
+            Account account = accountRepository.getAccount(connection, accountId);
             try {
                 account.withdraw(amount);
                 updateDatabaseBalance(account);
@@ -45,7 +46,7 @@ public class ServiceAccountWithdraw extends Service {
                 logger.error(e.getMessage());
                 addErrorMessage(model, "Error while withdrawing amount");
                 putBalanceInModel(model, accountId);
-                return render("/account/withdraw", model);
+                return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
             }
         }
     }

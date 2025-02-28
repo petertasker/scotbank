@@ -2,15 +2,15 @@ package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.ModelAndView;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.Service;
+import uk.co.asepstrath.bank.services.BaseService;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
 import java.util.Map;
 
-public class ServiceLoginDisplay extends Service {
+public class DisplayLoginService extends BaseService {
 
-    public ServiceLoginDisplay(Logger logger) {
+    public DisplayLoginService(Logger logger) {
         super(logger);
     }
 

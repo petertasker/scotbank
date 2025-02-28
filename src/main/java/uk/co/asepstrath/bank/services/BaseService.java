@@ -19,17 +19,17 @@ import java.util.Objects;
 import static uk.co.asepstrath.bank.Constants.SESSION_ACCOUNT_ID;
 import static uk.co.asepstrath.bank.Constants.URL_ERROR_MESSAGE;
 
-public abstract class Service {
+public abstract class BaseService {
 
     protected final DataSource dataSource;
     protected final Logger logger;
 
-    protected Service(DataSource dataSource, Logger logger) {
+    protected BaseService(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
 
-    protected Service(Logger logger) {
+    protected BaseService(Logger logger) {
         this.logger = logger;
         this.dataSource = null;
     }

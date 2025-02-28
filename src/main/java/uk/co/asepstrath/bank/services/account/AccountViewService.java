@@ -7,7 +7,7 @@ import io.jooby.annotation.GET;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.Service;
+import uk.co.asepstrath.bank.services.BaseService;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -16,9 +16,9 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ViewAccount extends Service {
+public class AccountViewService extends BaseService {
 
-    public ViewAccount(DataSource datasource, Logger logger){
+    public AccountViewService(DataSource datasource, Logger logger){
         super(datasource, logger);
     }
 

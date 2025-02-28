@@ -5,7 +5,7 @@ import io.jooby.ModelAndView;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.services.Service;
+import uk.co.asepstrath.bank.services.BaseService;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -16,9 +16,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class ServiceLoginProcess extends Service {
+public class ProcessLoginService extends BaseService {
 
-    public ServiceLoginProcess(DataSource dataSource, Logger logger) {
+    public ProcessLoginService(DataSource dataSource, Logger logger) {
         super(dataSource, logger);
     }
 

@@ -5,8 +5,8 @@ import io.jooby.ModelAndView;
 import org.slf4j.Logger;
 
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.DatabaseHandler;
-import uk.co.asepstrath.bank.services.Service;
+import uk.co.asepstrath.bank.services.BaseService;
+import uk.co.asepstrath.bank.services.repositories.AccountRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -15,13 +15,13 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ServiceAccountDeposit extends Service {
+public class AccountDepositService extends BaseService {
 
-    DatabaseHandler databaseHandler;
+    private static AccountRepository accountRepository;
 
-    public ServiceAccountDeposit(DataSource datasource, Logger logger) {
+    public AccountDepositService(DataSource datasource, Logger logger) {
         super(datasource, logger);
-        databaseHandler = new DatabaseHandler();
+        accountRepository = new AccountRepository(logger);
     }
 
     public ModelAndView<Map<String, Object>> renderDeposit(Context ctx) {
@@ -36,7 +36,7 @@ public class ServiceAccountDeposit extends Service {
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
-            Account account = databaseHandler.fetchAccount(connection, accountId);
+            Account account = accountRepository.getAccount(connection, accountId);
             try {
                 account.deposit(amount);
                 updateDatabaseBalance(account);

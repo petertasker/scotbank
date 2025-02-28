@@ -7,12 +7,15 @@ import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.controllers.ControllerLogin_;
-import uk.co.asepstrath.bank.services.login.ServiceLoginDisplay;
-import uk.co.asepstrath.bank.services.login.ServiceLoginProcess;
-import uk.co.asepstrath.bank.controllers.ControllerAccount_;
+import uk.co.asepstrath.bank.controllers.LoginController_;
+import uk.co.asepstrath.bank.controllers.AccountController_;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
+import uk.co.asepstrath.bank.services.repositories.DatabaseManager;
 
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.sql.*;
 
 public class App extends Jooby {
@@ -55,11 +58,11 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        ServiceLoginDisplay serviceLoginDisplay = new ServiceLoginDisplay(log);
-        ServiceLoginProcess serviceLoginProcess = new ServiceLoginProcess(ds, log);
+        DisplayLoginService displayLoginService = new DisplayLoginService(log);
+        ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
 
-        mvc(new ControllerAccount_(ds, log));
-        mvc(new ControllerLogin_(serviceLoginDisplay, serviceLoginProcess,  log));
+        mvc(new AccountController_(ds, log));
+        mvc(new LoginController_(displayLoginService, processLoginService,  log));
 
 
         /*
@@ -76,7 +79,7 @@ public class App extends Jooby {
     /*
     This function will be called when the application starts up,
      */
-    public void onStart() throws SQLException {
+    public void onStart() throws SQLException, XMLStreamException, IOException {
         Logger log = getLog();
         log.info("Starting Up...");
 
@@ -84,8 +87,8 @@ public class App extends Jooby {
         DataSource dataSource = require(DataSource.class);
 
         // Create Database and tables with initial data
-        DatabaseInitialiser initialiser = new DatabaseInitialiser(dataSource);
-        initialiser.initialise();
+        DatabaseManager databaseManager = new DatabaseManager(dataSource, log);
+        databaseManager.initialise();
     }
 
     /*
