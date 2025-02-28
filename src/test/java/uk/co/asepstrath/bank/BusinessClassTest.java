@@ -1,10 +1,9 @@
-package uk.co.asepstrath.bank.services;
+package uk.co.asepstrath.bank;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import uk.co.asepstrath.bank.Business;
 
-class BusinessClassTests {
+class BusinessClassTest {
 
     @Test
     void testGetters(){

@@ -2,7 +2,7 @@
  * Unit testing for the account Class
  */
 
-package uk.co.asepstrath.bank.services;
+package uk.co.asepstrath.bank.controllers;
 
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Account;
@@ -10,7 +10,7 @@ import uk.co.asepstrath.bank.Account;
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
-class AccountClassTests {
+class AccountClassTest {
     /* A new Account should have a value of 0 */
     @Test
     void createAccount(){

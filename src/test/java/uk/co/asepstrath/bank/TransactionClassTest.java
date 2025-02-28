@@ -1,12 +1,11 @@
-package uk.co.asepstrath.bank.services;
+package uk.co.asepstrath.bank;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.joda.time.DateTime;
-import uk.co.asepstrath.bank.Transaction;
 
 import java.math.BigDecimal;
 
-class TransactionTests {
+class TransactionClassTest {
 
     @Test
     void testGetters() {
