@@ -13,8 +13,4 @@ public abstract class BaseController {
         this.logger = logger;
         this.logger.info("{} created", this.getClass().getName());
     }
-
-    protected ModelAndView<Map<String, Object>> render(String viewName, Map<String, Object> model) {
-        return new ModelAndView<>(viewName, model);
-    }
 }
