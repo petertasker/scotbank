@@ -52,7 +52,7 @@ public class BusinessDataServiceTest {
     }
 
     @Test
-    void testFetchDataFailure() throws IOException {
+    void testFetchDataFailure() {
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(false);
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
