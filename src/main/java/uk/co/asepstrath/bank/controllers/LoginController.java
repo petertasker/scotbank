@@ -14,23 +14,23 @@ import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
 @Path("/login")
 public class LoginController extends BaseController {
-    private final DisplayLoginService serviceDisplayLoginService;
-    private final ProcessLoginService serviceLoginProcessServiceLoginService;
+    private final DisplayLoginService displayLoginService;
+    private final ProcessLoginService processLoginService;
 
     public LoginController(DisplayLoginService displayLoginService, ProcessLoginService processLoginService, Logger logger) {
         super(logger);
-        this.serviceDisplayLoginService = displayLoginService;
-        this.serviceLoginProcessServiceLoginService = processLoginService;
+        this.displayLoginService = displayLoginService;
+        this.processLoginService = processLoginService;
     }
 
     @GET
     public ModelAndView<Map<String, Object>> displayLogin() {
-        return serviceDisplayLoginService.displayLogin();
+        return displayLoginService.displayLogin();
     }
 
     @POST
     @Path("/process")
     public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
-        return serviceLoginProcessServiceLoginService.processLogin(ctx);
+        return processLoginService.processLogin(ctx);
     }
 }
