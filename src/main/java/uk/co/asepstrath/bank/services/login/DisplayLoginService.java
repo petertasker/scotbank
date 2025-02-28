@@ -8,9 +8,9 @@ import static uk.co.asepstrath.bank.Constants.*;
 
 import java.util.Map;
 
-public class DisplayLoginBaseService extends BaseService {
+public class DisplayLoginService extends BaseService {
 
-    public DisplayLoginBaseService(Logger logger) {
+    public DisplayLoginService(Logger logger) {
         super(logger);
     }
 

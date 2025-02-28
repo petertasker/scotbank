@@ -9,15 +9,15 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 
-import uk.co.asepstrath.bank.services.login.DisplayLoginBaseService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginBaseService;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
 @Path("/login")
 public class LoginController extends BaseController {
-    private final DisplayLoginBaseService serviceDisplayLoginService;
-    private final ProcessLoginBaseService serviceLoginProcessServiceLoginService;
+    private final DisplayLoginService serviceDisplayLoginService;
+    private final ProcessLoginService serviceLoginProcessServiceLoginService;
 
-    public LoginController(DisplayLoginBaseService displayLoginService, ProcessLoginBaseService processLoginService, Logger logger) {
+    public LoginController(DisplayLoginService displayLoginService, ProcessLoginService processLoginService, Logger logger) {
         super(logger);
         this.serviceDisplayLoginService = displayLoginService;
         this.serviceLoginProcessServiceLoginService = processLoginService;

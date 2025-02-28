@@ -9,8 +9,8 @@ import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.controllers.LoginController_;
 import uk.co.asepstrath.bank.controllers.AccountController_;
-import uk.co.asepstrath.bank.services.login.DisplayLoginBaseService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginBaseService;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 import uk.co.asepstrath.bank.services.repositories.DatabaseManager;
 
 import javax.sql.DataSource;
@@ -58,8 +58,8 @@ public class App extends Jooby {
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
 
-        DisplayLoginBaseService displayLoginService = new DisplayLoginBaseService(log);
-        ProcessLoginBaseService processLoginService = new ProcessLoginBaseService(ds, log);
+        DisplayLoginService displayLoginService = new DisplayLoginService(log);
+        ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
 
         mvc(new AccountController_(ds, log));
         mvc(new LoginController_(displayLoginService, processLoginService,  log));

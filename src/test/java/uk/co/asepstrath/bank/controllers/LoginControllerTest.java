@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
-import uk.co.asepstrath.bank.services.login.DisplayLoginBaseService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginBaseService;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -42,14 +42,14 @@ class LoginControllerTest {
     @Mock
     private Session mockSession = mock(Session.class);
     @Mock
-    private DisplayLoginBaseService mockDisplayLoginService = mock(DisplayLoginBaseService.class);
+    private DisplayLoginService mockDisplayLoginService = mock(DisplayLoginService.class);
     @Mock
-    private ProcessLoginBaseService mockProcessLoginService = mock(ProcessLoginBaseService.class);
+    private ProcessLoginService mockProcessLoginService = mock(ProcessLoginService.class);
     @Mock
     private ModelAndView<Map<String, Object>> mockModelAndView;
 
     LoginController loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
-    private ProcessLoginBaseService processLoginService;
+    private ProcessLoginService processLoginService;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -66,7 +66,7 @@ class LoginControllerTest {
 
         // Initialize controller with mocked dependencies
         loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
-        processLoginService = new ProcessLoginBaseService(mockDataSource, mockLogger);
+        processLoginService = new ProcessLoginService(mockDataSource, mockLogger);
     }
 
     /*
