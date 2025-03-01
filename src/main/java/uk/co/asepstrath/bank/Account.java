@@ -3,6 +3,8 @@ import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
+
 public class Account {
 
     private final String accountID;
@@ -23,12 +25,21 @@ public class Account {
         this.roundUpEnabled = roundUpEnabled;
     }
 
-    public void deposit(BigDecimal amount) throws ArithmeticException{
+    public void deposit(BigDecimal amount) throws ArithmeticException {
+
+        // Amount <= 0
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ArithmeticException("Deposit amount needs to be greater than 0");
         }
+
+        // Amount would lead to overflow in SQL database
+        if (balance.add(amount).compareTo(ACCOUNT_OBJECT_MAX_BALANCE) > 0) {
+            throw new ArithmeticException("Deposit would exceed maximum account balance");
+        }
+
         balance = balance.add(amount);
     }
+
 
     public void withdraw(BigDecimal amount) throws ArithmeticException {
         if (amount.compareTo(balance) > 0) { // if amount is greater than current Balance throw exception

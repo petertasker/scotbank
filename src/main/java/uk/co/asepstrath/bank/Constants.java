@@ -1,5 +1,7 @@
 package uk.co.asepstrath.bank;
 
+import java.math.BigDecimal;
+
 public final class Constants {
 
     private Constants() {
@@ -23,6 +25,8 @@ public final class Constants {
     public static final String TRANSACTION_OBJECT_EXISTS = "hastransactions";
 
     public static final String ACCOUNT_OBJECT_BALANCE = "balance";
+    public static final BigDecimal ACCOUNT_OBJECT_MAX_BALANCE = BigDecimal.valueOf(999_999_999.99);
+
 }
 
 
