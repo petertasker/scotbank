@@ -2,10 +2,9 @@
  * Unit testing for the account Class
  */
 
-package uk.co.asepstrath.bank.controllers;
+package uk.co.asepstrath.bank;
 
 import org.junit.jupiter.api.Test;
-import uk.co.asepstrath.bank.Account;
 
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,7 +105,7 @@ class AccountClassTest {
     }
 
     @Test
-    void updatingBalanceTset(){
+    void updatingBalanceTest(){
         Account a = new Account("1", "John Smith", BigDecimal.valueOf(20), false);
         BigDecimal bal = BigDecimal.valueOf(10);
         a.updateBalance(bal);
@@ -135,12 +134,19 @@ class AccountClassTest {
     }
 
     @Test
-    void displayData(){
+    void displayData() {
         Account a = new Account("4", "John Doe", BigDecimal.valueOf(5.45), false);
         String expected = "id: 4" + System.lineSeparator() +
                           "name: John Doe" + System.lineSeparator() +
                           "balance: 5.45" + System.lineSeparator() +
                           "roundUpEnabled: false";
         assertEquals(expected, a.toString());
+    }
+
+    @Test
+    void illegalOverflowDeposit() {
+        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false);
+        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(999999999)));
+
     }
 }

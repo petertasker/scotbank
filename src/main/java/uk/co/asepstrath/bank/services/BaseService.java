@@ -60,8 +60,10 @@ public abstract class BaseService {
     }
 
     public BigDecimal getFormBigDecimal(Context ctx, String name) {
-        return BigDecimal.valueOf(Double.parseDouble(Objects.requireNonNull(ctx.form(name).valueOrNull())));
+        String value = Objects.requireNonNull(ctx.form(name).valueOrNull()).trim();
+        return new BigDecimal(value);
     }
+
 
     protected void redirect(Context ctx, String url) {
         ctx.sendRedirect(url);
