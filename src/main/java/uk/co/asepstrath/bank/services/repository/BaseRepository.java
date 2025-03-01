@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.repositories;
+package uk.co.asepstrath.bank.services.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 abstract class BaseRepository {
     protected final Logger logger;

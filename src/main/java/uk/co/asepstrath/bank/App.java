@@ -9,9 +9,11 @@ import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.controllers.LoginController_;
 import uk.co.asepstrath.bank.controllers.AccountController_;
+import uk.co.asepstrath.bank.controllers.ManagerController_;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
-import uk.co.asepstrath.bank.services.repositories.DatabaseManager;
+import uk.co.asepstrath.bank.services.manager.ViewManagerDashboardService;
+import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
@@ -29,9 +31,13 @@ public class App extends Jooby {
             String path = ctx.getRequestPath();
             // add any JS/ CSS files here
             if (path.startsWith("/css")) return;
+
             Session session = ctx.sessionOrNull();
-            if ((session == null || session.get("name") == null || session.get("accountid") == null)
-                    && !path.equals("/login") && !path.equals("/login/process")) {
+            boolean userLoggedIn = session != null && session.get("name") != null && session.get("accountid") != null;
+            boolean isManagerLoggedIn = session != null && session.get("managerName") != null && session.get("role") != null;
+
+            if (!userLoggedIn && !path.equals("/login") && !path.equals("/login/process")
+                    && !path.equals("/manager/login") && !path.equals("/manager/login/process")){
                 ctx.setResponseCode(401).sendRedirect("/login");
             }
 
@@ -60,9 +66,11 @@ public class App extends Jooby {
 
         DisplayLoginService displayLoginService = new DisplayLoginService(log);
         ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
+        ViewManagerDashboardService viewManagerDashboardService = new ViewManagerDashboardService(ds, log);
 
         mvc(new AccountController_(ds, log));
         mvc(new LoginController_(displayLoginService, processLoginService,  log));
+        mvc(new ManagerController_(ds, log));
 
 
         /*

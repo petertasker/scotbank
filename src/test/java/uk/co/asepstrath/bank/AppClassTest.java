@@ -1,28 +1,14 @@
 package uk.co.asepstrath.bank;
 
 import io.jooby.*;
-import io.jooby.handlebars.HandlebarsModule;
-import io.jooby.helper.UniRestExtension;
-import io.jooby.hikari.HikariModule;
-import io.jooby.jackson.JacksonModule;
-import io.jooby.netty.NettyServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.controllers.AccountController_;
-import uk.co.asepstrath.bank.controllers.LoginController_;
-import uk.co.asepstrath.bank.services.login.DisplayLoginService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginService;
-import uk.co.asepstrath.bank.services.repositories.DatabaseManager;
+import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 
 import javax.sql.DataSource;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

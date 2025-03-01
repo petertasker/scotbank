@@ -1,13 +1,11 @@
-package uk.co.asepstrath.bank.services.repositories;
+package uk.co.asepstrath.bank.services.repository;
 
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
+import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.data.AccountDataService;
-import uk.co.asepstrath.bank.services.data.BusinessDataService;
-import uk.co.asepstrath.bank.services.data.DataService;
-import uk.co.asepstrath.bank.services.data.TransactionDataService;
+import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
@@ -24,10 +22,12 @@ public class DatabaseManager implements DatabaseOperations {
     private final AccountRepository accountRepository;
     private final BusinessRepository businessRepository;
     private final TransactionRepository transactionRepository;
+    private final ManagerRepository managerRepository;
 
     private final DataService<Account> accountDataService;
     private final DataService<Business> businessDataService;
     private final DataService<Transaction> transactionDataService;
+    private final DataService<Manager> managerDataService;
 
     public DatabaseManager(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
@@ -36,10 +36,13 @@ public class DatabaseManager implements DatabaseOperations {
         this.accountRepository = new AccountRepository(logger);
         this.businessRepository = new BusinessRepository(logger);
         this.transactionRepository = new TransactionRepository(logger, accountRepository);
+        this.managerRepository = new ManagerRepository(logger);
+
 
         this.accountDataService = new AccountDataService();
         this.businessDataService = new BusinessDataService();
         this.transactionDataService = new TransactionDataService();
+        this.managerDataService = new ManagerDataService();
 
     }
 
@@ -63,6 +66,9 @@ public class DatabaseManager implements DatabaseOperations {
 
         transactionRepository.createTable(connection);
         logger.info("Transaction table created");
+
+        managerRepository.createTable(connection);
+        logger.info("Manager table created");
     }
 
     @Override
@@ -87,6 +93,13 @@ public class DatabaseManager implements DatabaseOperations {
             transactionRepository.insert(connection, transaction);
         }
         logger.info("Transactions inserted");
+
+        // Insert some hard coded managers
+        List<Manager> managers = managerDataService.fetchData();
+        for (Manager manager : managers) {
+            managerRepository.insert(connection, manager);
+        }
+        logger.info("Managers inserted");
     }
 
 }

@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.repositories.AccountRepository;
+import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

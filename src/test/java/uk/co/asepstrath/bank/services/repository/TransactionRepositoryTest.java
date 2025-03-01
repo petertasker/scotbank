@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.repositories;
+package uk.co.asepstrath.bank.services.repository;
 
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Transaction;
 
 import java.math.BigDecimal;
@@ -16,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 

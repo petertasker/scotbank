@@ -52,16 +52,16 @@ public class ProcessLoginService extends BaseService {
 
                     // Add accountID to session
                     Session session = ctx.session();
-                    session.put("accountid", account.getAccountID());
-                    session.put("name", account.getName());
+                    session.put(SESSION_ACCOUNT_ID, account.getAccountID());
+                    session.put(SESSION_ACCOUNT_NAME, account.getName());
                     redirect(ctx, "/account");
                     return null;
                 }
-                else {
-                    // Handle case where account not found
-                    addErrorMessage(model, "Account not found");
-                    return render(URL_PAGE_LOGIN, model);
-                }
+
+                // Handle case where account not found
+                addErrorMessage(model, "Account not found");
+                return render(URL_PAGE_LOGIN, model);
+
             }
         }
         catch (SQLException e) {

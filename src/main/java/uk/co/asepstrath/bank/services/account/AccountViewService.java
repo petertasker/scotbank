@@ -24,7 +24,7 @@ public class AccountViewService extends BaseService {
 
     @GET
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
-        Map<String, Object> model = new HashMap<>();
+        Map<String, Object> model = createModel();
         Session session = ctx.session();
         model.put(SESSION_ACCOUNT_NAME, session.get("name"));
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
@@ -34,7 +34,7 @@ public class AccountViewService extends BaseService {
 
 
         // Get all transactions related to a user's account
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = getConnection()) {
             List<Transaction> transactions = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -69,8 +69,8 @@ public class AccountViewService extends BaseService {
             }
 
             model.put(TRANSACTION_OBJECT_LIST, transactions);
-            model.put(TRANSACTION_OBJECT_EXISTS, !transactions.isEmpty());
+            model.put(TRANSACTION_OBJECT_LIST_EXISTS, !transactions.isEmpty());
         }
-        return new ModelAndView<>(URL_PAGE_ACCOUNT, model);
+        return render(URL_PAGE_ACCOUNT, model);
     }
 }

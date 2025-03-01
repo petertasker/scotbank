@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.repositories;
+package uk.co.asepstrath.bank.services.repository;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;

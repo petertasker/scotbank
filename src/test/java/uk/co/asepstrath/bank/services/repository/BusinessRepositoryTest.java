@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.repositories;
+package uk.co.asepstrath.bank.services.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

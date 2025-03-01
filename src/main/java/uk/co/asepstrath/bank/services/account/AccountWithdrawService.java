@@ -5,7 +5,7 @@ import io.jooby.ModelAndView;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.services.BaseService;
-import uk.co.asepstrath.bank.services.repositories.AccountRepository;
+import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
