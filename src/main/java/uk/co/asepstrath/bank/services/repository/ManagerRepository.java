@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Manager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +64,7 @@ public class ManagerRepository extends BaseRepository {
      */
     public List<Account> getAllAccounts(Connection connection) throws SQLException {
         List<Account> accounts = new ArrayList<>();
-        try {
-            ResultSet resultSet = connection.createStatement().executeQuery(SQL_SELECT_ALL_ACCOUNTS);
+        try (ResultSet resultSet = connection.createStatement().executeQuery(SQL_SELECT_ALL_ACCOUNTS)) {
             while (resultSet.next()) {
                 accounts.add(
                         new Account(
@@ -81,6 +77,7 @@ public class ManagerRepository extends BaseRepository {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
+            throw e;
         }
         return accounts;
     }

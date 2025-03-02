@@ -1,9 +1,6 @@
 package uk.co.asepstrath.bank.controllers;
 
-import io.jooby.ModelAndView;
 import org.slf4j.Logger;
-
-import java.util.Map;
 
 public abstract class BaseController {
 

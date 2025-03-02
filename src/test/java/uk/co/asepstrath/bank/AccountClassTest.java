@@ -146,7 +146,8 @@ class AccountClassTest {
     @Test
     void illegalOverflowDeposit() {
         Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false);
-        assertThrows(ArithmeticException.class, () -> a.deposit(BigDecimal.valueOf(999999999)));
+        BigDecimal bal = BigDecimal.valueOf(999999999);
+        assertThrows(ArithmeticException.class, () -> a.deposit(bal));
 
     }
 }

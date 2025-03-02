@@ -59,9 +59,6 @@ public class AccountRepository extends BaseRepository {
             statement.setString(3, account.getName());
             statement.setBoolean(4, account.isRoundUpEnabled());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-            throw e;
         }
     }
 

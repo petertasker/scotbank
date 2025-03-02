@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.co.asepstrath.bank.Constants.URL_PAGE_LOGIN;
 
-public class DisplayLoginServiceTest {
+class DisplayLoginServiceTest {
 
     @Mock
     private Logger logger;

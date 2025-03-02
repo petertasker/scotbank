@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.repository;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +9,8 @@ import java.sql.SQLException;
 abstract class BaseRepository {
     protected final Logger logger;
 
-    public BaseRepository(Logger logger) {
-        this.logger = LoggerFactory.getLogger(BaseRepository.class);
+    protected BaseRepository(Logger logger) {
+        this.logger = logger;
     }
 
     protected void executeUpdate(Connection connection, String sql) throws SQLException {

@@ -29,16 +29,7 @@ public class BusinessDataServiceTest {
     void testFetchDataSuccess() throws IOException {
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
-        String csvData = "id,name,category,sanctioned\n" +
-                "ALD,Aldi,Groceries,false\n" +
-                "AMA,Amazon,Online Retailer,false\n" +
-                "ARG,Argos,Online Retailer,false\n" +
-                "BOO,Boom Battle Bar,Entertainment,false\n" +
-                "BOT,Boots,Health & Beauty,false\n" +
-                "BUR,Burger King,Eating Out,false\n" +
-                "CAF,Cafe Nero,Coffee,false\n" +
-                "CEX,CEX,Entertainment,true\n" +
-                "CLA,Clarks,Clothing,false";
+        String csvData = "id,name,category,sanctioned\nALD,Aldi,Groceries,false\nAMA,Amazon,Online Retailer,false\nARG,Argos,Online Retailer,false\nBOO,Boom Battle Bar,Entertainment,false\nBOT,Boots,Health & Beauty,false\nBUR,Burger King,Eating Out,false\nCAF,Cafe Nero,Coffee,false\nCEX,CEX,Entertainment,true\nCLA,Clarks,Clothing,false".formatted();
         when(mockResponse.getBody()).thenReturn(csvData);
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
         List<Business> businesses = businessDataService.fetchData();
@@ -48,7 +39,7 @@ public class BusinessDataServiceTest {
         assertEquals("ALD", businesses.getFirst().getID());
         assertEquals("Aldi", businesses.getFirst().getName());
         assertEquals("Groceries", businesses.getFirst().getCategory());
-        assertEquals(false, businesses.getFirst().isSanctioned());
+        assertFalse(businesses.getFirst().isSanctioned());
     }
 
     @Test

@@ -20,11 +20,16 @@ import static uk.co.asepstrath.bank.Constants.*;
  */
 public class AccountWithdrawService extends BaseService {
 
-    private static AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     public AccountWithdrawService(DataSource datasource, Logger logger) {
         super(datasource, logger);
         accountRepository = new AccountRepository(logger);
+    }
+
+    public AccountWithdrawService(DataSource datasource, Logger logger, AccountRepository accountRepository) {
+        super(datasource, logger);
+        this.accountRepository = accountRepository;
     }
 
     /**

@@ -17,12 +17,10 @@ import java.util.List;
  */
 public class AccountDataService implements DataService<Account> {
     private final ObjectMapper mapper;
-    private final Logger logger;
     private UnirestWrapper unirestWrapper;
 
     public AccountDataService() {
         this.mapper = new ObjectMapper();
-        this.logger = LoggerFactory.getLogger(this.getClass());
         this.unirestWrapper = new UnirestWrapper();
     }
 

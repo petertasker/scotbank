@@ -34,8 +34,6 @@ public class App extends Jooby {
 
             Session session = ctx.sessionOrNull();
             boolean userLoggedIn = session != null && session.get("name") != null && session.get("accountid") != null;
-            boolean isManagerLoggedIn = session != null && session.get("managerName") != null && session.get("role") != null;
-
             if (!userLoggedIn && !path.equals("/login") && !path.equals("/login/process")
                     && !path.equals("/manager/login") && !path.equals("/manager/login/process")){
                 ctx.setResponseCode(401).sendRedirect("/login");
@@ -66,7 +64,6 @@ public class App extends Jooby {
 
         DisplayLoginService displayLoginService = new DisplayLoginService(log);
         ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
-        ViewManagerDashboardService viewManagerDashboardService = new ViewManagerDashboardService(ds, log);
 
         mvc(new AccountController_(ds, log));
         mvc(new LoginController_(displayLoginService, processLoginService,  log));
