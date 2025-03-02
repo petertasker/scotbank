@@ -13,7 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BusinessDataServiceTest {
+class BusinessDataServiceTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
@@ -29,16 +29,18 @@ public class BusinessDataServiceTest {
     void testFetchDataSuccess() throws IOException {
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
-        String csvData = "id,name,category,sanctioned\n" +
-                "ALD,Aldi,Groceries,false\n" +
-                "AMA,Amazon,Online Retailer,false\n" +
-                "ARG,Argos,Online Retailer,false\n" +
-                "BOO,Boom Battle Bar,Entertainment,false\n" +
-                "BOT,Boots,Health & Beauty,false\n" +
-                "BUR,Burger King,Eating Out,false\n" +
-                "CAF,Cafe Nero,Coffee,false\n" +
-                "CEX,CEX,Entertainment,true\n" +
-                "CLA,Clarks,Clothing,false";
+        String csvData = String.join(System.lineSeparator(),
+                "id,name,category,sanctioned",
+                "ALD,Aldi,Groceries,false",
+                "AMA,Amazon,Online Retailer,false",
+                "ARG,Argos,Online Retailer,false",
+                "BOO,Boom Battle Bar,Entertainment,false",
+                "BOT,Boots,Health & Beauty,false",
+                "BUR,Burger King,Eating Out,false",
+                "CAF,Cafe Nero,Coffee,false",
+                "CEX,CEX,Entertainment,true",
+                "CLA,Clarks,Clothing,false"
+        );
         when(mockResponse.getBody()).thenReturn(csvData);
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
         List<Business> businesses = businessDataService.fetchData();
@@ -48,7 +50,7 @@ public class BusinessDataServiceTest {
         assertEquals("ALD", businesses.getFirst().getID());
         assertEquals("Aldi", businesses.getFirst().getName());
         assertEquals("Groceries", businesses.getFirst().getCategory());
-        assertEquals(false, businesses.getFirst().isSanctioned());
+        assertFalse(businesses.getFirst().isSanctioned());
     }
 
     @Test

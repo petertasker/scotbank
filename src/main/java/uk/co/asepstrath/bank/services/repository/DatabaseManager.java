@@ -51,19 +51,18 @@ public class DatabaseManager implements DatabaseOperations {
 
     /**
      * Instantiates the creation and insertion of API data
-     * @throws SQLException Database connection failure
-     * @throws IOException API parsing failure
-     * @throws XMLStreamException API parsing failure
+     *
+     * @throws SQLException If database connection or queries fail
+     * @throws IOException If API parsing fails
+     * @throws XMLStreamException If XML parsing fails
      */
     public void initialise() throws SQLException, IOException, XMLStreamException {
         try (Connection connection = dataSource.getConnection()) {
             createTables(connection);
             insertData(connection);
-        } catch (SQLException | IOException | XMLStreamException e) {
-            logger.error("Database initialization failed", e);
-            throw e;
         }
     }
+
 
     /**
      * Creates all the tables used in the database

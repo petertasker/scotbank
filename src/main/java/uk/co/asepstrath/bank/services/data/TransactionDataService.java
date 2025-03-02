@@ -3,7 +3,6 @@ package uk.co.asepstrath.bank.services.data;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import kong.unirest.core.HttpResponse;
-import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Transaction;

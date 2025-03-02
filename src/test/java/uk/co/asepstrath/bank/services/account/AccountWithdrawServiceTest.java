@@ -1,11 +1,11 @@
 package uk.co.asepstrath.bank.services.account;
+
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
@@ -54,25 +54,16 @@ class AccountWithdrawServiceTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        Session session = Mockito.mock(Session.class);
 
-        // Mock internal repository access with reflection to use our mock repository
-        try {
-            java.lang.reflect.Field field = AccountWithdrawService.class.getDeclaredField("accountRepository");
-            field.setAccessible(true);
-            field.set(service, accountRepository);
-        } catch (Exception e) {
-            fail("Failed to set mock accountRepository: " + e.getMessage());
-        }
-        service = new AccountWithdrawService(dataSource, logger);
+        // Inject the mock repository directly into the service constructor
+        service = new AccountWithdrawService(dataSource, logger, accountRepository);
+
         when(dataSource.getConnection()).thenReturn(connection);
         when(context.session()).thenReturn(session);
-
-        when(dataSource.getConnection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(context.session()).thenReturn(session);
     }
+
 
     @Test
     void testRenderWithdraw() {

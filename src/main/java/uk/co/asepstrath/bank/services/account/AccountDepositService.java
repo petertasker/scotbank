@@ -20,7 +20,7 @@ import static uk.co.asepstrath.bank.Constants.*;
  */
 public class AccountDepositService extends BaseService {
 
-    private static AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     public AccountDepositService(DataSource datasource, Logger logger) {
         super(datasource, logger);

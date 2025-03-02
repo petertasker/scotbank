@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
-public class AccountRepositoryTest {
+class AccountRepositoryTest {
 
     @Mock
     private Connection connection;

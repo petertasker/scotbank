@@ -6,19 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 
 import javax.sql.DataSource;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 
-public class AppClassTest {
+class AppClassTest {
 
     @Mock
     private DataSource mockDataSource;
@@ -27,13 +23,8 @@ public class AppClassTest {
     private Logger mockLogger;
 
     @Mock
-    private Session mockSession;
-
-    @Mock
     private Context mockContext;
 
-    @Mock
-    private DatabaseManager mockDatabaseManager;
 
     private App mockApp;
 

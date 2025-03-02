@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 
 import java.math.BigDecimal;
@@ -69,7 +70,7 @@ class ManagerRepositoryTest {
         repository.insert(mockConnection, manager);
 
         // Assert
-        verify(mockConnection).prepareStatement(eq("INSERT INTO Managers (ManagerID, Name) VALUES (?, ?)"));
+        verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name) VALUES (?, ?)");
         verify(mockPreparedStatement).setString(1, "M123");
         verify(mockPreparedStatement).setString(2, "John Doe");
         verify(mockPreparedStatement).executeUpdate();
@@ -116,10 +117,6 @@ class ManagerRepositoryTest {
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockStatement.executeQuery(anyString())).thenThrow(new SQLException("Database error"));
 
-        // Act
-        List<Account> accounts = repository.getAllAccounts(mockConnection);
-
-        // Assert
-        assertTrue(accounts.isEmpty());
+        assertThrows(DataAccessException.class, () -> repository.getAllAccounts(mockConnection));
     }
 }

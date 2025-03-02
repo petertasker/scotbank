@@ -18,7 +18,7 @@ import java.sql.Types;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class TransactionRepositoryTest {
+class TransactionRepositoryTest {
 
     @Mock
     private Connection connection;
