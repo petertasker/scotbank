@@ -34,7 +34,7 @@ public class AccountViewService extends BaseService {
     @GET
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
-        Session session = ctx.session();
+        Session session = getSession(ctx);
         model.put(SESSION_ACCOUNT_NAME, session.get("name"));
         model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
         logger.info("Put name and accountid in model");
