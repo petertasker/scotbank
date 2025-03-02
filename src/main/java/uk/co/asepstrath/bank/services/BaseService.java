@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.co.asepstrath.bank.Constants.SESSION_ACCOUNT_ID;
-import static uk.co.asepstrath.bank.Constants.URL_ERROR_MESSAGE;
+import static uk.co.asepstrath.bank.Constants.MODEL_ERROR_MESSAGE;
 
 public abstract class BaseService {
 
@@ -58,7 +58,7 @@ public abstract class BaseService {
      * @param message A custom error message
      */
     protected void addErrorMessage(Map<String, Object> model, String message) {
-        model.put(URL_ERROR_MESSAGE, message);
+        model.put(MODEL_ERROR_MESSAGE, message);
     }
 
     /**

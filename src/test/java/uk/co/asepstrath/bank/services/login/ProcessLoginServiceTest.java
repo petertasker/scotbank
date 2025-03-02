@@ -21,8 +21,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.URL_ERROR_MESSAGE;
-import static uk.co.asepstrath.bank.Constants.URL_PAGE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.MODEL_ERROR_MESSAGE;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
 
 public class ProcessLoginServiceTest {
     @Mock
@@ -70,9 +70,9 @@ public class ProcessLoginServiceTest {
         ModelAndView<Map<String, Object>> result = service.processLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
+        assertEquals(TEMPLATE_LOGIN, result.getView());
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));    }
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));    }
 
     @Test
     void testProcessLoginEmptyAccountId() throws SQLException {
@@ -83,10 +83,10 @@ public class ProcessLoginServiceTest {
         ModelAndView<Map<String, Object>> result = service.processLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
+        assertEquals(TEMPLATE_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         // Verify no database interaction
         verify(dataSource, never()).getConnection();
@@ -102,10 +102,10 @@ public class ProcessLoginServiceTest {
         ModelAndView<Map<String, Object>> result = service.processLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
+        assertEquals(TEMPLATE_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         verify(dataSource, never()).getConnection();
     }
@@ -150,10 +150,10 @@ public class ProcessLoginServiceTest {
         ModelAndView<Map<String, Object>> result = service.processLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
+        assertEquals(TEMPLATE_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         verify(logger).error(contains("Database error"), anyString(), any(SQLException.class));
     }

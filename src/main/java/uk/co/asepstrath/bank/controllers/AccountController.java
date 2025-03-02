@@ -14,10 +14,12 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 
+import static uk.co.asepstrath.bank.Constants.*;
+
 /**
  * The Account endpoint controller
  */
-@Path("/account")
+@Path(ROUTE_ACCOUNT)
 public class AccountController extends BaseController {
 
     private final AccountViewService viewAccountService;
@@ -48,7 +50,7 @@ public class AccountController extends BaseController {
      * @return The "/deposit" endpoint
      */
     @GET
-    @Path("/deposit")
+    @Path(ROUTE_DEPOSIT)
     public ModelAndView<Map<String, Object>> deposit(Context ctx) {
         return depositService.renderDeposit(ctx);
     }
@@ -60,7 +62,7 @@ public class AccountController extends BaseController {
      * @return The "/account/withdraw" endpoint
      */
     @GET
-    @Path("/withdraw")
+    @Path(ROUTE_WITHDRAW)
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
        return withdrawService.renderWithdraw(ctx);
     }
@@ -73,7 +75,7 @@ public class AccountController extends BaseController {
      * @throws SQLException on withdrawal failure
      */
     @POST
-    @Path("/withdraw/process")
+    @Path(ROUTE_WITHDRAW + ROUTE_PROCESS)
     ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
        return withdrawService.withdrawProcess(ctx);
     }
@@ -86,7 +88,7 @@ public class AccountController extends BaseController {
      * @throws SQLException on deposit failure
      */
     @POST
-    @Path("/deposit/process")
+    @Path(ROUTE_DEPOSIT + ROUTE_PROCESS)
     public ModelAndView<Map<String, Object>> depositProcess(Context ctx) throws SQLException {
         return depositService.processDeposit(ctx);
     }

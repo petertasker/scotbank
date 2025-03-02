@@ -25,7 +25,7 @@ public class AccountLogoutService extends BaseService {
     public ModelAndView<Map<String, Object>> logout(Context ctx) {
         ctx.session().destroy();
         Map<String, Object> model = createModel();
-        model.put(URL_SUCCESS_MESSAGE, "Logged out successfully");
-        return render(URL_PAGE_LOGIN, model);
+        model.put(MODEL_SUCCESS_MESSAGE, "Logged out successfully");
+        return render(TEMPLATE_LOGIN, model);
     }
 }

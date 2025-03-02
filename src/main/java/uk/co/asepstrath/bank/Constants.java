@@ -10,23 +10,32 @@ public final class Constants {
 
     /**
      * Endpoints
+     * NOTE: If you refactor these make sure that they are reflected in the handlebars templates,
+     * the variables there don't use these constants.
      **/
-    public static final String URL_PAGE_LOGIN = "login_user.hbs";
-    public static final String URL_PAGE_ACCOUNT = "account.hbs";
-    public static final String URL_PAGE_ACCOUNT_DEPOSIT = "deposit.hbs";
-    public static final String URL_PAGE_ACCOUNT_WITHDRAW = "withdraw.hbs";
 
-    public static final String URL_PAGE_MANAGER_LOGIN = "login_manager.hbs";
-    public static final String URL_PAGE_MANAGER_DASHBOARD = "manager_dashboard.hbs";
+    public static final String TEMPLATE_LOGIN = "login_user.hbs";
+    public static final String TEMPLATE_ACCOUNT = "account.hbs";
+    public static final String TEMPLATE_DEPOSIT = "deposit.hbs";
+    public static final String TEMPLATE_WITHDRAW = "withdraw.hbs";
+    public static final String TEMPLATE_MANAGER_LOGIN = "login_manager.hbs";
+    public static final String TEMPLATE_MANAGER_DASHBOARD = "manager_dashboard.hbs";
 
-    // NOTE: If you refactor these make sure that they are reflected in the handlebars templates,
-    // the variables there don't use these constants.
+    public static final String ROUTE_LOGIN = "/login";
+    public static final String ROUTE_ACCOUNT = "/account";
+    public static final String ROUTE_DEPOSIT = "/deposit";
+    public static final String ROUTE_WITHDRAW = "/withdraw";
+    public static final String ROUTE_MANAGER = "/manager";
+    public static final String ROUTE_DASHBOARD = "/dashboard";
+    public static final String ROUTE_PROCESS = "/process";
+
+
 
     /**
      * Success / Error messages
      */
-    public static final String URL_ERROR_MESSAGE = "error";
-    public static final String URL_SUCCESS_MESSAGE = "success";
+    public static final String MODEL_ERROR_MESSAGE = "error";
+    public static final String MODEL_SUCCESS_MESSAGE = "success";
 
     /**
      * Session Variables

@@ -35,8 +35,8 @@ public class AccountViewService extends BaseService {
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
         Session session = ctx.session();
-        model.put(SESSION_ACCOUNT_NAME, session.get("name"));
-        model.put(SESSION_ACCOUNT_ID, session.get("accountid"));
+        model.put(SESSION_ACCOUNT_NAME, session.get(SESSION_ACCOUNT_NAME));
+        model.put(SESSION_ACCOUNT_ID, session.get(SESSION_ACCOUNT_ID));
         logger.info("Put name and accountid in model");
 
         putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
@@ -80,6 +80,6 @@ public class AccountViewService extends BaseService {
             model.put(TRANSACTION_OBJECT_LIST, transactions);
             model.put(TRANSACTION_OBJECT_LIST_EXISTS, !transactions.isEmpty());
         }
-        return render(URL_PAGE_ACCOUNT, model);
+        return render(TEMPLATE_ACCOUNT, model);
     }
 }

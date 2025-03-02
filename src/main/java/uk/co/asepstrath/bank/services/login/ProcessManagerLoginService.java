@@ -37,7 +37,7 @@ public class ProcessManagerLoginService extends BaseService {
         String formManagerID = getFormValue(ctx, "managerid");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
             addErrorMessage(model, "Manager ID is required");
-            return render(URL_PAGE_MANAGER_LOGIN, model);
+            return render(TEMPLATE_MANAGER_LOGIN, model);
         }
 
         try (
@@ -59,18 +59,18 @@ public class ProcessManagerLoginService extends BaseService {
                     session.put(SESSION_MANAGER_ID, manager.getManagerID());
 
                     logger.info("Process Manager Login Success");
-                    redirect(ctx, "/manager/dashboard");
+                    redirect(ctx, ROUTE_MANAGER + ROUTE_DASHBOARD);
                     return null;
                 } else {
                     // Manager not found
                     addErrorMessage(model, "Manager not found");
-                    return render(URL_PAGE_MANAGER_LOGIN, model);
+                    return render(TEMPLATE_MANAGER_LOGIN, model);
                 }
             }
         } catch (SQLException ex) {
             logger.error("Database error during manager login", ex);
             addErrorMessage(model, "System error occurred. Please try again later.");
-            return render(URL_PAGE_MANAGER_LOGIN, model);
+            return render(TEMPLATE_MANAGER_LOGIN, model);
         }
     }
 }

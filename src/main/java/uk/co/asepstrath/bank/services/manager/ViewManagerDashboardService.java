@@ -42,6 +42,6 @@ public class ViewManagerDashboardService extends BaseService {
 
         model.put(ACCOUNT_OBJECT_LIST_EXISTS, !accounts.isEmpty());
         model.put(ACCOUNT_OBJECT_LIST, accounts);
-        return render(URL_PAGE_MANAGER_DASHBOARD, model);
+        return render(TEMPLATE_MANAGER_DASHBOARD, model);
     }
 }

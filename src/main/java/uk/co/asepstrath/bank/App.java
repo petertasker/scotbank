@@ -19,11 +19,14 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.*;
 
+import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
+import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
+
 public class App extends Jooby {
 
     public App() {
         // Account page as landing page
-        get("/", ctx -> ctx.sendRedirect( "/account"));
+        get("/", ctx -> ctx.sendRedirect(ROUTE_ACCOUNT));
 
         // Ensure user is logged in
         before(ctx -> {
@@ -33,7 +36,7 @@ public class App extends Jooby {
 
             Session session = ctx.sessionOrNull();
             boolean userLoggedIn = session != null && session.get("name") != null && session.get("accountid") != null;
-            if (!userLoggedIn && !path.equals("/login") && !path.equals("/login/process")
+            if (!userLoggedIn && !path.startsWith(ROUTE_LOGIN)
                     && !path.equals("/manager/login") && !path.equals("/manager/login/process")){
                 ctx.setResponseCode(401).sendRedirect("/login");
             }
