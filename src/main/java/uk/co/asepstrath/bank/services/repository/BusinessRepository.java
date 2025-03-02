@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * The Business repository service
+ */
 public class BusinessRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
@@ -26,9 +29,21 @@ public class BusinessRepository extends BaseRepository {
         super(logger);
     }
 
+    /**
+     * Creates the Business table
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     */
     public void createTable(Connection connection) throws SQLException {
         executeUpdate(connection, SQL_CREATE_TABLE);
     }
+
+    /**
+     * Inserts a Business into the Business table
+     * @param connection Database Connection
+     * @param business A Business object
+     * @throws SQLException Database connection failure
+     */
     public void insert(Connection connection, Business business) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_BUSINESS)) {
             preparedStatement.setString(1, business.getID());

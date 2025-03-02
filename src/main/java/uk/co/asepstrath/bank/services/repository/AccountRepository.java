@@ -9,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * The Account repository service
+ */
 public class AccountRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
@@ -34,10 +37,21 @@ public class AccountRepository extends BaseRepository {
         super(logger);
     }
 
+    /**
+     * Creates the Account table
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     */
     public void createTable(Connection connection) throws SQLException {
         executeUpdate(connection, SQL_CREATE_TABLE);
     }
 
+    /**
+     * Inserts an Account into the Account table
+     * @param connection Database Connection
+     * @param account An Account object
+     * @throws SQLException Database connection failure
+     */
     public void insert(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             statement.setString(1, account.getAccountID());
@@ -51,6 +65,12 @@ public class AccountRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Updates the balance of an Account
+     * @param connection Database connection
+     * @param account An Account object
+     * @throws SQLException Database connection failure
+     */
     public void updateBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BALANCE)) {
             statement.setBigDecimal(1, account.getBalance());
@@ -59,6 +79,13 @@ public class AccountRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Gets an Account object from the database
+     * @param connection Database connection
+     * @param accountID Unique identifier of an account
+     * @return An Account object parsed from the database
+     * @throws SQLException Database connection failure
+     */
     public Account getAccount(Connection connection, String accountID) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_GET_ACCOUNT)) {
             statement.setString(1, accountID);

@@ -14,6 +14,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The manager for all repository interactions
+ */
 public class DatabaseManager implements DatabaseOperations {
 
     private final DataSource dataSource;
@@ -46,6 +49,12 @@ public class DatabaseManager implements DatabaseOperations {
 
     }
 
+    /**
+     * Instantiates the creation and insertion of API data
+     * @throws SQLException Database connection failure
+     * @throws IOException API parsing failure
+     * @throws XMLStreamException API parsing failure
+     */
     public void initialise() throws SQLException, IOException, XMLStreamException {
         try (Connection connection = dataSource.getConnection()) {
             createTables(connection);
@@ -56,6 +65,11 @@ public class DatabaseManager implements DatabaseOperations {
         }
     }
 
+    /**
+     * Creates all the tables used in the database
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     */
     @Override
     public void createTables(Connection connection) throws SQLException {
         accountRepository.createTable(connection);
@@ -71,6 +85,13 @@ public class DatabaseManager implements DatabaseOperations {
         logger.info("Manager table created");
     }
 
+    /**
+     * Inserts initial API data into the database
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     * @throws IOException API parsing failure
+     * @throws XMLStreamException API parsing failure
+     */
     @Override
     public void insertData(Connection connection) throws SQLException, IOException, XMLStreamException {
         // Insert accounts

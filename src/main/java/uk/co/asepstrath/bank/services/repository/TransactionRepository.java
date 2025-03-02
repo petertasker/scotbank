@@ -7,6 +7,9 @@ import uk.co.asepstrath.bank.Transaction;
 import java.sql.*;
 import java.util.Objects;
 
+/**
+ * The Transaction repository service
+ */
 public class TransactionRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
@@ -39,10 +42,21 @@ public class TransactionRepository extends BaseRepository {
         this.accountRepository = accountRepository;
     }
 
+    /**
+     * Creates the Transaction table
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     */
     public void createTable(Connection connection) throws SQLException {
         executeUpdate(connection, SQL_CREATE_TABLE);
     }
 
+    /**
+     * Inserts a Transaction into the Transaction table
+     * @param connection Database Connection
+     * @param transaction a Transaction object
+     * @throws SQLException Database connection failure
+     */
     public void insert(Connection connection, Transaction transaction) throws SQLException {
         boolean accepted = processTransaction(connection, transaction);
 
@@ -72,6 +86,13 @@ public class TransactionRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Determines if a transaction is accepted or declined
+     * @param connection Database connection
+     * @param transaction the Transaction Object in question
+     * @return a boolean
+     * @throws SQLException Database connection failure
+     */
     private boolean processTransaction(Connection connection, Transaction transaction) throws SQLException {
         if (!Objects.equals(transaction.getType(), "DEPOSIT")) {
             Account senderAccount = accountRepository.getAccount(connection, transaction.getFrom());

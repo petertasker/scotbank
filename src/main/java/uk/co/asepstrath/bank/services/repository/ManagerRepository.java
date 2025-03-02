@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Manager repository service
+ */
 public class ManagerRepository extends BaseRepository {
 
     public ManagerRepository(Logger logger) {
@@ -32,10 +35,22 @@ public class ManagerRepository extends BaseRepository {
     private static final String SQL_SELECT_ALL_ACCOUNTS =
             "SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts";
 
+
+    /**
+     * Creates the Manager table
+     * @param connection Database connection
+     * @throws SQLException Database connection failure
+     */
     public void createTable(Connection connection) throws SQLException {
         executeUpdate(connection, SQL_CREATE_TABLE);
     }
 
+    /**
+     * Inserts a Manager into the Manager table
+     * @param connection Database Connection
+     * @param manager manager object
+     * @throws SQLException Database connection failure
+     */
     public void insert(Connection connection, Manager manager) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MANAGER)) {
             statement.setString(1, manager.getManagerID());
@@ -44,6 +59,12 @@ public class ManagerRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Selects all accounts from the database
+     * @param connection Database connection
+     * @return List of Account objects
+     * @throws SQLException Database connection failure
+     */
     public List<Account> getAllAccounts(Connection connection) throws SQLException {
         List<Account> accounts = new ArrayList<>();
         try {
