@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 
 import java.math.BigDecimal;
@@ -116,6 +117,6 @@ class ManagerRepositoryTest {
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockStatement.executeQuery(anyString())).thenThrow(new SQLException("Database error"));
 
-        assertThrows(SQLException.class, () -> repository.getAllAccounts(mockConnection));
+        assertThrows(DataAccessException.class, () -> repository.getAllAccounts(mockConnection));
     }
 }

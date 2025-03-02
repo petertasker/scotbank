@@ -12,7 +12,6 @@ import uk.co.asepstrath.bank.controllers.AccountController_;
 import uk.co.asepstrath.bank.controllers.ManagerController_;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
-import uk.co.asepstrath.bank.services.manager.ViewManagerDashboardService;
 import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 
 import javax.sql.DataSource;

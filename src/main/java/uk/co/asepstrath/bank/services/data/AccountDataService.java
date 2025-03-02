@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
-import kong.unirest.core.Unirest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Account;
 
 import java.io.IOException;

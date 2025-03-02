@@ -2,6 +2,7 @@ package uk.co.asepstrath.bank.services.repository;
 
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 
 import java.sql.*;
@@ -77,7 +78,7 @@ public class ManagerRepository extends BaseRepository {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
-            throw e;
+            throw new DataAccessException("Failed to retrieve accounts from the database: ",e);
         }
         return accounts;
     }

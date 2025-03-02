@@ -13,7 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BusinessDataServiceTest {
+class BusinessDataServiceTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
@@ -29,7 +29,18 @@ public class BusinessDataServiceTest {
     void testFetchDataSuccess() throws IOException {
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
-        String csvData = "id,name,category,sanctioned\nALD,Aldi,Groceries,false\nAMA,Amazon,Online Retailer,false\nARG,Argos,Online Retailer,false\nBOO,Boom Battle Bar,Entertainment,false\nBOT,Boots,Health & Beauty,false\nBUR,Burger King,Eating Out,false\nCAF,Cafe Nero,Coffee,false\nCEX,CEX,Entertainment,true\nCLA,Clarks,Clothing,false".formatted();
+        String csvData = String.join(System.lineSeparator(),
+                "id,name,category,sanctioned",
+                "ALD,Aldi,Groceries,false",
+                "AMA,Amazon,Online Retailer,false",
+                "ARG,Argos,Online Retailer,false",
+                "BOO,Boom Battle Bar,Entertainment,false",
+                "BOT,Boots,Health & Beauty,false",
+                "BUR,Burger King,Eating Out,false",
+                "CAF,Cafe Nero,Coffee,false",
+                "CEX,CEX,Entertainment,true",
+                "CLA,Clarks,Clothing,false"
+        );
         when(mockResponse.getBody()).thenReturn(csvData);
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
         List<Business> businesses = businessDataService.fetchData();
