@@ -13,6 +13,9 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The manager dashboard viewing service
+ */
 public class ViewManagerDashboardService extends BaseService {
 
     private static ManagerRepository managerRepository;
@@ -22,6 +25,10 @@ public class ViewManagerDashboardService extends BaseService {
         managerRepository = new ManagerRepository(logger);
     }
 
+    /**
+     * Renders the manager's dashboard
+     * @return The "/manager/dashboard" endpoint
+     */
     public ModelAndView<Map<String, Object>> renderDashboard() {
         List<Account> accounts;
         Map<String, Object> model = createModel();

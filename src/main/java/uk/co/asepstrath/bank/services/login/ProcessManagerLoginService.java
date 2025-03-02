@@ -16,12 +16,20 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The manager login process service
+ */
 public class ProcessManagerLoginService extends BaseService {
     public ProcessManagerLoginService(DataSource dataSource, Logger logger) {
         super(dataSource, logger);
     }
 
-
+    /**
+     * Processes the manager login
+     * @param ctx Session context
+     * @return the "/manager/login" endpoint on failure
+     * Redirects to "/manager/dashboard" on success
+     */
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {
         Map<String, Object> model = createModel();
 
