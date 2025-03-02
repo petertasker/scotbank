@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.co.asepstrath.bank.Constants.URL_PAGE_MANAGER_LOGIN;
+import static uk.co.asepstrath.bank.Constants.*;
 
 public class DisplayManagerLoginServiceTest {
 
@@ -30,7 +30,7 @@ public class DisplayManagerLoginServiceTest {
     public void testDisplayLogin() {
         ModelAndView<Map<String, Object>> result = displayManagerLoginService.displayManagerLogin();
         assertNotNull(result);
-        assertEquals(URL_PAGE_MANAGER_LOGIN, result.getView());
+        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
         assertNotNull(result.getModel());
     }
 }

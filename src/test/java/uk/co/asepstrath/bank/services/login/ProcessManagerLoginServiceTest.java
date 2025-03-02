@@ -71,9 +71,9 @@ public class ProcessManagerLoginServiceTest {
         ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_MANAGER_LOGIN, result.getView());
+        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));    }
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));    }
 
     @Test
     void testProcessLoginEmptyAccountId() throws SQLException {
@@ -84,10 +84,10 @@ public class ProcessManagerLoginServiceTest {
         ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_MANAGER_LOGIN, result.getView());
+        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         // Verify no database interaction
         verify(dataSource, never()).getConnection();
@@ -103,10 +103,10 @@ public class ProcessManagerLoginServiceTest {
         ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_MANAGER_LOGIN, result.getView());
+        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         verify(dataSource, never()).getConnection();
     }
@@ -128,8 +128,8 @@ public class ProcessManagerLoginServiceTest {
 
         assertNull(result);
 
-        verify(session).put("managerid", managerId);
-        verify(session).put("managername", name);
+        verify(session).put(SESSION_MANAGER_ID, managerId);
+        verify(session).put(SESSION_MANAGER_NAME, name);
 
         verify(dataSource).getConnection();
         verify(preparedStatement).setString(1, managerId);
@@ -147,10 +147,10 @@ public class ProcessManagerLoginServiceTest {
         ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 
         assertNotNull(result);
-        assertEquals(URL_PAGE_MANAGER_LOGIN, result.getView());
+        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
 
         Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(URL_ERROR_MESSAGE));
+        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
 
         verify(logger).error(anyString(), any(SQLException.class));
     }
