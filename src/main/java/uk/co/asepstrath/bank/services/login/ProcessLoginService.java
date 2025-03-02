@@ -16,12 +16,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+/**
+ * The login process service
+ */
 public class ProcessLoginService extends BaseService {
 
     public ProcessLoginService(DataSource dataSource, Logger logger) {
         super(dataSource, logger);
     }
 
+    /**
+     * Processes user login
+     * @param ctx Session context
+     * @return The "/login" endpoint on failure
+     * Redirects to the "/account" endpoint on success
+     */
     public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
         Map<String, Object> model = createModel();
 

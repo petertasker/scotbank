@@ -9,11 +9,19 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The account log out service
+ */
 public class AccountLogoutService extends BaseService {
     public AccountLogoutService(Logger logger) {
         super(logger);
     }
 
+    /**
+     * Logs the user out
+     * @param ctx Session context
+     * @return the "/login" endpoint with a logout success message
+     */
     public ModelAndView<Map<String, Object>> logout(Context ctx) {
         ctx.session().destroy();
         Map<String, Object> model = createModel();
