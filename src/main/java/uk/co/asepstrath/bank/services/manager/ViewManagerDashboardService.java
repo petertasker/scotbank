@@ -34,9 +34,10 @@ public class ViewManagerDashboardService extends BaseService {
      * @return The "/manager/dashboard" endpoint
      */
     public ModelAndView<Map<String, Object>> renderDashboard(Context ctx) {
+        List<Account> accounts;
         Map<String, Object> model = createModel();
         try {
-            List<Account> accounts = managerRepository.getAllAccounts(getConnection());
+            accounts = managerRepository.getAllAccounts(getConnection());
         } catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
