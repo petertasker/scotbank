@@ -78,7 +78,7 @@ public class ManagerRepository extends BaseRepository {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
-            // either throw or use logger
+            throw new DataAccessException("Failed to retrieve accounts from the database: ",e);
         }
         return accounts;
     }

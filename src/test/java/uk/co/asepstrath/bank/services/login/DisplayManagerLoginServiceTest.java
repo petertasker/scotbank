@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.co.asepstrath.bank.Constants.*;
 
-class DisplayManagerLoginServiceTest {
+public class DisplayManagerLoginServiceTest {
 
     @Mock
     private Logger logger;
@@ -21,13 +21,13 @@ class DisplayManagerLoginServiceTest {
     private DisplayManagerLoginService displayManagerLoginService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         displayManagerLoginService = new DisplayManagerLoginService(logger);
     }
 
     @Test
-    void testDisplayLogin() {
+    public void testDisplayLogin() {
         ModelAndView<Map<String, Object>> result = displayManagerLoginService.displayManagerLogin();
         assertNotNull(result);
         assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());

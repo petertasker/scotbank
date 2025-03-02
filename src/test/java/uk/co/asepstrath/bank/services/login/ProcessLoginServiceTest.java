@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static uk.co.asepstrath.bank.Constants.MODEL_ERROR_MESSAGE;
 import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
 
-class ProcessLoginServiceTest {
+public class ProcessLoginServiceTest {
     @Mock
     private Logger logger;
 
