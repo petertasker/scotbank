@@ -4,6 +4,10 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Fetches data from an external API
+ * @param <T> the object that is being generated
+ */
 public interface DataService<T> {
     List<T> fetchData() throws IOException, XMLStreamException;
 }

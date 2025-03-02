@@ -4,7 +4,15 @@ import uk.co.asepstrath.bank.Manager;
 
 import java.util.List;
 
+/**
+ * Fetches some hard-coded managers
+ */
 public class ManagerDataService implements DataService<Manager> {
+
+    /**
+     * Generates a list of manager objects
+     * @return List of manager objects
+     */
     @Override
     public List<Manager> fetchData() {
         return List.of(

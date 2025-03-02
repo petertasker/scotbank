@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fetches Business data from external API
+ */
 public class BusinessDataService implements DataService<Business> {
 
     private UnirestWrapper unirestWrapper;
@@ -24,6 +27,11 @@ public class BusinessDataService implements DataService<Business> {
         this.unirestWrapper = wrapper;
     }
 
+    /**
+     * Gets business data from the API
+     * @return List of Business objects
+     * @throws IOException Failed to fetch data from API
+     */
     @Override
     public List<Business> fetchData() throws IOException {
         try {

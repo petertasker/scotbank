@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fetches Transaction data from external API
+ */
 public class TransactionDataService implements DataService<Transaction> {
 
     private final Logger logger;
@@ -31,6 +34,11 @@ public class TransactionDataService implements DataService<Transaction> {
     }
 
 
+    /**
+     * Fetches a List of Transactions from an external API
+     * @return A list of transaction objects
+     * @throws XMLStreamException failed to parse XML data from API
+     */
     @Override
     public List<Transaction> fetchData() throws XMLStreamException {
         List<Transaction> allTransactions = new ArrayList<>();
