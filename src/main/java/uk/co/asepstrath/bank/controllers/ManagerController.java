@@ -6,9 +6,9 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.manager.ProcessManagerLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessManagerLoginService;
 import uk.co.asepstrath.bank.services.manager.ViewManagerDashboardService;
-import uk.co.asepstrath.bank.services.manager.ViewManagerLoginService;
+import uk.co.asepstrath.bank.services.login.DisplayManagerLoginService;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -21,13 +21,13 @@ import java.util.Map;
 public class ManagerController extends BaseController {
 
     private final ViewManagerDashboardService viewManagerDashboardService;
-    private final ViewManagerLoginService viewManagerLoginService;
+    private final DisplayManagerLoginService displayManagerLoginService;
     private final ProcessManagerLoginService processManagerLoginService;
 
     public ManagerController(DataSource dataSource, Logger logger) {
         super(logger);
         viewManagerDashboardService = new ViewManagerDashboardService(dataSource, logger);
-        viewManagerLoginService = new ViewManagerLoginService(logger);
+        displayManagerLoginService = new DisplayManagerLoginService(logger);
         processManagerLoginService = new ProcessManagerLoginService(dataSource, logger);
     }
 
@@ -48,7 +48,7 @@ public class ManagerController extends BaseController {
     @GET
     @Path("/login")
     public ModelAndView<Map<String, Object>> displayManagerLogin() {
-        return viewManagerLoginService.displayManagerLogin();
+        return displayManagerLoginService.displayManagerLogin();
     }
 
     /**

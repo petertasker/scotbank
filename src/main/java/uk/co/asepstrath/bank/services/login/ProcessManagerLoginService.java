@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.manager;
+package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;

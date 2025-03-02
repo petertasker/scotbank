@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.manager;
+package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.ModelAndView;
 import org.slf4j.Logger;
@@ -8,9 +8,9 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.URL_PAGE_MANAGER_LOGIN;
 
-public class ViewManagerLoginService extends BaseService {
+public class DisplayManagerLoginService extends BaseService {
 
-    public ViewManagerLoginService(Logger logger) {
+    public DisplayManagerLoginService(Logger logger) {
         super(logger);
     }
 
