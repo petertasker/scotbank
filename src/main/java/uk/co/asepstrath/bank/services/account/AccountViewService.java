@@ -16,12 +16,21 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The Account Viewing service
+ */
 public class AccountViewService extends BaseService {
 
     public AccountViewService(DataSource datasource, Logger logger){
         super(datasource, logger);
     }
 
+    /**
+     * Displays the "/account" endpoint
+     * @param ctx Session Context
+     * @return the "/account" endpoint
+     * @throws SQLException Transactions not found in database
+     */
     @GET
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();

@@ -15,6 +15,9 @@ import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The Account deposit service
+ */
 public class AccountDepositService extends BaseService {
 
     private static AccountRepository accountRepository;
@@ -24,6 +27,11 @@ public class AccountDepositService extends BaseService {
         accountRepository = new AccountRepository(logger);
     }
 
+    /**
+     * Displays the deposit endpoint
+     * @param ctx Session context
+     * @return The "/account/deposit" endpoint
+     */
     public ModelAndView<Map<String, Object>> renderDeposit(Context ctx) {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
@@ -31,6 +39,14 @@ public class AccountDepositService extends BaseService {
         return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
     }
 
+    /**
+     * The deposit process
+     * @param ctx Session context
+     * @return The "/account/deposit" endpoint on failure
+     * Redirects to "/account" on success
+     * @throws SQLException Database connection error
+     * @throws ArithmeticException User bad input error
+     */
     public ModelAndView<Map<String, Object>> processDeposit(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);

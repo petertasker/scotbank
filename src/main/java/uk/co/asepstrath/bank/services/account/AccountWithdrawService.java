@@ -15,6 +15,9 @@ import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
+/**
+ * The Account withdrawal service
+ */
 public class AccountWithdrawService extends BaseService {
 
     private static AccountRepository accountRepository;
@@ -24,6 +27,11 @@ public class AccountWithdrawService extends BaseService {
         accountRepository = new AccountRepository(logger);
     }
 
+    /**
+     * Displays the "/account/withdraw" endpoint
+     * @param ctx Session Context
+     * @return The "/account/withdraw" endpoint
+     */
     public ModelAndView<Map<String, Object>> renderWithdraw(Context ctx) {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
@@ -31,6 +39,14 @@ public class AccountWithdrawService extends BaseService {
         return render(URL_PAGE_ACCOUNT_WITHDRAW, model);
     }
 
+    /**
+     * The withdrawal process
+     * @param ctx Session Context
+     * @return The "/account/withdraw" endpoint on failure
+     * Redirects to "/account" on success
+     * @throws SQLException Database connection error
+     * @throws ArithmeticException User input error
+     */
     public ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
         try (Connection connection = getConnection()) {
