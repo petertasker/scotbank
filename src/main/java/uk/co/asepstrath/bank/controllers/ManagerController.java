@@ -37,8 +37,8 @@ public class ManagerController extends BaseController {
      */
     @GET
     @Path("/dashboard")
-    public ModelAndView<Map<String, Object>> displayManagerDashboard() {
-        return viewManagerDashboardService.renderDashboard();
+    public ModelAndView<Map<String, Object>> displayManagerDashboard(Context ctx) {
+        return viewManagerDashboardService.renderDashboard(ctx);
     }
 
     /**
