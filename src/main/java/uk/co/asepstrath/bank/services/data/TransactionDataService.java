@@ -42,46 +42,35 @@ public class TransactionDataService implements DataService<Transaction> {
     public List<Transaction> fetchData() throws XMLStreamException {
         List<Transaction> allTransactions = new ArrayList<>();
         int page = 0;
-        boolean hasMorePages = true;
-
         try {
-            // Initialize the HTTP response
-            HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions");
-            if (!response.isSuccess()) {
-                throw new XMLStreamException("Failed to fetch transactions: " + response.getStatus());
-            }
-
-            // Set up the XML mapper
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new JodaModule());
 
-            // Continue fetching pages until there are no more
-            while (hasMorePages) {
-                // Fetch the next page
-                response = unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions?page=" + page);
+            while (true) {
+                HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", page);
 
                 if (!response.isSuccess()) {
-                    // Exit if the response is not successful
-                    hasMorePages = false;
-                    logger.warn("Failed to fetch page {}, exiting loop", page);
-                } else {
-                    // Parse the response body into XmlParser
-                    XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
-                    List<Transaction> pageTransactions = pageResult.getTransactions();
-
-                    // Check if no transactions are found or the list is empty
-                    if (pageTransactions == null || pageTransactions.isEmpty()) {
-                        hasMorePages = false;  // Exit the loop if no transactions are found
-                        logger.info("No more transactions found, exiting loop.");
-                    } else {
-                        // Add the current page's transactions to the list
-                        allTransactions.addAll(pageTransactions);
-
-                        // Get the next page number and increment
-                        page = pageResult.getPage() + 1;
-                        logger.info("Fetched page {} of {}", pageResult.getPage(), pageResult.getTotalPages());
-                    }
+                    logger.info("Failed to fetch page {}: {}", page, response.getStatus());
+                    break;
                 }
+
+                XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
+                List<Transaction> pageTransactions = pageResult.getTransactions();
+
+                if (pageTransactions == null || pageTransactions.isEmpty()) {
+                    logger.info("No more transactions found on page {}", page);
+                    break;
+                }
+
+                allTransactions.addAll(pageTransactions);
+
+                if (!pageResult.isHasNext() || page >= pageResult.getTotalPages() - 1) {
+                    logger.info("Reached last page ({})", page);
+                    break;
+                }
+
+                page++;
+                logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
             }
         } catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
