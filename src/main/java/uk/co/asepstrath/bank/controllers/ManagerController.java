@@ -13,6 +13,10 @@ import uk.co.asepstrath.bank.services.manager.ViewManagerLoginService;
 import javax.sql.DataSource;
 import java.util.Map;
 
+
+/**
+ * The Manager endpoint Controller
+ */
 @Path("/manager")
 public class ManagerController extends BaseController {
 
@@ -27,18 +31,32 @@ public class ManagerController extends BaseController {
         processManagerLoginService = new ProcessManagerLoginService(dataSource, logger);
     }
 
+    /**
+     * Displays all accounts on the system
+     * @return The "/dashboard" endpoint
+     */
     @GET
     @Path("/dashboard")
     public ModelAndView<Map<String, Object>> displayManagerDashboard() {
         return viewManagerDashboardService.renderDashboard();
     }
 
+    /**
+     * Displays the manager login endpoint
+     * @return The "/manager/login" endpoint
+     */
     @GET
     @Path("/login")
     public ModelAndView<Map<String, Object>> displayManagerLogin() {
         return viewManagerLoginService.displayManagerLogin();
     }
 
+    /**
+     * Engages the manager login process
+     * @param ctx Session contrxt
+     * @return The "/manager/login" endpoint on failure
+     * Redirects to "/manager/dashboard" on success
+     */
     @POST
     @Path("/login/process")
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {

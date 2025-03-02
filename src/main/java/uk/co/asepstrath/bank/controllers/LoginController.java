@@ -12,6 +12,9 @@ import java.util.Map;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
+/**
+ * The Login process endpoint controller
+ */
 @Path("/login")
 public class LoginController extends BaseController {
     private final DisplayLoginService displayLoginService;
@@ -23,11 +26,21 @@ public class LoginController extends BaseController {
         this.processLoginService = processLoginService;
     }
 
+    /**
+     * Displays the login endpoint
+     * @return ModelAndView
+     */
     @GET
     public ModelAndView<Map<String, Object>> displayLogin() {
         return displayLoginService.displayLogin();
     }
 
+    /**
+     * Directs the login process
+     * @param ctx Session context
+     * @return The "/login" endpoint on failure
+     * Redirects to "/account" on success
+     */
     @POST
     @Path("/process")
     public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
