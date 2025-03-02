@@ -50,8 +50,8 @@ public class ProcessManagerLoginService extends BaseService {
                 if (rs.next()) {
                     // Manager found - create session
                     Manager manager = new Manager(
-                            rs.getString("Name"),
-                            rs.getString("ManagerID")
+                            rs.getString("ManagerID"),
+                            rs.getString("Name")
                     );
 
                     Session session = ctx.session();

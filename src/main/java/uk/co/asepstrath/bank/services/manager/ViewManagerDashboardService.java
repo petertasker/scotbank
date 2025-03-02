@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank.services.manager;
 
+import io.jooby.Context;
 import io.jooby.ModelAndView;
+import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
@@ -31,7 +33,7 @@ public class ViewManagerDashboardService extends BaseService {
      * Renders the manager's dashboard
      * @return The "/manager/dashboard" endpoint
      */
-    public ModelAndView<Map<String, Object>> renderDashboard() {
+    public ModelAndView<Map<String, Object>> renderDashboard(Context ctx) {
         List<Account> accounts;
         Map<String, Object> model = createModel();
         try {
@@ -39,9 +41,9 @@ public class ViewManagerDashboardService extends BaseService {
         } catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
-
-        model.put(ACCOUNT_OBJECT_LIST_EXISTS, !accounts.isEmpty());
-        model.put(ACCOUNT_OBJECT_LIST, accounts);
+        Session session = getSession(ctx);
+        model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
+        model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
         return render(TEMPLATE_MANAGER_DASHBOARD, model);
     }
 }
