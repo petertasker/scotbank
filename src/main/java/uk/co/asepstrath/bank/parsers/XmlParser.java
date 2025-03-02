@@ -31,40 +31,8 @@ public class XmlParser {
         return hasNext;
     }
 
-    public void setHasNext(boolean hasNext) {
-        this.hasNext = hasNext;
-    }
-
-    public boolean isHasPrevious() {
-        return hasPrevious;
-    }
-
-    public void setHasPrevious(boolean hasPrevious) {
-        this.hasPrevious = hasPrevious;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     public int getTotalPages() {
         return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
     }
 
     public List<Transaction> getTransactions() {
