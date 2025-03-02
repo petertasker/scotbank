@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,12 +20,11 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ProcessManagerLoginServiceTest {
+class ProcessManagerLoginServiceTest {
 
     @Mock
     private Logger logger;
