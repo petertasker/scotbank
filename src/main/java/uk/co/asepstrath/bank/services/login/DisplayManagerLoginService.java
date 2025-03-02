@@ -6,7 +6,7 @@ import uk.co.asepstrath.bank.services.BaseService;
 
 import java.util.Map;
 
-import static uk.co.asepstrath.bank.Constants.URL_PAGE_MANAGER_LOGIN;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_MANAGER_LOGIN;
 
 /**
  * The manager display login service
@@ -23,6 +23,6 @@ public class DisplayManagerLoginService extends BaseService {
      */
     public ModelAndView<Map<String, Object>> displayManagerLogin() {
         Map<String, Object> model = createModel();
-        return render(URL_PAGE_MANAGER_LOGIN, model);
+        return render(TEMPLATE_MANAGER_LOGIN, model);
     }
 }

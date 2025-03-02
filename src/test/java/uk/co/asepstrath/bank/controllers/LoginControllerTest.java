@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
 
 class LoginControllerTest {
 
@@ -133,7 +134,7 @@ class LoginControllerTest {
         verify(mockSession).put("name", name);
 
         // Verify no other interactions with session.put()
-        verify(mockContext).sendRedirect("/account");
+        verify(mockContext).sendRedirect(ROUTE_ACCOUNT);
         verify(mockSession, times(2)).put(anyString(), (String) any());
     }
 }

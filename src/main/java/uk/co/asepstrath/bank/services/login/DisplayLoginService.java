@@ -23,6 +23,6 @@ public class DisplayLoginService extends BaseService {
      */
     public ModelAndView<Map<String, Object>> displayLogin() {
         Map<String, Object> model = createModel();
-        return render(URL_PAGE_LOGIN, model);
+        return render(TEMPLATE_LOGIN, model);
     }
 }

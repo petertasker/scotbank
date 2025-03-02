@@ -36,7 +36,7 @@ public class AccountDepositService extends BaseService {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
         putBalanceInModel(model, accountId);
-        return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
+        return render(TEMPLATE_DEPOSIT, model);
     }
 
     /**
@@ -56,13 +56,13 @@ public class AccountDepositService extends BaseService {
             try {
                 account.deposit(amount);
                 updateDatabaseBalance(account);
-                redirect(ctx, "/account");
+                redirect(ctx, ROUTE_ACCOUNT);
                 return null;
             } catch (ArithmeticException e) {
                 logger.error(e.getMessage());
                 addErrorMessage(model, "Error while depositing amount.");
                 putBalanceInModel(model, accountId);
-                return render(URL_PAGE_ACCOUNT_DEPOSIT, model);
+                return render(TEMPLATE_DEPOSIT, model);
             }
         }
     }

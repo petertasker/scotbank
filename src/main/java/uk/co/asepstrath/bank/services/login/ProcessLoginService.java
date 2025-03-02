@@ -38,7 +38,7 @@ public class ProcessLoginService extends BaseService {
         String formID = getFormValue(ctx, "accountid");
         if (formID == null || formID.trim().isEmpty()) {
             addErrorMessage(model, "Account ID is required");
-            return render(URL_PAGE_LOGIN, model);
+            return render(TEMPLATE_LOGIN, model);
         }
 
         try (Connection con = getConnection();
@@ -63,20 +63,20 @@ public class ProcessLoginService extends BaseService {
                     Session session = ctx.session();
                     session.put(SESSION_ACCOUNT_ID, account.getAccountID());
                     session.put(SESSION_ACCOUNT_NAME, account.getName());
-                    redirect(ctx, "/account");
+                    redirect(ctx, ROUTE_ACCOUNT);
                     return null;
                 }
 
                 // Handle case where account not found
                 addErrorMessage(model, "Account not found");
-                return render(URL_PAGE_LOGIN, model);
+                return render(TEMPLATE_LOGIN, model);
 
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
             addErrorMessage(model, "Database error!");
-            return render(URL_PAGE_LOGIN, model);
+            return render(TEMPLATE_LOGIN, model);
         }
     }
 }

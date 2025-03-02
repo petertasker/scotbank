@@ -13,11 +13,13 @@ import uk.co.asepstrath.bank.services.login.DisplayManagerLoginService;
 import javax.sql.DataSource;
 import java.util.Map;
 
+import static uk.co.asepstrath.bank.Constants.*;
+
 
 /**
  * The Manager endpoint Controller
  */
-@Path("/manager")
+@Path(ROUTE_MANAGER)
 public class ManagerController extends BaseController {
 
     private final ViewManagerDashboardService viewManagerDashboardService;
@@ -36,7 +38,7 @@ public class ManagerController extends BaseController {
      * @return The "/dashboard" endpoint
      */
     @GET
-    @Path("/dashboard")
+    @Path(ROUTE_DASHBOARD)
     public ModelAndView<Map<String, Object>> displayManagerDashboard(Context ctx) {
         return viewManagerDashboardService.renderDashboard(ctx);
     }
@@ -46,7 +48,7 @@ public class ManagerController extends BaseController {
      * @return The "/manager/login" endpoint
      */
     @GET
-    @Path("/login")
+    @Path(ROUTE_LOGIN)
     public ModelAndView<Map<String, Object>> displayManagerLogin() {
         return displayManagerLoginService.displayManagerLogin();
     }
@@ -58,7 +60,7 @@ public class ManagerController extends BaseController {
      * Redirects to "/manager/dashboard" on success
      */
     @POST
-    @Path("/login/process")
+    @Path(ROUTE_LOGIN + ROUTE_PROCESS)
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {
         return processManagerLoginService.processManagerLogin(ctx);
     }

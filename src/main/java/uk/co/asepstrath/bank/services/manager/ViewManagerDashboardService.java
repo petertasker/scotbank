@@ -42,10 +42,8 @@ public class ViewManagerDashboardService extends BaseService {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
         Session session = getSession(ctx);
-        model.put(ACCOUNT_OBJECT_LIST_EXISTS, !accounts.isEmpty());
-        model.put(ACCOUNT_OBJECT_LIST, accounts);
         model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
         model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
-        return render(URL_PAGE_MANAGER_DASHBOARD, model);
+        return render(TEMPLATE_MANAGER_DASHBOARD, model);
     }
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.URL_PAGE_ACCOUNT_WITHDRAW;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_WITHDRAW;
 
 
 class AccountWithdrawServiceTest {
@@ -69,6 +69,6 @@ class AccountWithdrawServiceTest {
     void testRenderWithdraw() {
         ModelAndView<Map<String, Object>> result = service.renderWithdraw(context);
         assertNotNull(result);
-        assertEquals(URL_PAGE_ACCOUNT_WITHDRAW, result.getView());
+        assertEquals(TEMPLATE_WITHDRAW, result.getView());
     }
 }

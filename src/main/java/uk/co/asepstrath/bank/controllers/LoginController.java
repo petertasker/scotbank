@@ -12,10 +12,13 @@ import java.util.Map;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
+import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.ROUTE_PROCESS;
+
 /**
  * The Login process endpoint controller
  */
-@Path("/login")
+@Path(ROUTE_LOGIN)
 public class LoginController extends BaseController {
     private final DisplayLoginService displayLoginService;
     private final ProcessLoginService processLoginService;
@@ -42,7 +45,7 @@ public class LoginController extends BaseController {
      * Redirects to "/account" on success
      */
     @POST
-    @Path("/process")
+    @Path(ROUTE_PROCESS)
     public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
         return processLoginService.processLogin(ctx);
     }

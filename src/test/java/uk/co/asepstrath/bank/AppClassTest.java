@@ -12,6 +12,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
+import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
 
 
 class AppClassTest {
@@ -76,8 +78,8 @@ class AppClassTest {
 
         for (Route route : routes) {
             String pattern = route.getPattern();
-            if (pattern.startsWith("/login")) hasLoginRoutes = true;
-            if (pattern.startsWith("/account")) hasAccountRoutes = true;
+            if (pattern.startsWith(ROUTE_LOGIN)) hasLoginRoutes = true;
+            if (pattern.startsWith(ROUTE_ACCOUNT)) hasAccountRoutes = true;
         }
 
         assertTrue(hasLoginRoutes, "Login routes should be registered");

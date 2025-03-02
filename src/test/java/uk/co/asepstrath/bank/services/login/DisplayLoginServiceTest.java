@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static uk.co.asepstrath.bank.Constants.URL_PAGE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
 
 class DisplayLoginServiceTest {
 
@@ -29,7 +29,7 @@ class DisplayLoginServiceTest {
     void testDisplayLogin() {
         ModelAndView<Map<String, Object>> result = service.displayLogin();
         assertNotNull(result);
-        assertEquals(URL_PAGE_LOGIN, result.getView());
+        assertEquals(TEMPLATE_LOGIN, result.getView());
         assertNotNull(result.getModel());
 
     }
