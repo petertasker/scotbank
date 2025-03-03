@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 
 class AccountControllerTest {
 
+
     @Mock
     private AccountController accountController;
     @Mock
@@ -32,15 +33,23 @@ class AccountControllerTest {
     private Session mockSession;
     @Mock
     private ResultSet mockResultSet;
+    @Mock
+    private Connection mockConnection;
+    @Mock
+    private PreparedStatement mockPreparedStatement;
+    @Mock
+    private DataSource mockDataSource;
+    @Mock
+    private Logger mockLogger;
 
     @BeforeEach
     void setUp() throws Exception {
         mockCtx = mock(Context.class);
         mockSession = mock(Session.class);
-        DataSource mockDataSource = mock(DataSource.class);
-        Logger mockLogger = mock(Logger.class);
-        Connection mockConnection = mock(Connection.class);
-        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        mockDataSource = mock(DataSource.class);
+        mockLogger = mock(Logger.class);
+        mockConnection = mock(Connection.class);
+        mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
 
         when(mockCtx.session()).thenReturn(mockSession);
@@ -83,4 +92,72 @@ class AccountControllerTest {
         assertEquals("12345", model.get("accountid").toString());
 
     }
+
+    @Test
+    void testViewAccountWithNoTransactions() throws Exception {
+        // Mock session values
+        Value mockNameValue = mock(Value.class);
+        when(mockNameValue.toString()).thenReturn("Jane Smith");
+        Value mockAccountValue = mock(Value.class);
+        when(mockAccountValue.toString()).thenReturn("67890");
+
+        when(mockSession.get("name")).thenReturn(mockNameValue);
+        when(mockSession.get("accountid")).thenReturn(mockAccountValue);
+
+        // Mock empty result set (no transactions)
+        when(mockResultSet.next()).thenReturn(false);
+
+        // Execute method
+        ModelAndView<Map<String, Object>> result = accountController.viewAccount(mockCtx);
+
+        // Validate ModelAndView
+        assertNotNull(result);
+        Map<String, Object> model = result.getModel();
+        assertEquals("Jane Smith", model.get("name").toString());
+        assertEquals("67890", model.get("accountid").toString());
+        assertNotNull(model.get("transactions"));
+    }
+
+    @Test
+    void testDepositRender() throws Exception {
+        // Mock session values
+        Value mockNameValue = mock(Value.class);
+        when(mockNameValue.toString()).thenReturn("John Doe");
+        Value mockAccountValue = mock(Value.class);
+        when(mockAccountValue.toString()).thenReturn("12345");
+
+        when(mockSession.get("name")).thenReturn(mockNameValue);
+        when(mockSession.get("accountid")).thenReturn(mockAccountValue);
+
+        // Mock balance retrieval
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getInt("Balance")).thenReturn(500);
+
+        // Execute method
+        ModelAndView<Map<String, Object>> result = accountController.deposit(mockCtx);
+
+        // Validate ModelAndView without assuming specific model entries
+        assertNotNull(result);
+    }
+
+    @Test
+    void testWithdrawRender() throws Exception {
+        Value mockNameValue = mock(Value.class);
+        when(mockNameValue.toString()).thenReturn("John Doe");
+        Value mockAccountValue = mock(Value.class);
+        when(mockAccountValue.toString()).thenReturn("12345");
+
+        when(mockSession.get("name")).thenReturn(mockNameValue);
+        when(mockSession.get("accountid")).thenReturn(mockAccountValue);
+
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getInt("Balance")).thenReturn(500);
+
+        ModelAndView<Map<String, Object>> result = accountController.withdraw(mockCtx);
+        assertNotNull(result);
+
+    }
+
+
+
 }

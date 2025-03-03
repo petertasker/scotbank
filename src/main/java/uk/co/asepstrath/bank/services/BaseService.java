@@ -137,11 +137,12 @@ public abstract class BaseService {
         try(PreparedStatement statement = getConnection().prepareStatement("select Balance from Accounts where AccountID = ?")) {
             statement.setString(1, accountId);
             ResultSet rs = statement.executeQuery();
-            try(rs){
+            try(rs) {
                 if (rs.next()) {
                     balance = rs.getBigDecimal("Balance");
                     logger.info("Account balance: {}" , balance);
-                }else{
+                }
+                else {
                     logger.info("Account balance is empty");
                 }
             }

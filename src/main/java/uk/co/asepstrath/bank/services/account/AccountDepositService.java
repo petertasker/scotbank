@@ -41,14 +41,12 @@ public class AccountDepositService extends BaseService {
 
     /**
      * The deposit process
+     *
      * @param ctx Session context
-     * @return The "/account/deposit" endpoint on failure
-     * Redirects to "/account" on success
-     * @throws SQLException Database connection error
+     * @throws SQLException        Database connection error
      * @throws ArithmeticException User bad input error
      */
-    public ModelAndView<Map<String, Object>> processDeposit(Context ctx) throws SQLException {
-        Map<String, Object> model = createModel();
+    public void processDeposit(Context ctx) throws SQLException {
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
@@ -57,12 +55,10 @@ public class AccountDepositService extends BaseService {
                 account.deposit(amount);
                 updateDatabaseBalance(account);
                 redirect(ctx, ROUTE_ACCOUNT);
-                return null;
             } catch (ArithmeticException e) {
                 logger.error(e.getMessage());
                 addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while depositing amount.");
-                putBalanceInModel(model, accountId);
-                return render(TEMPLATE_DEPOSIT, model);
+                redirect(ctx, ROUTE_ACCOUNT + ROUTE_DEPOSIT);
             }
         }
     }
