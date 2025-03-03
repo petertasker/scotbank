@@ -36,8 +36,9 @@ public class ProcessManagerLoginService extends BaseService {
         // Validate manager ID
         String formManagerID = getFormValue(ctx, "managerid");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
-            addErrorMessage(model, "Manager ID is required");
-            return render(TEMPLATE_MANAGER_LOGIN, model);
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+            redirect(ctx, ROUTE_MANAGER + ROUTE_LOGIN);
+            return null;
         }
 
         try (
@@ -54,23 +55,33 @@ public class ProcessManagerLoginService extends BaseService {
                             rs.getString("Name")
                     );
 
-                    Session session = ctx.session();
-                    session.put(SESSION_MANAGER_NAME, manager.getName());
-                    session.put(SESSION_MANAGER_ID, manager.getManagerID());
-
+                    createManagerSession(ctx, manager);
                     logger.info("Process Manager Login Success");
                     redirect(ctx, ROUTE_MANAGER + ROUTE_DASHBOARD);
                     return null;
+
                 } else {
                     // Manager not found
-                    addErrorMessage(model, "Manager not found");
-                    return render(TEMPLATE_MANAGER_LOGIN, model);
+                    handleLoginFailure(ctx, "Invalid account ID.");
+                    return null;
                 }
             }
+
         } catch (SQLException ex) {
             logger.error("Database error during manager login", ex);
-            addErrorMessage(model, "System error occurred. Please try again later.");
-            return render(TEMPLATE_MANAGER_LOGIN, model);
+            handleLoginFailure(ctx, "Database error during manager login");
+            return null;
         }
+    }
+
+    private void handleLoginFailure(Context ctx, String message) {
+        addMessageToSession(ctx, SESSION_ERROR_MESSAGE, message);
+        redirect(ctx, ROUTE_MANAGER + ROUTE_LOGIN);
+    }
+
+    private void createManagerSession(Context ctx, Manager manager) {
+        Session session = ctx.session();
+        session.put(SESSION_MANAGER_ID, manager.getManagerID());
+        session.put(SESSION_MANAGER_NAME, manager.getName());
     }
 }

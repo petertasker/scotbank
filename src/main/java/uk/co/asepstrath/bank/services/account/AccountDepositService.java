@@ -60,7 +60,7 @@ public class AccountDepositService extends BaseService {
                 return null;
             } catch (ArithmeticException e) {
                 logger.error(e.getMessage());
-                addErrorMessage(model, "Error while depositing amount.");
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while depositing amount.");
                 putBalanceInModel(model, accountId);
                 return render(TEMPLATE_DEPOSIT, model);
             }

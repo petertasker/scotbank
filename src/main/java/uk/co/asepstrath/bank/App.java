@@ -9,6 +9,7 @@ import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.controllers.LoginController_;
 import uk.co.asepstrath.bank.controllers.AccountController_;
+import uk.co.asepstrath.bank.controllers.LogoutController_;
 import uk.co.asepstrath.bank.controllers.ManagerController_;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
@@ -70,6 +71,7 @@ public class App extends Jooby {
         mvc(new AccountController_(ds, log));
         mvc(new LoginController_(displayLoginService, processLoginService,  log));
         mvc(new ManagerController_(ds, log));
+        mvc(new LogoutController_(log));
 
 
         /*
