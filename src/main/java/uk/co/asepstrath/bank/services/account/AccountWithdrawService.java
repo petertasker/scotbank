@@ -53,7 +53,6 @@ public class AccountWithdrawService extends BaseService {
      * @throws ArithmeticException User input error
      */
     public void withdrawProcess(Context ctx) throws SQLException {
-        Map<String, Object> model = createModel();
         try (Connection connection = getConnection()) {
             String accountId = getAccountIdFromSession(ctx);
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
@@ -65,7 +64,7 @@ public class AccountWithdrawService extends BaseService {
             } catch (ArithmeticException e) {
                 logger.error(e.getMessage());
                 addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while withdrawing amount");
-                redirect(ctx, ROUTE_DEPOSIT);
+                redirect(ctx, ROUTE_ACCOUNT + ROUTE_WITHDRAW);
             }
         }
     }
