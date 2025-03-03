@@ -9,7 +9,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,12 +65,11 @@ public class TransactionDataServiceTest {
         when(pageResponse.getBody()).thenReturn(xmlData, emptyXmlData);
         
         // Configure mock wrapper to return the initial response, page 0 and page 1 responses
-        when(unirestWrapper.get(anyString())).thenReturn(initialResponse, pageResponse, pageResponse);
-        
+        when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(initialResponse, pageResponse);
         List<Transaction> transactions = transactionDataService.fetchData();
         
         // Verify results
         assertNotNull(transactions);
-        assertEquals(1, transactions.size());
+        assertEquals(2, transactions.size());
     }
 }
