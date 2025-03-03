@@ -47,12 +47,12 @@ public class AccountWithdrawService extends BaseService {
     /**
      * The withdrawal process
      * @param ctx Session Context
-     * @return The "/account/withdraw" endpoint on failure
      * Redirects to "/account" on success
+     * Redirects to "/deposit" on failure
      * @throws SQLException Database connection error
      * @throws ArithmeticException User input error
      */
-    public ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
+    public void withdrawProcess(Context ctx) throws SQLException {
         Map<String, Object> model = createModel();
         try (Connection connection = getConnection()) {
             String accountId = getAccountIdFromSession(ctx);
@@ -62,12 +62,10 @@ public class AccountWithdrawService extends BaseService {
                 account.withdraw(amount);
                 updateDatabaseBalance(account);
                 redirect(ctx, ROUTE_ACCOUNT);
-                return null;
             } catch (ArithmeticException e) {
                 logger.error(e.getMessage());
-                addErrorMessage(model, "Error while withdrawing amount");
-                putBalanceInModel(model, accountId);
-                return render(TEMPLATE_DEPOSIT, model);
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while withdrawing amount");
+                redirect(ctx, ROUTE_DEPOSIT);
             }
         }
     }

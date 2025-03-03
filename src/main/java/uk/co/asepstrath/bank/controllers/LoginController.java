@@ -34,19 +34,18 @@ public class LoginController extends BaseController {
      * @return ModelAndView
      */
     @GET
-    public ModelAndView<Map<String, Object>> displayLogin() {
-        return displayLoginService.displayLogin();
+    public ModelAndView<Map<String, Object>> displayLogin(Context ctx) {
+        return displayLoginService.displayLogin(ctx);
     }
 
     /**
      * Directs the login process
      * @param ctx Session context
-     * @return The "/login" endpoint on failure
      * Redirects to "/account" on success
      */
     @POST
     @Path(ROUTE_PROCESS)
-    public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
-        return processLoginService.processLogin(ctx);
+    public void processLogin(Context ctx) {
+        processLoginService.processLogin(ctx);
     }
 }

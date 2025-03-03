@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +20,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static uk.co.asepstrath.bank.Constants.*;
@@ -68,12 +66,11 @@ public class ProcessManagerLoginServiceTest {
         when(value.valueOrNull()).thenReturn("funfun123"); // Non existent in DB
 
         when(resultSet.next()).thenReturn(false);
-        ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
+        processManagerLoginService.processManagerLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));    }
+        verify(session).put(SESSION_ERROR_MESSAGE, "Invalid account ID.");
+        verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
+    }
 
     @Test
     void testProcessLoginEmptyAccountId() throws SQLException {
@@ -81,17 +78,13 @@ public class ProcessManagerLoginServiceTest {
         when(context.form("managerid")).thenReturn(valueNode);
         when(valueNode.valueOrNull()).thenReturn("");
 
-        ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
+        processManagerLoginService.processManagerLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
-
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
+        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
 
         // Verify no database interaction
         verify(dataSource, never()).getConnection();
-
     }
 
     @Test
@@ -100,13 +93,10 @@ public class ProcessManagerLoginServiceTest {
         when(context.form("managerid")).thenReturn(valueNode);
         when(valueNode.valueOrNull()).thenReturn(null);
 
-        ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
+        processManagerLoginService.processManagerLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
-
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
+        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
 
         verify(dataSource, never()).getConnection();
     }
@@ -144,14 +134,13 @@ public class ProcessManagerLoginServiceTest {
 
         when(dataSource.getConnection()).thenThrow(new SQLException("Database error!!"));
 
-        ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
+        processManagerLoginService.processManagerLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_MANAGER_LOGIN, result.getView());
+        // Verify that redirect was called with the expected route
+        verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
 
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
-
+        // Verify that an error was logged
         verify(logger).error(anyString(), any(SQLException.class));
     }
+
 }

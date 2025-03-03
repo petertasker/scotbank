@@ -26,26 +26,28 @@ public class AccountController extends BaseController {
     private final AccountDepositService depositService;
     private final AccountWithdrawService withdrawService;
 
-   public AccountController(DataSource datasource, Logger logger) {
-       super(logger);
-       viewAccountService = new AccountViewService(datasource, logger);
-       depositService = new AccountDepositService(datasource, logger);
-       withdrawService = new AccountWithdrawService(datasource, logger);
-   }
+    public AccountController(DataSource datasource, Logger logger) {
+        super(logger);
+        viewAccountService = new AccountViewService(datasource, logger);
+        depositService = new AccountDepositService(datasource, logger);
+        withdrawService = new AccountWithdrawService(datasource, logger);
+    }
 
     /**
      * Renders the account page
+     *
      * @param ctx Session context
      * @return The "/account" endpoint
      * @throws SQLException Failed to find an account with the session account identifier
      */
-   @GET
-   public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
+    @GET
+    public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         return viewAccountService.viewAccount(ctx);
     }
 
     /**
      * Renders the deposit page
+     *
      * @param ctx Session context
      * @return The "/deposit" endpoint
      */
@@ -58,38 +60,41 @@ public class AccountController extends BaseController {
 
     /**
      * Renders the withdrawal page
+     *
      * @param ctx Session context
      * @return The "/account/withdraw" endpoint
      */
     @GET
     @Path(ROUTE_WITHDRAW)
     public ModelAndView<Map<String, Object>> withdraw(Context ctx) {
-       return withdrawService.renderWithdraw(ctx);
+        return withdrawService.renderWithdraw(ctx);
     }
 
     /**
      * Engages the withdrawal process
+     *
      * @param ctx Session Context
-     * @return The "/account/withdraw" endpoint on failure
-     * Redirects to "/account" on success
+     *            Redirects to "/account" on success
+     *            Redirects to "/withdraw" on failure
      * @throws SQLException on withdrawal failure
      */
     @POST
     @Path(ROUTE_WITHDRAW + ROUTE_PROCESS)
-    ModelAndView<Map<String, Object>> withdrawProcess(Context ctx) throws SQLException {
-       return withdrawService.withdrawProcess(ctx);
+    public void withdrawProcess(Context ctx) throws SQLException {
+        withdrawService.withdrawProcess(ctx);
     }
 
     /**
      * Engages the deposit process
+     *
      * @param ctx Session Context
-     * @return The "/account/deposit" endpoint on failure
      * Redirects to "/account" on success
+     * Redirects to "/deposit" on failure
      * @throws SQLException on deposit failure
      */
     @POST
     @Path(ROUTE_DEPOSIT + ROUTE_PROCESS)
-    public ModelAndView<Map<String, Object>> depositProcess(Context ctx) throws SQLException {
-        return depositService.processDeposit(ctx);
+    public void depositProcess(Context ctx) throws SQLException {
+        depositService.processDeposit(ctx);
     }
 }

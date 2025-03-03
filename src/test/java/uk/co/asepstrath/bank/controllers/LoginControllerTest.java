@@ -77,27 +77,23 @@ class LoginControllerTest {
     @Test
     void testDisplayLogin() {
         // Mock DisplayLogin
-        when(mockDisplayLoginService.displayLogin()).thenReturn(mockModelAndView);
+        when(mockDisplayLoginService.displayLogin(mockContext)).thenReturn(mockModelAndView);
         // Act
-        ModelAndView<Map<String, Object>> result = loginController.displayLogin();
+        ModelAndView<Map<String, Object>> result = loginController.displayLogin(mockContext);
 
         assertNotNull(result);
         assertEquals(mockModelAndView, result);
-        verify(mockDisplayLoginService).displayLogin();
+        verify(mockDisplayLoginService).displayLogin(mockContext);
     }
 
     // Test that the logincontroller was succesful in calling loginProcess
     @Test
     void testLoginProcessCall() {
         // Mock ProcessLogin
-        when(mockProcessLoginService.processLogin(mockContext)).thenReturn(mockModelAndView);
 
         // Act
-        ModelAndView<Map<String, Object>> result = loginController.processLogin(mockContext);
+        loginController.processLogin(mockContext);
         // Assert
-        assertNotNull(result);
-        assertEquals(mockModelAndView, result);
-        
         verify(mockProcessLoginService).processLogin(mockContext);
         // Verify no other interactions 
         verifyNoMoreInteractions(mockProcessLoginService);
@@ -125,10 +121,9 @@ class LoginControllerTest {
         when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(roundUpEnabled);
 
         // Act
-        ModelAndView<Map<String, Object>> result = processLoginService.processLogin(mockContext);
+        processLoginService.processLogin(mockContext);
 
         // Assert
-        assertNull(result); // Should be null because of redirect
 
         verify(mockSession).put("accountid", accountId);
         verify(mockSession).put("name", name);

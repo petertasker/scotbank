@@ -1,6 +1,6 @@
 package uk.co.asepstrath.bank.services.login;
 
-import io.jooby.ModelAndView;
+import io.jooby.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,12 +10,22 @@ import org.slf4j.Logger;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
+import static org.mockito.Mockito.*;
+import static uk.co.asepstrath.bank.Constants.*;
 
 class DisplayLoginServiceTest {
 
     @Mock
     private Logger logger;
+
+    @Mock
+    private Context ctx;
+
+    @Mock
+    private Session session;
+
+    @Mock
+    private Value sessionValue;
 
     private DisplayLoginService service;
 
@@ -23,14 +33,36 @@ class DisplayLoginServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         service = new DisplayLoginService(logger);
+
+        // Setup context mock
+        when(ctx.session()).thenReturn(session);
+        when(session.get(anyString())).thenReturn(sessionValue);
+        when(sessionValue.isPresent()).thenReturn(false);
     }
 
     @Test
     void testDisplayLogin() {
-        ModelAndView<Map<String, Object>> result = service.displayLogin();
+
+        // Mock ValueNode to return the expected string error message
+        ValueNode valueNode = mock(ValueNode.class);
+        when(valueNode.valueOrNull()).thenReturn("Invalid login.");
+        when(session.get(SESSION_ERROR_MESSAGE)).thenReturn(valueNode);
+        ModelAndView<Map<String, Object>> result = service.displayLogin(ctx);
+
         assertNotNull(result);
         assertEquals(TEMPLATE_LOGIN, result.getView());
         assertNotNull(result.getModel());
+    }
 
+
+    @Test
+    void testDisplayLoginWithError() {
+        when(sessionValue.isPresent()).thenReturn(true);
+        when(sessionValue.value()).thenReturn("Error message");
+
+        ModelAndView<Map<String, Object>> result = service.displayLogin(ctx);
+
+        assertNotNull(result.getModel().get(SESSION_ERROR_MESSAGE));
+        verify(session).remove(SESSION_ERROR_MESSAGE);
     }
 }

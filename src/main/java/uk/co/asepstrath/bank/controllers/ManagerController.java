@@ -49,8 +49,8 @@ public class ManagerController extends BaseController {
      */
     @GET
     @Path(ROUTE_LOGIN)
-    public ModelAndView<Map<String, Object>> displayManagerLogin() {
-        return displayManagerLoginService.displayManagerLogin();
+    public ModelAndView<Map<String, Object>> displayManagerLogin(Context ctx) {
+        return displayManagerLoginService.displayManagerLogin(ctx);
     }
 
     /**

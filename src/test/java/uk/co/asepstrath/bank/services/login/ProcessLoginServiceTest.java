@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.Context;
-import io.jooby.ModelAndView;
 import io.jooby.Session;
 import io.jooby.ValueNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +15,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.MODEL_ERROR_MESSAGE;
-import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.*;
 
 public class ProcessLoginServiceTest {
     @Mock
@@ -64,15 +60,15 @@ public class ProcessLoginServiceTest {
     void testProcessLoginAccountNotFound() throws SQLException {
         ValueNode value = mock(ValueNode.class);
         when(context.form("accountid")).thenReturn(value);
-        when(value.valueOrNull()).thenReturn("funfun123"); // Non existent in DB
+        when(value.valueOrNull()).thenReturn("funfun123"); // Non-existent in DB
 
         when(resultSet.next()).thenReturn(false);
-        ModelAndView<Map<String, Object>> result = service.processLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_LOGIN, result.getView());
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));    }
+        service.processLogin(context);
+
+        verify(session).put(SESSION_ERROR_MESSAGE, "Invalid account ID.");
+        verify(context).sendRedirect(ROUTE_LOGIN);
+    }
 
     @Test
     void testProcessLoginEmptyAccountId() throws SQLException {
@@ -80,13 +76,10 @@ public class ProcessLoginServiceTest {
         when(context.form("accountid")).thenReturn(valueNode);
         when(valueNode.valueOrNull()).thenReturn("");
 
-        ModelAndView<Map<String, Object>> result = service.processLogin(context);
+        service.processLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_LOGIN, result.getView());
-
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
+        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(context).sendRedirect(ROUTE_LOGIN);
 
         // Verify no database interaction
         verify(dataSource, never()).getConnection();
@@ -99,13 +92,10 @@ public class ProcessLoginServiceTest {
         when(context.form("accountid")).thenReturn(valueNode);
         when(valueNode.valueOrNull()).thenReturn(null);
 
-        ModelAndView<Map<String, Object>> result = service.processLogin(context);
+        service.processLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_LOGIN, result.getView());
-
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
+        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(context).sendRedirect(ROUTE_LOGIN);
 
         verify(dataSource, never()).getConnection();
     }
@@ -127,12 +117,12 @@ public class ProcessLoginServiceTest {
         when(resultSet.getBigDecimal("Balance")).thenReturn(balance);
         when(resultSet.getBoolean("RoundUpEnabled")).thenReturn(roundUpEnabled);
 
-        ModelAndView<Map<String, Object>> result = service.processLogin(context);
-
-        assertNull(result);
+        service.processLogin(context);
 
         verify(session).put("accountid", accountId);
         verify(session).put("name", name);
+
+        verify(context).sendRedirect(ROUTE_ACCOUNT); // Adjust based on actual redirection
 
         verify(dataSource).getConnection();
         verify(preparedStatement).setString(1, accountId);
@@ -147,13 +137,10 @@ public class ProcessLoginServiceTest {
 
         when(dataSource.getConnection()).thenThrow(new SQLException("Database error!!"));
 
-        ModelAndView<Map<String, Object>> result = service.processLogin(context);
+        service.processLogin(context);
 
-        assertNotNull(result);
-        assertEquals(TEMPLATE_LOGIN, result.getView());
-
-        Map<String, Object> model = result.getModel();
-        assertTrue(model.containsKey(MODEL_ERROR_MESSAGE));
+        verify(session).put(SESSION_ERROR_MESSAGE, "A database error occurred. Please try again.");
+        verify(context).sendRedirect(ROUTE_LOGIN);
 
         verify(logger).error(contains("Database error"), anyString(), any(SQLException.class));
     }

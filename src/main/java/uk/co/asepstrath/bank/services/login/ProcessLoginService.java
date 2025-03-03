@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.Context;
-import io.jooby.ModelAndView;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
@@ -28,17 +27,17 @@ public class ProcessLoginService extends BaseService {
     /**
      * Processes user login
      * @param ctx Session context
-     * @return The "/login" endpoint on failure
      * Redirects to the "/account" endpoint on success
      */
-    public ModelAndView<Map<String, Object>> processLogin(Context ctx) {
+    public void processLogin(Context ctx) {
         Map<String, Object> model = createModel();
 
         // Check if form value exists and is not empty
         String formID = getFormValue(ctx, "accountid");
         if (formID == null || formID.trim().isEmpty()) {
-            addErrorMessage(model, "Account ID is required");
-            return render(TEMPLATE_LOGIN, model);
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+            redirect(ctx, ROUTE_LOGIN);
+            return;
         }
 
         try (Connection con = getConnection();
@@ -64,19 +63,18 @@ public class ProcessLoginService extends BaseService {
                     session.put(SESSION_ACCOUNT_ID, account.getAccountID());
                     session.put(SESSION_ACCOUNT_NAME, account.getName());
                     redirect(ctx, ROUTE_ACCOUNT);
-                    return null;
+                    return;
                 }
 
                 // Handle case where account not found
-                addErrorMessage(model, "Account not found");
-                return render(TEMPLATE_LOGIN, model);
-
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Invalid account ID.");
+                redirect(ctx, ROUTE_LOGIN);
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
-            addErrorMessage(model, "Database error!");
-            return render(TEMPLATE_LOGIN, model);
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "A database error occurred. Please try again.");
+            redirect(ctx, ROUTE_LOGIN);
         }
     }
 }

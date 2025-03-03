@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static uk.co.asepstrath.bank.Constants.SESSION_ACCOUNT_ID;
-import static uk.co.asepstrath.bank.Constants.MODEL_ERROR_MESSAGE;
+import static uk.co.asepstrath.bank.Constants.*;
 
 public abstract class BaseService {
 
@@ -52,14 +51,31 @@ public abstract class BaseService {
         return new HashMap<>();
     }
 
+
     /**
-     * Adds an error message to a model
-     * @param model A map
-     * @param message A custom error message
+     * Add a customer message to the session to be displayed after a redirect
+     * @param ctx Session context
+     * @param key the key value of the message
+     * @param message Custom message
      */
-    protected void addErrorMessage(Map<String, Object> model, String message) {
-        model.put(MODEL_ERROR_MESSAGE, message);
+    protected void addMessageToSession(Context ctx, String key, String message) {
+        Session session = ctx.session();
+        session.put(key, message);
     }
+
+
+    protected void transferSessionAttributeToModel(Context ctx, String attributeName, Map<String, Object> model) {
+        Session session = ctx.session();
+        model.put(attributeName, session.get(attributeName));
+        logger.info("Removing session attribute: {}, {} ", attributeName, session.get(attributeName));
+        session.remove(attributeName);
+        logger.info("Removed session attribute: {}, {}", attributeName, model.get(attributeName));
+
+    }
+
+
+
+
 
     /**
      * Gets connection to the database

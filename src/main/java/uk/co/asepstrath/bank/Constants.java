@@ -28,14 +28,14 @@ public final class Constants {
     public static final String ROUTE_MANAGER = "/manager";
     public static final String ROUTE_DASHBOARD = "/dashboard";
     public static final String ROUTE_PROCESS = "/process";
-
+    public static final String ROUTE_LOGOUT = "/logout";
 
 
     /**
      * Success / Error messages
      */
-    public static final String MODEL_ERROR_MESSAGE = "error";
-    public static final String MODEL_SUCCESS_MESSAGE = "success";
+    public static final String SESSION_ERROR_MESSAGE = "error";
+    public static final String SESSION_SUCCESS_MESSAGE = "success";
 
     /**
      * Session Variables
