@@ -73,6 +73,7 @@ public class AccountViewService extends BaseService {
                         boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
                         Transaction transaction = new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType, transactionAccepted);
                         transactions.add(transaction);
+                        logger.info("Added transaction " + transaction);
                     }
                 }
             }
