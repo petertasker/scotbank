@@ -10,6 +10,8 @@ import uk.co.asepstrath.bank.services.BaseService;
 import static uk.co.asepstrath.bank.Constants.*;
 
 import javax.sql.DataSource;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,9 +42,14 @@ public class ProcessLoginService extends BaseService {
             addErrorMessage(model, "Account ID is required");
             return render(TEMPLATE_LOGIN, model);
         }
+        String password = getFormValue(ctx, "password");
+        if (password == null || password.trim().isEmpty()) {
+            addErrorMessage(model, "Password is required");
+            return render(TEMPLATE_LOGIN, model);
+        }
 
         try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT AccountID, Password, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
 
             ps.setString(1, formID);
 
@@ -51,26 +58,33 @@ public class ProcessLoginService extends BaseService {
 
                 Account account = null;
                 if (rs.next()) {  // Changed while to if since we expect one result
-                    logger.info("Found account");
-                    account = new Account(
-                            rs.getString("AccountID"),
-                            rs.getString("Name"),
-                            rs.getBigDecimal("Balance"),
-                            rs.getBoolean("RoundUpEnabled")
-                    );
+                    String hashedPassword = rs.getString("Password");
+                    if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
+                        logger.info("Found account");
+                        account = new Account(
+                                rs.getString("AccountID"),
+                                rs.getString("Name"),
+                                rs.getBigDecimal("Balance"),
+                                rs.getBoolean("RoundUpEnabled")
+                        );
 
-                    // Add accountID to session
-                    Session session = ctx.session();
-                    session.put(SESSION_ACCOUNT_ID, account.getAccountID());
-                    session.put(SESSION_ACCOUNT_NAME, account.getName());
-                    redirect(ctx, ROUTE_ACCOUNT);
-                    return null;
+                        // Add accountID to session
+                        Session session = ctx.session();
+                        session.put(SESSION_ACCOUNT_ID, account.getAccountID());
+                        session.put(SESSION_ACCOUNT_NAME, account.getName());
+                        redirect(ctx, ROUTE_ACCOUNT);
+                        return null;
+                    } else {
+                        addErrorMessage(model, "Invalid Password");
+                        return render(TEMPLATE_LOGIN, model);
+                    }
                 }
-
                 // Handle case where account not found
                 addErrorMessage(model, "Account not found");
                 return render(TEMPLATE_LOGIN, model);
 
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                throw new RuntimeException(e);
             }
         }
         catch (SQLException e) {
@@ -78,5 +92,6 @@ public class ProcessLoginService extends BaseService {
             addErrorMessage(model, "Database error!");
             return render(TEMPLATE_LOGIN, model);
         }
+
     }
 }

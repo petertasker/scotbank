@@ -6,8 +6,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,17 +54,18 @@ class AccountRepositoryTest {
     }
 
     @Test
-    void testInsert() throws SQLException {
+    void testInsert() throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
-
-        accountRepository.insert(connection, account);
+        String psw = "Password123";
+        String hashedPassword = HashingPasswordService.hashPassword(psw);
+        accountRepository.insert(connection, account,hashedPassword);
 
         verify(connection).prepareStatement(contains("INSERT INTO Accounts"));
         verify(preparedStatement).setString(1, "12345");
-        verify(preparedStatement).setBigDecimal(2, new BigDecimal("90.21"));
-        verify(preparedStatement).setString(3, "Peter Tasker");
-        verify(preparedStatement).setBoolean(4, true);
+        verify(preparedStatement).setBigDecimal(3, new BigDecimal("90.21"));
+        verify(preparedStatement).setString(4, "Peter Tasker");
+        verify(preparedStatement).setBoolean(5, true);
         verify(preparedStatement).executeUpdate();
     }
 
