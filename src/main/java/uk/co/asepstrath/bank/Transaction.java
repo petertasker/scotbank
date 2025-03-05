@@ -133,8 +133,7 @@ public class Transaction {
                 accountRepository.updateBalance(connection, depositAccount);
                 return true;
 
-            case "WITHDRAW":
-                logger.info("Trying to withdraw transaction");
+            case "WITHDRAWAL":
                 // Withdrawals only require 'from' account
                 if (getFrom() == null) {
                     logger.info("From is null");
@@ -185,6 +184,7 @@ public class Transaction {
                 }
 
             default:
+                logger.info("Unknown transaction type: {}", this);
                 return true;
         }
     }
