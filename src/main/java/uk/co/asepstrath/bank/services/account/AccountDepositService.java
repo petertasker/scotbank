@@ -56,22 +56,35 @@ public class AccountDepositService extends BaseService {
         logger.info("Enter deposit process");
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {
+
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
             Account account = accountRepository.getAccount(connection, accountId);
+            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
+
+            try {
+                connection.setAutoCommit(false);
+                transactionRepository.insert(connection, transaction);
+            } catch (ArithmeticException e) {
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
+                logger.info("Transaction blocked due to potential balance overflow");
+                connection.setAutoCommit(true);
+                redirect(ctx, ROUTE_ACCOUNT);
+            } finally {
+                connection.setAutoCommit(true);
+            }
+
 
             try {
                 account.deposit(amount);
                 updateDatabaseBalance(account);
                 logger.info("Successfully deposited into account");
                 addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully deposited into account!");
-                redirect(ctx, ROUTE_ACCOUNT);
             } catch (ArithmeticException e) {
                 logger.info("Unable to deposit into account");
                 addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
+            } finally {
                 redirect(ctx, ROUTE_ACCOUNT);
             }
-            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
-            transactionRepository.insert(connection, transaction);
         }
     }
 }

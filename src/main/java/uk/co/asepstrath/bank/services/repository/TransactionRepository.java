@@ -7,6 +7,8 @@ import uk.co.asepstrath.bank.Transaction;
 import java.sql.*;
 import java.util.Objects;
 
+import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
+
 /**
  * The Transaction repository service
  */
@@ -54,7 +56,10 @@ public class TransactionRepository extends BaseRepository {
      * @param transaction a Transaction object
      * @throws SQLException Database connection failure
      */
-    public void insert(Connection connection, Transaction transaction) throws SQLException {
+    public void insert(Connection connection, Transaction transaction) throws SQLException, ArithmeticException {
+        if (transaction.getAmount().compareTo(ACCOUNT_OBJECT_MAX_BALANCE) > 0) {
+            throw new ArithmeticException("Amount given exceeds maximum possible value");
+        }
         try (PreparedStatement stmt = connection.prepareStatement(SQL_INSERT_TRANSACTION)) {
             stmt.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             stmt.setString(2, transaction.getAmount().toString());
