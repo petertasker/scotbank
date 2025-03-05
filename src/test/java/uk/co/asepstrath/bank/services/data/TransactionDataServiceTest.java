@@ -1,11 +1,10 @@
-package java.uk.co.asepstrath.bank.services.data;
+package uk.co.asepstrath.bank.services.data;
 
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.data.TransactionDataService;
-import uk.co.asepstrath.bank.services.data.UnirestWrapper;
+
 
 import java.math.BigDecimal;
 import java.sql.Connection;

@@ -1,4 +1,4 @@
-package java.uk.co.asepstrath.bank.services.data;
+package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import kong.unirest.core.HttpResponse;
