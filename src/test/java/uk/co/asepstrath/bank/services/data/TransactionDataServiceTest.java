@@ -1,17 +1,25 @@
-package uk.co.asepstrath.bank.services.data;
+package java.uk.co.asepstrath.bank.services.data;
 
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.services.data.TransactionDataService;
+import uk.co.asepstrath.bank.services.data.UnirestWrapper;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
+import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TransactionDataServiceTest {
     
@@ -26,14 +34,15 @@ public class TransactionDataServiceTest {
     }
 
     @Test
-    void testFetchDataSuccess() throws XMLStreamException{
+    void testFetchDataSuccess() throws XMLStreamException, SQLException {
+        // Mocking HttpResponse
         HttpResponse<String> initialResponse = mock(HttpResponse.class);
         HttpResponse<String> pageResponse = mock(HttpResponse.class);
-        
+
         when(initialResponse.isSuccess()).thenReturn(true);
         when(pageResponse.isSuccess()).thenReturn(true);
-        
-        // XML representing page 0 out of 154 pages
+
+        // Sample XML Data
         String xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<pageResult>" +
                 "  <hasNext>true</hasNext>" +
@@ -50,8 +59,7 @@ public class TransactionDataServiceTest {
                 "  <size>1</size>" +
                 "  <totalPages>154</totalPages>" +
                 "</pageResult>";
-        
-        // For page 1, return an empty response to terminate the loop
+
         String emptyXmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<pageResult>" +
                 "  <hasNext>true</hasNext>" +
@@ -60,16 +68,42 @@ public class TransactionDataServiceTest {
                 "  <size>0</size>" +
                 "  <totalPages>154</totalPages>" +
                 "</pageResult>";
-        
+
+        // Mock DataSource and Connection
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        // Ensure that prepareStatement returns the mock PreparedStatement
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true, false);
+
+        when(mockResultSet.getString("timestamp")).thenReturn("2023-04-10 08:43");
+        when(mockResultSet.getBigDecimal("amount")).thenReturn(BigDecimal.valueOf(21));
+        when(mockResultSet.getString("from")).thenReturn("8f95782c-7c83-4dd7-8856-0e19a0e0a075");
+        when(mockResultSet.getString("id")).thenReturn("0043d8d9-846d-49cb-9b04-8d3823e9d8c9");
+        when(mockResultSet.getString("to")).thenReturn("TOP");
+        when(mockResultSet.getString("type")).thenReturn("PAYMENT");
+
+        // Mocking transactionDataService and its methods
+        TransactionDataService transactionDataService = new TransactionDataService(mockDataSource);
+
+        // Mock the behavior of UnirestWrapper to return the XML responses
         when(initialResponse.getBody()).thenReturn(xmlData);
         when(pageResponse.getBody()).thenReturn(xmlData, emptyXmlData);
-        
-        // Configure mock wrapper to return the initial response, page 0 and page 1 responses
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(initialResponse, pageResponse);
+
+        // Test the fetchData method
         List<Transaction> transactions = transactionDataService.fetchData();
-        
-        // Verify results
+
+        // Verify the results
         assertNotNull(transactions);
         assertEquals(2, transactions.size());
+
+        // Verify that the connection was used correctly
+        verify(mockConnection, times(1)).prepareStatement(anyString());  // Verifying the usage of prepareStatement
     }
 }

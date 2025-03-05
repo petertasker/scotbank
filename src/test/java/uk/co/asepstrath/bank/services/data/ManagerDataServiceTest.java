@@ -1,8 +1,9 @@
-package uk.co.asepstrath.bank.services.data;
+package java.uk.co.asepstrath.bank.services.data;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Manager;
+import uk.co.asepstrath.bank.services.data.ManagerDataService;
 
 import java.util.List;
 

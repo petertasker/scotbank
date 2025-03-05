@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.data;
+package java.uk.co.asepstrath.bank.services.data;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.configuration.plugins.Plugins;
