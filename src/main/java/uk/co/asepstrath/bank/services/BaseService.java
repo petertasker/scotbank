@@ -3,6 +3,8 @@ package uk.co.asepstrath.bank.services;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
@@ -74,6 +76,13 @@ public abstract class BaseService {
         session.remove(attributeName);
         logger.info("Removed session attribute: {}, {}", attributeName, model.get(attributeName));
 
+    }
+
+    protected void ensureManagerIsLoggedIn(Context ctx) {
+        Session session = getSession(ctx);
+        if (session.get(SESSION_MANAGER_NAME).isMissing() || session.get(SESSION_MANAGER_ID).isMissing()) {
+            throw new StatusCodeException(StatusCode.FORBIDDEN, "Manager access required");
+        }
     }
 
 

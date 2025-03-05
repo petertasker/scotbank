@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Constants;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -66,7 +67,7 @@ public class ProcessLoginServiceTest {
 
         service.processLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Invalid account ID.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Invalid account ID.");
         verify(context).sendRedirect(ROUTE_LOGIN);
     }
 
@@ -78,7 +79,7 @@ public class ProcessLoginServiceTest {
 
         service.processLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
         verify(context).sendRedirect(ROUTE_LOGIN);
 
         // Verify no database interaction
@@ -94,7 +95,7 @@ public class ProcessLoginServiceTest {
 
         service.processLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
         verify(context).sendRedirect(ROUTE_LOGIN);
 
         verify(dataSource, never()).getConnection();
@@ -139,7 +140,7 @@ public class ProcessLoginServiceTest {
 
         service.processLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "A database error occurred. Please try again.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "A database error occurred. Please try again.");
         verify(context).sendRedirect(ROUTE_LOGIN);
 
         verify(logger).error(contains("Database error"), anyString(), any(SQLException.class));

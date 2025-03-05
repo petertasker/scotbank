@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Constants;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -68,7 +69,7 @@ public class ProcessManagerLoginServiceTest {
         when(resultSet.next()).thenReturn(false);
         processManagerLoginService.processManagerLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Invalid account ID.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Invalid account ID.");
         verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
     }
 
@@ -80,7 +81,7 @@ public class ProcessManagerLoginServiceTest {
 
         processManagerLoginService.processManagerLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
         verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
 
         // Verify no database interaction
@@ -95,7 +96,7 @@ public class ProcessManagerLoginServiceTest {
 
         processManagerLoginService.processManagerLogin(context);
 
-        verify(session).put(SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+        verify(session).put(Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
         verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
 
         verify(dataSource, never()).getConnection();

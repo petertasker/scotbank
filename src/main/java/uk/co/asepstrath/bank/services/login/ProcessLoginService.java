@@ -4,6 +4,7 @@ import io.jooby.Context;
 import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.services.BaseService;
 
 import static uk.co.asepstrath.bank.Constants.*;
@@ -13,7 +14,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * The login process service
@@ -34,7 +34,7 @@ public class ProcessLoginService extends BaseService {
         // Check if form value exists and is not empty
         String formID = getFormValue(ctx, "accountid");
         if (formID == null || formID.trim().isEmpty()) {
-            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+            addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
             redirect(ctx, ROUTE_LOGIN);
             return;
         }
