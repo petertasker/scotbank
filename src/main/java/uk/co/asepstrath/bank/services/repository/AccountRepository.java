@@ -59,6 +59,7 @@ public class AccountRepository extends BaseRepository {
             statement.setString(3, account.getName());
             statement.setBoolean(4, account.isRoundUpEnabled());
             statement.executeUpdate();
+            logger.info("Inserted account {} into table Accounts", account.getAccountID());
         }
     }
 

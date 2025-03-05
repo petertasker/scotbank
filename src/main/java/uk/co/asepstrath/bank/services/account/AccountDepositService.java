@@ -58,8 +58,7 @@ public class AccountDepositService extends BaseService {
         try (Connection connection = getConnection()) {
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
             Account account = accountRepository.getAccount(connection, accountId);
-            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
-            transactionRepository.insert(connection, transaction);
+
             try {
                 account.deposit(amount);
                 updateDatabaseBalance(account);
@@ -68,9 +67,11 @@ public class AccountDepositService extends BaseService {
                 redirect(ctx, ROUTE_ACCOUNT);
             } catch (ArithmeticException e) {
                 logger.info("Unable to deposit into account");
-                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while depositing amount.");
-                redirect(ctx, ROUTE_ACCOUNT + ROUTE_DEPOSIT);
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
+                redirect(ctx, ROUTE_ACCOUNT);
             }
+            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
+            transactionRepository.insert(connection, transaction);
         }
     }
 }

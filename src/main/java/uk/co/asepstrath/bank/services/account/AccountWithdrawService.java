@@ -74,9 +74,9 @@ public class AccountWithdrawService extends BaseService {
                 logger.info("Successfully withdrawn from account");
                 redirect(ctx, ROUTE_ACCOUNT);
             } catch (ArithmeticException e) {
-                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while withdrawing amount");
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
                 logger.info("Unable to withdraw account");
-                redirect(ctx, ROUTE_ACCOUNT + ROUTE_WITHDRAW);
+                redirect(ctx, ROUTE_ACCOUNT);
             }
         }
     }
