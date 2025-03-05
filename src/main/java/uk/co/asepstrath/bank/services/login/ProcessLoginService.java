@@ -30,7 +30,6 @@ public class ProcessLoginService extends BaseService {
      * Redirects to the "/account" endpoint on success
      */
     public void processLogin(Context ctx) {
-        Map<String, Object> model = createModel();
 
         // Check if form value exists and is not empty
         String formID = getFormValue(ctx, "accountid");

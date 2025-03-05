@@ -40,6 +40,7 @@ public class AccountWithdrawService extends BaseService {
 
     /**
      * Displays the "/account/withdraw" endpoint
+     *
      * @param ctx Session Context
      * @return The "/account/withdraw" endpoint
      */
@@ -53,31 +54,46 @@ public class AccountWithdrawService extends BaseService {
 
     /**
      * The withdrawal process
+     *
      * @param ctx Session Context
-     * Redirects to "/account" on success
-     * Redirects to "/deposit" on failure
-     * @throws SQLException Database connection error
+     *            Redirects to "/account" on success and failure
+     * @throws SQLException        Database connection error
      * @throws ArithmeticException User input error
      */
     public void processWithdraw(Context ctx) throws SQLException {
         logger.info("Enter withdraw process");
+        String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {
-            String accountId = getAccountIdFromSession(ctx);
+
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
             Account account = accountRepository.getAccount(connection, accountId);
-            Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId, UUID.randomUUID().toString(), null , "WITHDRAWAL");
-            transactionRepository.insert(connection, transaction);
+            Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId, UUID.randomUUID().toString(), null, "WITHDRAWAL");
+
+            // Check if transaction would cause an overflow before insertion
+            try {
+                connection.setAutoCommit(false); // Start transaction
+                transactionRepository.insert(connection, transaction);
+            } catch (ArithmeticException e) {
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
+                logger.info("Transaction blocked due to potential balance overflow");
+                connection.setAutoCommit(true);
+                redirect(ctx, ROUTE_ACCOUNT);
+            } finally {
+                connection.setAutoCommit(true);
+            }
+
             try {
                 account.withdraw(amount);
                 updateDatabaseBalance(account);
-                addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully withdrawn from account!");
                 logger.info("Successfully withdrawn from account");
-                redirect(ctx, ROUTE_ACCOUNT);
+                addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully withdrawn from account!");
             } catch (ArithmeticException e) {
-                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Error while withdrawing amount");
-                logger.info("Unable to withdraw account");
-                redirect(ctx, ROUTE_ACCOUNT + ROUTE_WITHDRAW);
+                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Transaction failed: " + e.getMessage());
+                logger.error("Transaction failed", e);
+            } finally {
+                redirect(ctx, ROUTE_ACCOUNT);
             }
         }
+
     }
 }
