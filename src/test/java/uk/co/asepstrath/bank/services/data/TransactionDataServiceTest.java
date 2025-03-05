@@ -80,8 +80,13 @@ public class TransactionDataServiceTest {
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true, false);
 
+        // Mock account balance retrieval for the account
+        BigDecimal initialBalance = BigDecimal.valueOf(100.00); // Mocking an account balance
+        when(mockResultSet.getBigDecimal("balance")).thenReturn(initialBalance);
+
+        // Mock transaction data
         when(mockResultSet.getString("timestamp")).thenReturn("2023-04-10 08:43");
-        when(mockResultSet.getBigDecimal("amount")).thenReturn(BigDecimal.valueOf(21));
+        when(mockResultSet.getBigDecimal("amount")).thenReturn(BigDecimal.valueOf(21.00));
         when(mockResultSet.getString("from")).thenReturn("8f95782c-7c83-4dd7-8856-0e19a0e0a075");
         when(mockResultSet.getString("id")).thenReturn("0043d8d9-846d-49cb-9b04-8d3823e9d8c9");
         when(mockResultSet.getString("to")).thenReturn("TOP");
@@ -105,4 +110,5 @@ public class TransactionDataServiceTest {
         // Verify that the connection was used correctly
         verify(mockConnection, times(1)).prepareStatement(anyString());  // Verifying the usage of prepareStatement
     }
+
 }
