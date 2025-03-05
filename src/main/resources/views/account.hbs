@@ -1,46 +1,52 @@
 <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<h1>Welcome, {{name}}</h1>
-Your account ID is {{accountid}}
+<div class="content-wrapper">
+    <h1>Welcome, {{name}}</h1>
 
-<a href="/logout">Logout</a>
-
-<button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
-<button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
-
-{{#if success}}
-    <p style="color: green">{{success}}</p>
-{{/if}}
-{{#if error}}
-    <p style="color: red">{{error}}</p>
-{{/if}}
-
-<br>Current balance is: £{{balance}}
-
-{{#if hastransactions}}
-    <div class="transactions-section">
-        <hr style="border-top: 1px solid black;">
-        {{#each transactions}}
-            <div class="transaction">
-                <p>Timestamp: {{timestamp}}</p>
-                <p>Transaction ID: {{id}}</p>
-                <p>Amount: £{{amount}}</p>
-                <p>From: {{from}}</p>
-                <p>To: {{to}}</p>
-                <p>Type: {{type}}</p>
-                <p>Status: {{#if status}}Accepted{{else}}Declined{{/if}}</p>
-            </div>
-            <hr style="border-top: 1px solid black;">
-        {{/each}}
+    <div class="account-info">
+        <p class="account-id">Account ID: {{accountid}}</p>
+        <p class="balance">£{{balance}}</p>
+        <a href="/logout">Logout</a>
     </div>
-{{else}}
-    <p>No transactions found.</p>
-{{/if}}
+
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
+    </div>
+
+    {{#if success}}
+        <p style="color: green">{{success}}</p>
+    {{/if}}
+    {{#if error}}
+        <p style="color: red">{{error}}</p>
+    {{/if}}
+
+    {{#if hastransactions}}
+        <div class="transactions-section">
+            <h2>Transaction History</h2>
+            <hr>
+            {{#each transactions}}
+                <div class="transaction">
+                    <p><strong>Date:</strong> {{timestamp}}</p>
+                    <p><strong>ID:</strong> {{id}}</p>
+                    <p><strong>Amount:</strong> £{{amount}}</p>
+                    <p><strong>From:</strong> {{from}}</p>
+                    <p><strong>To:</strong> {{to}}</p>
+                    <p><strong>Type:</strong> {{type}}</p>
+                    <p><strong>Status:</strong> {{#if status}}Accepted{{else}}Declined{{/if}}</p>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <p>No transactions found.</p>
+    {{/if}}
+</div>
 </body>
 </html>

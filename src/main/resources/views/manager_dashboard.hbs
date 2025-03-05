@@ -3,34 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Manager Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<h1>Welcome, {{managername}}</h1>
-Your manager ID is {{managerid}}
+<div class="content-wrapper">
+    <h1>Welcome, {{managername}}</h1>
+    <p>Your manager ID is {{managerid}}</p>
 
-<a href="/logout">Logout</a>
+    <a href="/logout" class="btn btn-primary">Logout</a>
 
-<h2>Manager Dashboard - List of Accounts</h2>
-<table>
-    <thead>
-    <tr>
-        <th>Account ID</th>
-        <th>Name</th>
-        <th>Balance</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{#if hasaccounts}}
-        {{#each accounts}}
+    <h2>Manager Dashboard - List of Accounts</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Account ID</th>
+            <th>Name</th>
+            <th>Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#if hasaccounts}}
+            {{#each accounts}}
+                <tr>
+                    <td>{{accountID}}</td>
+                    <td>{{name}}</td>
+                    <td>${{balance}}</td>
+                </tr>
+            {{/each}}
+        {{else}}
             <tr>
-                <td>AccountID: {{accountID}}</td>
-                <td>Name: {{name}}</td>
-                <td>Balance: ${{balance}}</td>
+                <td colspan="3">No accounts found.</td>
             </tr>
-        {{/each}}
-    {{else}}
-        <p>No accounts found.</p>
-    {{/if}}
-    </tbody>
-</table>
+        {{/if}}
+        </tbody>
+    </table>
+</div>
 </body>
+</html>

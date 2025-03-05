@@ -80,6 +80,7 @@ public class ManagerRepository extends BaseRepository {
             logger.error(e.getMessage());
             throw new DataAccessException("Failed to retrieve accounts from the database: ",e);
         }
+        logger.info("Returning accounts from the database");
         return accounts;
     }
 }

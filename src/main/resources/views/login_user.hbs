@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/loginstyle.css">
-    <meta name = "viewport" content=" width-device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <title>Log in</title>
+    <title>Login - Banking Portal</title>
 </head>
 
 <body>
-<div class = "wrapper">
+<div class="wrapper">
     <form action="/login/process" method="post">
         <h1>Login</h1>
-        <div class = "input-box">
-            <input type="text" placeholder= "Account ID" id="accountid" name="accountid">
+        <div class="input-box">
+            <input type="text" placeholder="Account ID" id="accountid" name="accountid" required>
             <i class='bx bxs-user'></i>
         </div>
-        <button type = "submit" class="btn">Login</button>
+        <button type="submit" class="btn">Login</button>
     </form>
     <a href="/manager/login">Manager Login</a>
+
+    {{#if error}}
+        <p class="message error">{{error}}</p>
+    {{/if}}
+    {{#if success}}
+        <p class="message success">{{success}}</p>
+    {{/if}}
 </div>
-{{#if error}}
-    <p style="color: red;">{{error}}</p>
-{{/if}}
-{{#if success}}
-    <p style="color: green;">{{success}}</p>
-{{/if}}
 </body>
 </html>

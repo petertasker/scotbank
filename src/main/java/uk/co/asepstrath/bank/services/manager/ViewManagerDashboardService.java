@@ -40,13 +40,14 @@ public class ViewManagerDashboardService extends BaseService {
         Map<String, Object> model = createModel();
         try {
             accounts = managerRepository.getAllAccounts(getConnection());
+            Session session = getSession(ctx);
+            model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
+            model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
+            model.put(ACCOUNT_OBJECT_LIST, accounts);
+            model.put(ACCOUNT_OBJECT_LIST_EXISTS, !accounts.isEmpty());
+            return render(TEMPLATE_MANAGER_DASHBOARD, model);
         } catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
-        Session session = getSession(ctx);
-        model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
-        model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
-        model.put(ACCOUNT_OBJECT_LIST, accounts);
-        return render(TEMPLATE_MANAGER_DASHBOARD, model);
     }
 }

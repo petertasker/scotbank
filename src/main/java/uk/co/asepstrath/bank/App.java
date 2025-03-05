@@ -39,11 +39,14 @@ public class App extends Jooby {
             if (path.startsWith("/css")) return;
 
             Session session = ctx.sessionOrNull();
-            boolean userLoggedIn = session != null && session.get("name").isPresent() && session.get("accountid").isPresent();
-            if (!userLoggedIn && !path.startsWith(ROUTE_LOGIN)
-                    && !path.equals("/manager/login") && !path.equals("/manager/login/process")){
+            boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(SESSION_ACCOUNT_ID).isPresent();
+            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(SESSION_MANAGER_ID).isPresent();
+
+            if (!userLoggedIn && !managerLoggedIn && !path.startsWith(ROUTE_LOGIN)
+                    && !path.startsWith("/manager/login")) {
                 ctx.setResponseCode(401).sendRedirect("/login");
             }
+
 
         });
 

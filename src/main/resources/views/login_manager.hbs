@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/loginstyle.css">
-    <meta name = "viewport" content=" width-device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>Log in</title>
 </head>
 
 <body>
-<div class = "wrapper">
+<div class="content-wrapper wrapper">
     <form action="/manager/login/process" method="post">
         <h1>Manager Login</h1>
-        <div class = "input-box">
-            <input type="text" placeholder= "ManagerID" id="managerid" name="managerid">
+        <div class="input-box">
+            <input type="text" placeholder="ManagerID" id="managerid" name="managerid" required>
             <i class='bx bxs-user'></i>
         </div>
-        <button type = "submit" class="btn">Login</button>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
+
+    {{#if error}}
+        <p style="color: red;">{{error}}</p>
+    {{/if}}
+
+    {{#if success}}
+        <p style="color: green;">{{success}}</p>
+    {{/if}}
 </div>
-{{#if error}}
-    <p style="color: red;">{{error}}</p>
-{{/if}}
-{{#if success}}
-    <p style="color: green;">{{success}}</p>
-{{/if}}
 </body>
 </html>

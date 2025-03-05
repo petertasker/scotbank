@@ -1,0 +1,244 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+:root {
+    /* Colors */
+    --text-primary: #fff;
+    --text-secondary: #333;
+    --border-color: rgba(255, 255, 255, 0.2);
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --btn-bg: white;
+    --error-bg: rgba(255, 0, 0, 0.1);
+    --success-bg: rgba(0, 255, 0, 0.1);
+    --transaction-bg: rgba(255, 255, 255, 0.1);
+
+    /* Sizes */
+    --border-radius-lg: 40px;
+    --border-radius-sm: 10px;
+    --spacing-sm: 20px;
+    --spacing-md: 30px;
+    --spacing-lg: 40px;
+
+    /* Effects */
+    --blur-amount: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background: url(https://www.inspiringtravelscotland.com/wp-content/uploads/2019/05/Quiraing-Skye-Scottish-Highlands.jpg) no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    padding: var(--spacing-md);
+}
+
+/* Container styles */
+.content-wrapper {
+    width: 90%;
+    max-width: 800px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    backdrop-filter: blur(var(--blur-amount));
+    box-shadow: 0 0 10px var(--shadow-color);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Header styles */
+h1 {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Account info */
+.account-info {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.account-id {
+    margin-bottom: 10px;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.balance {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 15px 0;
+}
+
+/* Button styles */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.btn-primary {
+    background-color: var(--btn-bg);
+    color: var(--text-secondary);
+}
+
+.btn-primary:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: var(--spacing-sm) 0;
+}
+
+/* Transaction form styles */
+.transaction-form {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.transaction-form h1 {
+    margin-bottom: var(--spacing-md);
+}
+
+.transaction-form form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: var(--spacing-md);
+}
+
+.transaction-form label {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.transaction-form input[type="number"] {
+    padding: 10px 15px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 16px;
+    width: 200px;
+}
+
+.transaction-form input[type="submit"] {
+    padding: 10px 25px;
+    background: var(--btn-bg);
+    color: var(--text-secondary);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.transaction-form input[type="submit"]:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Logout link */
+a {
+    display: inline-block;
+    color: var(--text-primary);
+    text-decoration: none;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+/* Message styling */
+p[style*="color: red"], p[style*="color: green"] {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    font-size: 14px;
+    width: 100%;
+}
+
+p[style*="color: red"] {
+    background-color: var(--error-bg);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    color: #ff3333 !important;
+}
+
+p[style*="color: green"] {
+    background-color: var(--success-bg);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: #00cc00 !important;
+}
+
+/* Transaction history */
+.transactions-section {
+    width: 100%;
+    margin-top: var(--spacing-md);
+}
+
+.transaction {
+    background-color: var(--transaction-bg);
+    border-radius: var(--border-radius-sm);
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.transaction p {
+    margin: 5px 0;
+}
+
+hr {
+    border-color: var(--border-color) !important;
+    opacity: 0.5;
+    margin: 20px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .content-wrapper {
+        width: 95%;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .balance {
+        font-size: 24px;
+    }
+
+    .transaction-form input[type="number"] {
+        width: 150px;
+    }
+}
