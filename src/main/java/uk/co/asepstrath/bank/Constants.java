@@ -3,11 +3,6 @@ package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 
 public final class Constants {
-
-    private Constants() {
-
-    }
-
     /**
      * Endpoints
      * NOTE: If you refactor these make sure that they are reflected in the handlebars templates,
@@ -32,11 +27,31 @@ public final class Constants {
 
 
     /**
-     * Success / Error messages
+     * Error routes
+     */
+    public static final String ROUTE_ERROR = "/error";
+    public static final String ROUTE_404_NOT_FOUND = "/404_not_found";
+    public static final String ROUTE_403_FORBIDDEN = "/403_forbidden";
+    public static final String ROUTE_405_METHOD_NOT_ALLOWED = "/405_method_not_allowed";
+    public static final String ROUTE_400_BAD_REQUEST = "/400_bad_request";
+    public static final String ROUTE_GENERIC_ERROR = "/generic_error";
+
+    public static final String SESSION_SERVER_ERROR_TITLE = "errorTitle";
+    public static final String SESSION_SERVER_ERROR_CODE = "errorCode";
+    public static final String SESSION_SERVER_ERROR_MESSAGE = "errorMessage";
+    public static final String SESSION_SERVER_ERROR_SUGGESTION = "errorSuggestion";
+
+    /**
+     * Error template
+     */
+    public static final String TEMPLATE_ERROR = "error.hbs";
+
+
+    /**
+     * Session Success / Error messages
      */
     public static final String SESSION_ERROR_MESSAGE = "error";
     public static final String SESSION_SUCCESS_MESSAGE = "success";
-
     /**
      * Session Variables
      */

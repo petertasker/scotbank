@@ -34,6 +34,8 @@ public class ViewManagerDashboardService extends BaseService {
      * @return The "/manager/dashboard" endpoint
      */
     public ModelAndView<Map<String, Object>> renderDashboard(Context ctx) {
+        ensureManagerIsLoggedIn(ctx);
+
         List<Account> accounts;
         Map<String, Object> model = createModel();
         try {

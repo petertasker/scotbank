@@ -5,6 +5,7 @@ import io.jooby.ModelAndView;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
@@ -48,7 +49,7 @@ public class AccountWithdrawService extends BaseService {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
         putBalanceInModel(model, accountId);
-        transferSessionAttributeToModel(ctx, SESSION_ERROR_MESSAGE, model);
+        transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
         return render(TEMPLATE_WITHDRAW, model);
     }
 
@@ -74,7 +75,7 @@ public class AccountWithdrawService extends BaseService {
                 connection.setAutoCommit(false); // Start transaction
                 transactionRepository.insert(connection, transaction);
             } catch (ArithmeticException e) {
-                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, e.getMessage());
+                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
                 logger.info("Transaction blocked due to potential balance overflow");
                 connection.setAutoCommit(true);
                 redirect(ctx, ROUTE_ACCOUNT);
@@ -88,7 +89,7 @@ public class AccountWithdrawService extends BaseService {
                 logger.info("Successfully withdrawn from account");
                 addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully withdrawn from account!");
             } catch (ArithmeticException e) {
-                addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Transaction failed: " + e.getMessage());
+                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Transaction failed: " + e.getMessage());
                 logger.error("Transaction failed", e);
             } finally {
                 redirect(ctx, ROUTE_ACCOUNT);

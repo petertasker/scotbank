@@ -6,6 +6,7 @@ import io.jooby.Session;
 import io.jooby.annotation.GET;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.services.BaseService;
 
@@ -41,7 +42,7 @@ public class AccountViewService extends BaseService {
 
         putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
         transferSessionAttributeToModel(ctx, SESSION_SUCCESS_MESSAGE, model);
-        transferSessionAttributeToModel(ctx, SESSION_ERROR_MESSAGE, model);
+        transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
 
 
         // Get all transactions related to a user's account

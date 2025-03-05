@@ -7,21 +7,24 @@ import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
+import uk.co.asepstrath.bank.services.repository.DatabaseManager;
+
 import uk.co.asepstrath.bank.controllers.LoginController_;
 import uk.co.asepstrath.bank.controllers.AccountController_;
 import uk.co.asepstrath.bank.controllers.LogoutController_;
 import uk.co.asepstrath.bank.controllers.ManagerController_;
-import uk.co.asepstrath.bank.services.login.DisplayLoginService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginService;
-import uk.co.asepstrath.bank.services.repository.DatabaseManager;
+import uk.co.asepstrath.bank.controllers.ErrorController_;
+
+
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.*;
 
-import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
-import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.*;
 
 public class App extends Jooby {
 
@@ -36,12 +39,28 @@ public class App extends Jooby {
             if (path.startsWith("/css")) return;
 
             Session session = ctx.sessionOrNull();
-            boolean userLoggedIn = session != null && session.get("name") != null && session.get("accountid") != null;
+            boolean userLoggedIn = session != null && session.get("name").isPresent() && session.get("accountid").isPresent();
             if (!userLoggedIn && !path.startsWith(ROUTE_LOGIN)
                     && !path.equals("/manager/login") && !path.equals("/manager/login/process")){
                 ctx.setResponseCode(401).sendRedirect("/login");
             }
 
+        });
+
+        // Unbelievable that I cannot switch on this
+        error((ctx, cause, code) -> {
+            if (code == StatusCode.FORBIDDEN) {
+                ctx.setResponseCode(403).sendRedirect(ROUTE_ERROR + ROUTE_403_FORBIDDEN);
+            }
+            else if (code == StatusCode.NOT_FOUND) {
+                ctx.setResponseCode(404).sendRedirect(ROUTE_ERROR + ROUTE_404_NOT_FOUND);
+            }
+            else if (code == StatusCode.METHOD_NOT_ALLOWED) {
+                ctx.setResponseCode(405).sendRedirect(ROUTE_ERROR + ROUTE_405_METHOD_NOT_ALLOWED);
+            }
+            else {
+                ctx.sendRedirect(ROUTE_ERROR + ROUTE_GENERIC_ERROR);
+            }
         });
 
         /*
@@ -69,9 +88,10 @@ public class App extends Jooby {
         ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
 
         mvc(new AccountController_(ds, log));
-        mvc(new LoginController_(displayLoginService, processLoginService,  log));
+        mvc(new LoginController_(displayLoginService, processLoginService, log));
         mvc(new ManagerController_(ds, log));
         mvc(new LogoutController_(log));
+        mvc(new ErrorController_(log));
 
 
         /*

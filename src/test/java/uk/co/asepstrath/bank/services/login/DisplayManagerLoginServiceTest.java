@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Constants;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +50,7 @@ public class DisplayManagerLoginServiceTest {
         // Mock ValueNode to return the expected string error message
         ValueNode valueNode = mock(ValueNode.class);
         when(valueNode.valueOrNull()).thenReturn("Invalid login.");
-        when(session.get(SESSION_ERROR_MESSAGE)).thenReturn(valueNode);
+        when(session.get(Constants.SESSION_ERROR_MESSAGE)).thenReturn(valueNode);
 
         ModelAndView<Map<String, Object>> result = displayManagerLoginService.displayManagerLogin(ctx);
 
@@ -70,7 +70,7 @@ public class DisplayManagerLoginServiceTest {
         ModelAndView<Map<String, Object>> result = displayManagerLoginService.displayManagerLogin(ctx);
 
         // Verify error was added to model and removed from session
-        assertNotNull(result.getModel().get(SESSION_ERROR_MESSAGE));
-        verify(session).remove(SESSION_ERROR_MESSAGE);
+        assertNotNull(result.getModel().get(Constants.SESSION_ERROR_MESSAGE));
+        verify(session).remove(Constants.SESSION_ERROR_MESSAGE);
     }
 }
