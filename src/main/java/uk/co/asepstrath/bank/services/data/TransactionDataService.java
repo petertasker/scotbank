@@ -8,11 +8,16 @@ import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.parsers.XmlParser;
 
+import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Fetches Transaction data from external API
@@ -21,9 +26,17 @@ public class TransactionDataService implements DataService<Transaction> {
 
     private final Logger logger;
     private UnirestWrapper unirestWrapper;
+    private Connection connection;
 
 
     public TransactionDataService() {
+        this.logger = LoggerFactory.getLogger(TransactionDataService.class);
+        this.unirestWrapper = new UnirestWrapper();
+    }
+
+    public TransactionDataService(DataSource dataSource) throws SQLException {
+        super();
+        this.connection = dataSource.getConnection();
         this.logger = LoggerFactory.getLogger(TransactionDataService.class);
         this.unirestWrapper = new UnirestWrapper();
     }
@@ -55,9 +68,21 @@ public class TransactionDataService implements DataService<Transaction> {
                 }
 
                 XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
-                List<Transaction> pageTransactions = pageResult.getTransactions();
-
-                if (pageTransactions == null || pageTransactions.isEmpty()) {
+                List<Transaction> pageTransactions = pageResult.getTransactions()
+                        .stream()
+                        .map(transaction -> {
+                            try {
+                                return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
+                                        transaction.getFrom(), transaction.getId(), transaction.getTo(),
+                                        transaction.getType());
+                            } catch (SQLException e) {
+                                // Log error or handle exception
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .toList();
+                if (pageTransactions.isEmpty()) {
                     logger.info("No more transactions found on page {}", page);
                     break;
                 }

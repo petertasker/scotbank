@@ -81,7 +81,7 @@ public class AccountController extends BaseController {
     @POST
     @Path(ROUTE_WITHDRAW + ROUTE_PROCESS)
     public void withdrawProcess(Context ctx) throws SQLException {
-        withdrawService.withdrawProcess(ctx);
+        withdrawService.processWithdraw(ctx);
     }
 
     /**
