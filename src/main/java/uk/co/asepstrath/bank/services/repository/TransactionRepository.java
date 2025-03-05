@@ -35,11 +35,8 @@ public class TransactionRepository extends BaseRepository {
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-    private final AccountRepository accountRepository;
-
-    public TransactionRepository(Logger logger, AccountRepository accountRepository) {
+    public TransactionRepository(Logger logger) {
         super(logger);
-        this.accountRepository = accountRepository;
     }
 
     /**
@@ -58,8 +55,6 @@ public class TransactionRepository extends BaseRepository {
      * @throws SQLException Database connection failure
      */
     public void insert(Connection connection, Transaction transaction) throws SQLException {
-        boolean accepted = processTransaction(connection, transaction);
-
         try (PreparedStatement stmt = connection.prepareStatement(SQL_INSERT_TRANSACTION)) {
             stmt.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             stmt.setString(2, transaction.getAmount().toString());
@@ -81,33 +76,8 @@ public class TransactionRepository extends BaseRepository {
             }
 
             stmt.setString(7, transaction.getType());
-            stmt.setBoolean(8, accepted);
+            stmt.setBoolean(8, transaction.getStatus());
             stmt.executeUpdate();
         }
-    }
-
-    /**
-     * Determines if a transaction is accepted or declined
-     * @param connection Database connection
-     * @param transaction the Transaction Object in question
-     * @return a boolean
-     * @throws SQLException Database connection failure
-     */
-    private boolean processTransaction(Connection connection, Transaction transaction) throws SQLException {
-        if (!Objects.equals(transaction.getType(), "DEPOSIT")) {
-            Account senderAccount = accountRepository.getAccount(connection, transaction.getFrom());
-            if (senderAccount == null) {
-                return false;
-            }
-
-            try {
-                senderAccount.withdraw(transaction.getAmount());
-                accountRepository.updateBalance(connection, senderAccount);
-                return true;
-            } catch (ArithmeticException e) {
-                return false;
-            }
-        }
-        return true;
     }
 }

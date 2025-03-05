@@ -40,6 +40,8 @@ public class AccountViewService extends BaseService {
         logger.info("Put name and accountid in model");
 
         putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        transferSessionAttributeToModel(ctx, SESSION_SUCCESS_MESSAGE, model);
+        transferSessionAttributeToModel(ctx, SESSION_ERROR_MESSAGE, model);
 
 
         // Get all transactions related to a user's account
@@ -49,9 +51,13 @@ public class AccountViewService extends BaseService {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, ReceiverBusinessID, TransactionType, TransactionAccepted " +
                             "FROM Transactions " +
-                            "WHERE SenderID = ?"
+                            "WHERE SenderID = ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " +
+                            "ORDER BY Timestamp DESC"
             )) {
-                preparedStatement.setString(1, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+                String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+                preparedStatement.setString(1, accountId);
+                preparedStatement.setString(2, accountId);
+                preparedStatement.setString(3, accountId);
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
@@ -73,7 +79,7 @@ public class AccountViewService extends BaseService {
                         boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
                         Transaction transaction = new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType, transactionAccepted);
                         transactions.add(transaction);
-                        logger.info("Added transaction " + transaction);
+                        logger.info("Added transaction {}, {}", transaction.getId(), transaction.getStatus());
                     }
                 }
             }

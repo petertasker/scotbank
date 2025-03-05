@@ -37,7 +37,7 @@ class TransactionRepositoryTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        transactionRepository = new TransactionRepository(logger, accountRepository);
+        transactionRepository = new TransactionRepository(logger);
     }
 
     @Test

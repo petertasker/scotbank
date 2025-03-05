@@ -32,19 +32,19 @@ public class DatabaseManager implements DatabaseOperations {
     private final DataService<Transaction> transactionDataService;
     private final DataService<Manager> managerDataService;
 
-    public DatabaseManager(DataSource dataSource, Logger logger) {
+    public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
         this.dataSource = dataSource;
         this.logger = logger;
 
         this.accountRepository = new AccountRepository(logger);
         this.businessRepository = new BusinessRepository(logger);
-        this.transactionRepository = new TransactionRepository(logger, accountRepository);
+        this.transactionRepository = new TransactionRepository(logger);
         this.managerRepository = new ManagerRepository(logger);
 
 
         this.accountDataService = new AccountDataService();
         this.businessDataService = new BusinessDataService();
-        this.transactionDataService = new TransactionDataService();
+        this.transactionDataService = new TransactionDataService(dataSource);
         this.managerDataService = new ManagerDataService();
 
     }
