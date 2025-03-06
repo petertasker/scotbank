@@ -12,8 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
-import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.*;
 
 
 class AppClassTest {
@@ -75,16 +74,26 @@ class AppClassTest {
         // Check for controller routes
         boolean hasLoginRoutes = false;
         boolean hasAccountRoutes = false;
+        boolean hasManagerRoutes = false;
+        boolean hasLogoutRoutes = false;
+        boolean hasErrorRoutes = false;
 
         for (Route route : routes) {
             String pattern = route.getPattern();
             if (pattern.startsWith(ROUTE_LOGIN)) hasLoginRoutes = true;
             if (pattern.startsWith(ROUTE_ACCOUNT)) hasAccountRoutes = true;
+            if (pattern.startsWith(ROUTE_MANAGER)) hasManagerRoutes = true;
+            if (pattern.startsWith(ROUTE_LOGOUT)) hasLogoutRoutes = true;
+            if (pattern.startsWith(ROUTE_ERROR)) hasErrorRoutes = true;
         }
 
         assertTrue(hasLoginRoutes, "Login routes should be registered");
         assertTrue(hasAccountRoutes, "Account routes should be registered");
+        assertTrue(hasManagerRoutes, "Manager routes should be registered");
+        assertTrue(hasLogoutRoutes, "Logout routes should be registered");
+        assertTrue(hasErrorRoutes, "Error routes should be registered");
     }
+
 
     @Test
     void testRedirectToAccount() {

@@ -41,6 +41,7 @@ public class AccountViewService extends BaseService {
         logger.info("Put name and accountid in model");
 
         putBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+        putRoundUpBalanceInModel(model, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
         transferSessionAttributeToModel(ctx, SESSION_SUCCESS_MESSAGE, model);
         transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
 
@@ -91,5 +92,30 @@ public class AccountViewService extends BaseService {
         return render(TEMPLATE_ACCOUNT, model);
     }
 
-    
+    /**
+     * Gets the roundUp balance for an account and adds it to the model
+     * @param model The model to add the roundUp balance to
+     * @param accountId The account ID to get the roundUp balance for
+     * @throws SQLException Database connection failure
+     */
+    private void putRoundUpBalanceInModel(Map<String, Object> model, String accountId) throws SQLException {
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "SELECT RoundUpAmount, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
+                statement.setString(1, accountId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
+                        model.put("roundUpEnabled", roundUpEnabled);
+
+                        if (roundUpEnabled) {
+                            BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                            model.put("roundUpBalance", roundUpAmount);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
