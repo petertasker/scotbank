@@ -20,6 +20,7 @@ public class AccountRepository extends BaseRepository {
             Balance DECIMAL(12,2) NOT NULL,
             Name VARCHAR(255) NOT NULL,
             RoundUpEnabled BIT NOT NULL,
+            RoundUpAmount DECIMAL(12,2) NULL DEFAULT 0,
             PRIMARY KEY (AccountID)
         )
         """;
@@ -28,10 +29,10 @@ public class AccountRepository extends BaseRepository {
             "INSERT INTO Accounts (AccountID, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_UPDATE_BALANCE =
-            "UPDATE Accounts SET Balance = ? WHERE AccountID = ?";
+            "UPDATE Accounts SET Balance = ?, RoundUpAmount = ? WHERE AccountID = ?";
 
     private static final String SQL_GET_ACCOUNT =
-            "SELECT Balance, Name, RoundUpEnabled FROM Accounts WHERE AccountID = ?";
+            "SELECT Balance, Name, RoundUpEnabled, RoundUpAmount FROM Accounts WHERE AccountID = ?";
 
     public AccountRepository(Logger logger) {
         super(logger);
@@ -59,7 +60,7 @@ public class AccountRepository extends BaseRepository {
             statement.setString(3, account.getName());
             statement.setBoolean(4, account.isRoundUpEnabled());
             statement.executeUpdate();
-            logger.info("Inserted account {} into table Accounts", account.getAccountID());
+            logger.info("Inserted account {}, round up enabled: {}", account.getAccountID(), account.isRoundUpEnabled());
         }
     }
 
@@ -72,7 +73,8 @@ public class AccountRepository extends BaseRepository {
     public void updateBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BALANCE)) {
             statement.setBigDecimal(1, account.getBalance());
-            statement.setString(2, account.getAccountID());
+            statement.setBigDecimal(2, account.getRoundUpBalance() != null ? account.getRoundUpBalance() : BigDecimal.ZERO);
+            statement.setString(3, account.getAccountID());
             statement.executeUpdate();
         }
     }
@@ -92,7 +94,12 @@ public class AccountRepository extends BaseRepository {
                     BigDecimal balance = resultSet.getBigDecimal("Balance");
                     String name = resultSet.getString("Name");
                     boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
-                    return new Account(accountID, name, balance, roundUpEnabled);
+                    Account account = new Account(accountID, name, balance, roundUpEnabled);
+                    if (roundUpEnabled) {
+                        BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                        account.updateRoundUpBalance(roundUpAmount);
+                    }
+                    return account;
                 }
             }
         }

@@ -2,6 +2,8 @@ package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
 
@@ -10,11 +12,12 @@ import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
  */
 public class Account {
 
+    private static final Logger log = LoggerFactory.getLogger(Account.class);
     private final String accountID;
     private BigDecimal balance;
     private final boolean roundUpEnabled;
     private final String name;
-
+    private BigDecimal roundUpBalance;
 
     @JsonCreator
     public Account(
@@ -27,6 +30,7 @@ public class Account {
         this.balance = startingBalance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
+        this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
     }
 
     /**
@@ -95,12 +99,28 @@ public class Account {
         return name;
     }
 
+    public BigDecimal getRoundUpBalance() {
+        return roundUpBalance;
+    }
+
+    public void addToRoundUpBalance(BigDecimal amount) {
+        if (roundUpEnabled && amount.compareTo(BigDecimal.ZERO) > 0) {
+            roundUpBalance = roundUpBalance.add(amount);
+        }
+        log.info("Round up balance: {}", roundUpBalance);
+    }
     /**
      * Gets the boolean value of roundUpEnabled
      * @return roundUpEnabled
      */
     public boolean isRoundUpEnabled() {
         return roundUpEnabled;
+    }
+
+    public void updateRoundUpBalance(BigDecimal amount) {
+        if (roundUpEnabled) {
+            this.roundUpBalance = amount;
+        }
     }
 
     /**

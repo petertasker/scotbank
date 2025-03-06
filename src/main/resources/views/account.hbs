@@ -13,6 +13,13 @@
     <div class="account-info">
         <p class="account-id">Account ID: {{accountid}}</p>
         <p class="balance">£{{balance}}</p>
+        <!-- Add RoundUp Pot Display -->
+        {{#roundUpEnabled}}
+            <div class="roundup-pot">
+                <p class="roundup-title">Round-Up Savings Pot</p>
+                <p class="roundup-balance">£{{roundUpBalance}}</p>
+            </div>
+        {{/roundUpEnabled}}
         <a href="/logout">Logout</a>
     </div>
 

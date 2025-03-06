@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -173,12 +174,28 @@ public class Transaction {
                 }
 
             case "PAYMENT":
-                // Payments require both 'from' and 'to' accounts, similar to transfer
                 if (getFrom() == null || getTo() == null) return false;
                 Account payerAccount = accountRepository.getAccount(connection, getFrom());
                 if (payerAccount == null) return false;
                 try {
+                    // First withdraw the payment amount
                     payerAccount.overdraftWithdraw(getAmount());
+
+                    // Handle roundUp if enabled
+                    if (payerAccount.isRoundUpEnabled()) {
+                        BigDecimal amount = getAmount();
+                        BigDecimal nextPound = amount.setScale(0, RoundingMode.UP);
+                        BigDecimal roundUpAmount = nextPound.subtract(amount);
+
+                        if (roundUpAmount.compareTo(BigDecimal.ZERO) > 0) {
+                            // Withdraw the additional roundUp amount from main balance
+                            payerAccount.overdraftWithdraw(roundUpAmount);
+                            // Add to roundUp pot
+                            payerAccount.addToRoundUpBalance(roundUpAmount);
+                            logger.info("Round up amount {} to {}", roundUpAmount, roundUpAmount);
+                        }
+                    }
+
                     accountRepository.updateBalance(connection, payerAccount);
                     return true;
                 } catch (ArithmeticException e) {
