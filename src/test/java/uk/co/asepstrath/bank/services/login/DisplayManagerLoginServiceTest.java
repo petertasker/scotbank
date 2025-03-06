@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class DisplayManagerLoginServiceTest {
+class DisplayManagerLoginServiceTest {
 
     @Mock
     private Logger logger;

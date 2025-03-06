@@ -1,13 +1,11 @@
 package uk.co.asepstrath.bank.controllers;
 
 import io.jooby.Context;
-import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.logout.LogoutService;
 
-import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.ROUTE_LOGOUT;
 

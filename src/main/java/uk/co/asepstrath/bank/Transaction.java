@@ -10,7 +10,6 @@ import uk.co.asepstrath.bank.services.repository.AccountRepository;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 
 /**
  * The Transaction class
@@ -63,7 +62,6 @@ public class Transaction {
         logger = LoggerFactory.getLogger(this.getClass());
         accountRepository = new AccountRepository(logger);
         this.transactionStatus = processTransaction(connection);
-        // logger.info("Transaction status: {}, New Balance: {}", transactionStatus, amount);
     }
 
     /**
@@ -123,71 +121,77 @@ public class Transaction {
     }
 
     private boolean processTransaction(Connection connection) throws SQLException {
-        switch (getType()) {
-
-            case "DEPOSIT":
-                // Deposits only require 'to' account
-                if (getTo() == null) return false;
-                Account depositAccount = accountRepository.getAccount(connection, getTo());
-                if (depositAccount == null) return false;
-                depositAccount.deposit(getAmount());
-                accountRepository.updateBalance(connection, depositAccount);
-                return true;
-
-            case "WITHDRAWAL":
-                // Withdrawals only require 'from' account
-                if (getFrom() == null) {
-                    logger.info("From is null");
-                    return false;
-                }
-
-                Account withdrawAccount = accountRepository.getAccount(connection, getFrom());
-                if (withdrawAccount == null) {
-                    logger.info("account is null");
-                    return false;
-                }
-                try {
-                    withdrawAccount.withdraw(getAmount());
-                    accountRepository.updateBalance(connection, withdrawAccount);
-                    return true;
-                } catch (ArithmeticException e) {
-                    logger.info("Arithmetic exception");
-                    return false;
-                }
-
-            case "TRANSFER":
-                // Transfers require both 'from' and 'to' accounts
-                if (getFrom() == null || getTo() == null) return false;
-                Account senderAccount = accountRepository.getAccount(connection, getFrom());
-                Account receiverAccount = accountRepository.getAccount(connection, getTo());
-                if (senderAccount == null || receiverAccount == null) return false;
-                try {
-                    senderAccount.withdraw(getAmount());
-                    receiverAccount.deposit(getAmount());
-                    accountRepository.updateBalance(connection, senderAccount);
-                    accountRepository.updateBalance(connection, receiverAccount);
-                    return true;
-                } catch (ArithmeticException e) {
-                    return false;
-                }
-
-            case "PAYMENT":
-                // Payments require both 'from' and 'to' accounts, similar to transfer
-                if (getFrom() == null || getTo() == null) return false;
-                Account payerAccount = accountRepository.getAccount(connection, getFrom());
-                if (payerAccount == null) return false;
-                try {
-                    payerAccount.withdraw(getAmount());
-                    accountRepository.updateBalance(connection, payerAccount);
-                    return true;
-                } catch (ArithmeticException e) {
-                    return false;
-                }
-
-            default:
-                logger.info("Unknown transaction type: {}", this);
-                return true;
+        if (!validateAccountsForTransactionType()) {
+            return false;
         }
+
+        try {
+            return switch (getType()) {
+                case "DEPOSIT" -> handleDeposit(connection);
+                case "WITHDRAWAL" -> handleWithdrawal(connection);
+                case "TRANSFER" -> handleTransfer(connection);
+                case "PAYMENT" -> handlePayment(connection);
+                default -> {
+                    logger.info("Unknown transaction type: {}", this);
+                    yield true;
+                }
+            };
+        } catch (ArithmeticException e) {
+            logger.info("Arithmetic exception in transaction");
+            return false;
+        }
+    }
+
+    private boolean validateAccountsForTransactionType() {
+        return switch (getType()) {
+            case "DEPOSIT" -> getTo() != null;
+            case "WITHDRAWAL" -> getFrom() != null;
+            case "TRANSFER", "PAYMENT" -> getFrom() != null && getTo() != null;
+            default -> true;
+        };
+    }
+
+    private boolean handleDeposit(Connection connection) throws SQLException {
+        Account account = accountRepository.getAccount(connection, getTo());
+        if (account == null) return false;
+
+        account.deposit(getAmount());
+        accountRepository.updateBalance(connection, account);
+        return true;
+    }
+
+    private boolean handleWithdrawal(Connection connection) throws SQLException {
+        Account account = accountRepository.getAccount(connection, getFrom());
+        if (account == null) {
+            logger.info("account is null");
+            return false;
+        }
+
+        account.withdraw(getAmount());
+        accountRepository.updateBalance(connection, account);
+        return true;
+    }
+
+    private boolean handleTransfer(Connection connection) throws SQLException {
+        Account sender = accountRepository.getAccount(connection, getFrom());
+        Account receiver = accountRepository.getAccount(connection, getTo());
+
+        if (sender == null || receiver == null) return false;
+
+        sender.withdraw(getAmount());
+        receiver.deposit(getAmount());
+        accountRepository.updateBalance(connection, sender);
+        accountRepository.updateBalance(connection, receiver);
+        return true;
+    }
+
+    private boolean handlePayment(Connection connection) throws SQLException {
+        Account payer = accountRepository.getAccount(connection, getFrom());
+        if (payer == null) return false;
+
+        payer.withdraw(getAmount());
+        accountRepository.updateBalance(connection, payer);
+        return true;
     }
 
     /**

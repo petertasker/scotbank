@@ -12,12 +12,12 @@ public class ManagerDataServiceTest {
     private ManagerDataService managerDataService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         managerDataService = new ManagerDataService();
     }
 
     @Test
-    public void testCreateManagers() {
+    void testCreateManagers() {
         List<Manager> managers = managerDataService.fetchData();
         assertEquals(5, managers.size());
         assertEquals("Oles Vynnychuk", managers.getFirst().getName());

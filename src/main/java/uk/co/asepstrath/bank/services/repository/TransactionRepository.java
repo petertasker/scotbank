@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.repository;
 
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Transaction;
 
 import java.sql.*;

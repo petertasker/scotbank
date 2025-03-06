@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ProcessLoginServiceTest {
+class ProcessLoginServiceTest {
     @Mock
     private Logger logger;
 

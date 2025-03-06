@@ -1,4 +1,4 @@
-//package uk.co.asepstrath.bank.parsers;
+package uk.co.asepstrath.bank.parsers;
 //
 //import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 //import org.junit.jupiter.api.BeforeEach;

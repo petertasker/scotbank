@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static uk.co.asepstrath.bank.Constants.*;
 
-public class ProcessManagerLoginServiceTest {
+class ProcessManagerLoginServiceTest {
 
     @Mock
     private Logger logger;

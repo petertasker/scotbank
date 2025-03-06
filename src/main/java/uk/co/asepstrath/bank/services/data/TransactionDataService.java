@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Fetches Transaction data from external API
@@ -59,43 +58,47 @@ public class TransactionDataService implements DataService<Transaction> {
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.registerModule(new JodaModule());
 
-            while (true) {
+            boolean hasMorePages = true;
+            while (hasMorePages) {
                 HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", page);
 
-                if (!response.isSuccess()) {
+                if (response.isSuccess()) {
+                    XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
+                    List<Transaction> pageTransactions = pageResult.getTransactions()
+                            .stream()
+                            .map(transaction -> {
+                                try {
+                                    return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
+                                            transaction.getFrom(), transaction.getId(), transaction.getTo(),
+                                            transaction.getType());
+                                } catch (SQLException e) {
+                                    // Log error or handle exception
+                                    return null;
+                                }
+                            })
+                            .filter(Objects::nonNull)
+                            .toList();
+
+                    if (!pageTransactions.isEmpty()) {
+                        allTransactions.addAll(pageTransactions);
+
+                        // Check if we've reached the end of available pages
+                        hasMorePages = pageResult.isHasNext() && page < pageResult.getTotalPages() - 1;
+
+                        if (hasMorePages) {
+                            page++;
+                            logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
+                        } else {
+                            logger.info("Reached last page ({})", page);
+                        }
+                    } else {
+                        logger.info("No more transactions found on page {}", page);
+                        hasMorePages = false;
+                    }
+                } else {
                     logger.info("Failed to fetch page {}: {}", page, response.getStatus());
-                    break;
+                    hasMorePages = false;
                 }
-
-                XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
-                List<Transaction> pageTransactions = pageResult.getTransactions()
-                        .stream()
-                        .map(transaction -> {
-                            try {
-                                return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
-                                        transaction.getFrom(), transaction.getId(), transaction.getTo(),
-                                        transaction.getType());
-                            } catch (SQLException e) {
-                                // Log error or handle exception
-                                return null;
-                            }
-                        })
-                        .filter(Objects::nonNull)
-                        .toList();
-                if (pageTransactions.isEmpty()) {
-                    logger.info("No more transactions found on page {}", page);
-                    break;
-                }
-
-                allTransactions.addAll(pageTransactions);
-
-                if (!pageResult.isHasNext() || page >= pageResult.getTotalPages() - 1) {
-                    logger.info("Reached last page ({})", page);
-                    break;
-                }
-
-                page++;
-                logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
             }
         } catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);

@@ -3,6 +3,10 @@ package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 
 public final class Constants {
+
+    private Constants() {
+
+    }
     /**
      * Endpoints
      * NOTE: If you refactor these make sure that they are reflected in the handlebars templates,

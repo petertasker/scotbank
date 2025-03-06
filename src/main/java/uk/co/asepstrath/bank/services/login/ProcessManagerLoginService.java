@@ -32,8 +32,6 @@ public class ProcessManagerLoginService extends BaseService {
      * Redirects to "/manager/dashboard" on success
      */
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {
-        Map<String, Object> model = createModel();
-
         // Validate manager ID
         String formManagerID = getFormValue(ctx, "managerid");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
