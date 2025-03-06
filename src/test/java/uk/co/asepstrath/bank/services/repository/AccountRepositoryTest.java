@@ -87,8 +87,10 @@ class AccountRepositoryTest {
 
         verify(connection).prepareStatement(contains("UPDATE Accounts"));
         verify(preparedStatement).setBigDecimal(1, new BigDecimal("90.21"));
-        verify(preparedStatement).setString(2, "12345");
-        verify(preparedStatement).executeUpdate();
+        preparedStatement.setBigDecimal(2, BigDecimal.ZERO);
+        preparedStatement.setString(3, "12345");
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
     }
 
     @Test
