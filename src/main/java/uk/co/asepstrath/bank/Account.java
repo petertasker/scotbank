@@ -64,6 +64,13 @@ public class Account {
         balance = balance.subtract(amount);
     }
 
+    public void overdraftWithdraw(BigDecimal amount) throws ArithmeticException {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) { // if withdraw amount is less or equal to 0
+            throw new ArithmeticException("Withdraw amount must be greater than 0");
+        }
+        balance = balance.subtract(amount);
+    }
+
     /**
      * Gets balance from the account
      * @return Account balance

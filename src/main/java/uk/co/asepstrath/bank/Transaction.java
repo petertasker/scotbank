@@ -151,7 +151,7 @@ public class Transaction {
                     accountRepository.updateBalance(connection, withdrawAccount);
                     return true;
                 } catch (ArithmeticException e) {
-                    logger.info("Arithmetic exception");
+                    logger.info("Arithmetic exception on withdraw");
                     return false;
                 }
 
@@ -162,12 +162,13 @@ public class Transaction {
                 Account receiverAccount = accountRepository.getAccount(connection, getTo());
                 if (senderAccount == null || receiverAccount == null) return false;
                 try {
-                    senderAccount.withdraw(getAmount());
+                    senderAccount.overdraftWithdraw(getAmount());
                     receiverAccount.deposit(getAmount());
                     accountRepository.updateBalance(connection, senderAccount);
                     accountRepository.updateBalance(connection, receiverAccount);
                     return true;
                 } catch (ArithmeticException e) {
+                    logger.info("Arithmetic exception on transfer");
                     return false;
                 }
 
@@ -177,10 +178,11 @@ public class Transaction {
                 Account payerAccount = accountRepository.getAccount(connection, getFrom());
                 if (payerAccount == null) return false;
                 try {
-                    payerAccount.withdraw(getAmount());
+                    payerAccount.overdraftWithdraw(getAmount());
                     accountRepository.updateBalance(connection, payerAccount);
                     return true;
                 } catch (ArithmeticException e) {
+                    logger.info("Arithmetic exception on payment");
                     return false;
                 }
 
