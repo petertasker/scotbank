@@ -63,6 +63,18 @@ public final class Constants {
     public static final String ACCOUNT_OBJECT_LIST = "accounts";
     public static final String ACCOUNT_OBJECT_LIST_EXISTS = "hasaccounts";
 
+    /**
+     * Password Hashing Constants
+     */
+    public static final int ITERATION = 100_000;
+    public static final int SALT_SIZE = 16;
+    public static final int KEY_LENGTH = 256;
+    public static final String ALGORITHM = "PBKDF2WithHmacSHA256";
+
+    /**
+     * Default Password Use
+     */
+    public static final String DEFAULT_PASSWORD = "MyFixedPassword";
 }
 
 

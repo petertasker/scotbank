@@ -6,6 +6,7 @@ import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.services.BaseService;
+import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -38,11 +39,13 @@ public class ProcessLoginService extends BaseService {
 
         // Check if form value exists and is not empty
         String formID = getFormValue(ctx, "accountid");
+        String password = getFormValue(ctx, "password");
+
         if (formID == null || formID.trim().isEmpty()) {
             addErrorMessage(model, "Account ID is required");
             return render(TEMPLATE_LOGIN, model);
         }
-        String password = getFormValue(ctx, "password");
+
         if (password == null || password.trim().isEmpty()) {
             addErrorMessage(model, "Password is required");
             return render(TEMPLATE_LOGIN, model);
@@ -83,14 +86,15 @@ public class ProcessLoginService extends BaseService {
                 addErrorMessage(model, "Account not found");
                 return render(TEMPLATE_LOGIN, model);
 
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                throw new RuntimeException(e);
             }
         }
         catch (SQLException e) {
             logger.error("Database error: {}", e.getMessage(), e);
             addErrorMessage(model, "Database error!");
             return render(TEMPLATE_LOGIN, model);
+        }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
         }
 
     }
