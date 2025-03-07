@@ -34,10 +34,13 @@ public final class Constants {
      * Error routes
      */
     public static final String ROUTE_ERROR = "/error";
-    public static final String ROUTE_404_NOT_FOUND = "/404_not_found";
     public static final String ROUTE_403_FORBIDDEN = "/403_forbidden";
+    public static final String ROUTE_404_NOT_FOUND = "/404_not_found";
     public static final String ROUTE_405_METHOD_NOT_ALLOWED = "/405_method_not_allowed";
     public static final String ROUTE_400_BAD_REQUEST = "/400_bad_request";
+
+    public static final String ROUTE_505_SERVER_ERROR = "/505_server_error";
+
     public static final String ROUTE_GENERIC_ERROR = "/generic_error";
 
     public static final String SESSION_SERVER_ERROR_TITLE = "errorTitle";
@@ -82,6 +85,18 @@ public final class Constants {
     public static final String ACCOUNT_OBJECT_LIST = "accounts";
     public static final String ACCOUNT_OBJECT_LIST_EXISTS = "hasaccounts";
 
+    /**
+     * Password Hashing Constants
+     */
+    public static final int ITERATION = 100_000;
+    public static final int SALT_SIZE = 16;
+    public static final int KEY_LENGTH = 256;
+    public static final String ALGORITHM = "PBKDF2WithHmacSHA256";
+
+    /**
+     * Default Password Use
+     */
+    public static final String DEFAULT_PASSWORD = "MyFixedPassword";
 }
 
 

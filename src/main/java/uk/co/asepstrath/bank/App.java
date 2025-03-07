@@ -62,6 +62,9 @@ public class App extends Jooby {
             else if (code == StatusCode.METHOD_NOT_ALLOWED) {
                 ctx.setResponseCode(405).sendRedirect(ROUTE_ERROR + ROUTE_405_METHOD_NOT_ALLOWED);
             }
+            else if (code == StatusCode.SERVER_ERROR) {
+                ctx.setResponseCode(505).sendRedirect(ROUTE_ERROR + ROUTE_505_SERVER_ERROR);
+            }
             else {
                 ctx.sendRedirect(ROUTE_ERROR + ROUTE_GENERIC_ERROR);
             }

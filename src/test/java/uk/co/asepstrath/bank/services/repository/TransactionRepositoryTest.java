@@ -68,4 +68,34 @@ class TransactionRepositoryTest {
         verify(preparedStatement).setBoolean(8, true);
         verify(preparedStatement).executeUpdate();
     }
+
+    @Test
+    void testInsertPayment() throws SQLException {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+        DateTime dateTime = new DateTime(2025, 2, 14, 8, 30, 0);
+        Transaction transaction = new Transaction(
+                dateTime,
+                new BigDecimal(100),
+                "thisshouldnotmatter",
+                "TXN456",
+                "iGotThisMoney",
+                "PAYMENT",
+                true
+        );
+
+        transactionRepository.insert(connection, transaction);
+
+        verify(connection).prepareStatement(anyString());
+        verify(preparedStatement).setTimestamp(1, new Timestamp(dateTime.getMillis()));
+        verify(preparedStatement).setString(2, "100");
+        verify(preparedStatement).setString(3, transaction.getFrom());
+        verify(preparedStatement).setString(4, transaction.getId());
+        verify(preparedStatement).setNull(5, Types.VARCHAR);
+        verify(preparedStatement).setString(6, transaction.getTo());
+        verify(preparedStatement).setString(7, "PAYMENT");
+        verify(preparedStatement).setBoolean(8, true);
+        verify(preparedStatement).executeUpdate();
+
+    }
 }

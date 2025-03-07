@@ -96,9 +96,9 @@ class ManagerRepositoryTest {
         assertEquals(2, accounts.size());
 
         // First account
-        assertEquals("A001", accounts.get(0).getAccountID());
-        assertEquals("Alice", accounts.get(0).getName());
-        assertEquals(new BigDecimal("1000.00"), accounts.get(0).getBalance());
+        assertEquals("A001", accounts.getFirst().getAccountID());
+        assertEquals("Alice", accounts.getFirst().getName());
+        assertEquals(new BigDecimal("1000.00"), accounts.getFirst().getBalance());
         assertTrue(accounts.get(0).isRoundUpEnabled());
 
         // Second account

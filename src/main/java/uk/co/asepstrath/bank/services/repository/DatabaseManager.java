@@ -10,9 +10,19 @@ import uk.co.asepstrath.bank.services.data.*;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
+
+import static uk.co.asepstrath.bank.Constants.DEFAULT_PASSWORD;
 
 /**
  * The manager for all repository interactions
@@ -96,7 +106,12 @@ public class DatabaseManager implements DatabaseOperations {
         // Insert accounts
         List<Account> accounts = accountDataService.fetchData();
         for (Account account : accounts) {
-            accountRepository.insert(connection, account);
+            try {
+                String password = generatePassword(account.getAccountID());
+                accountRepository.insert(connection, account,password);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                throw new SQLException("Unable to insert account");
+            }
         }
         logger.info("Accounts inserted");
 
@@ -121,5 +136,16 @@ public class DatabaseManager implements DatabaseOperations {
         }
         logger.info("Managers inserted");
     }
+
+    public static String generatePassword(String accountID) throws NoSuchAlgorithmException {
+        String plainTextPassword = accountID + DEFAULT_PASSWORD;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(plainTextPassword.getBytes(StandardCharsets.UTF_8));
+
+        String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
+
+        return "Psw@" + encodedHash.substring(0,8) + "$$";
+    }
+
 
 }

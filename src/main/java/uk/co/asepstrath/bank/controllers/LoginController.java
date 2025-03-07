@@ -7,6 +7,7 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
@@ -45,7 +46,7 @@ public class LoginController extends BaseController {
      */
     @POST
     @Path(ROUTE_PROCESS)
-    public void processLogin(Context ctx) {
+    public void processLogin(Context ctx) throws SQLException {
         processLoginService.processLogin(ctx);
     }
 }

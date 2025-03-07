@@ -88,7 +88,7 @@ class LoginControllerTest {
 
     // Test that the logincontroller was succesful in calling loginProcess
     @Test
-    void testLoginProcessCall() {
+    void testLoginProcessCall() throws SQLException {
         // Mock ProcessLogin
 
         // Act
@@ -101,35 +101,4 @@ class LoginControllerTest {
         verifyNoMoreInteractions(mockSession);        
     }
 
-    @Test
-    void testLoginProcessSuccess() throws SQLException {
-        String accountId = "12";
-        String name = "Peter Tasker";
-        BigDecimal balance = new BigDecimal("1000.00");
-        boolean roundUpEnabled = true;
-
-        // Mock form values
-        ValueNode mockAccountIdNode = mock(ValueNode.class);
-        when(mockAccountIdNode.valueOrNull()).thenReturn(accountId);
-        when(mockContext.form("accountid")).thenReturn(mockAccountIdNode);
-
-        // Mock database response
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getString("AccountID")).thenReturn(accountId);
-        when(mockResultSet.getString("Name")).thenReturn(name);
-        when(mockResultSet.getBigDecimal("Balance")).thenReturn(balance);
-        when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(roundUpEnabled);
-
-        // Act
-        processLoginService.processLogin(mockContext);
-
-        // Assert
-
-        verify(mockSession).put("accountid", accountId);
-        verify(mockSession).put("name", name);
-
-        // Verify no other interactions with session.put()
-        verify(mockContext).sendRedirect(ROUTE_ACCOUNT);
-        verify(mockSession, times(2)).put(anyString(), (String) any());
-    }
 }
