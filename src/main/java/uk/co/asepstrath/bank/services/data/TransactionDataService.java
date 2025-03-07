@@ -68,13 +68,22 @@ public class TransactionDataService implements DataService<Transaction> {
                             .stream()
                             .map(transaction -> {
                                 try {
+                                    if (transaction.getAmount() == null) {
+                                        logger.warn("Skipping transaction with null amount: {}", transaction.getId());
+                                        return null;
+                                    }
                                     return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
                                             transaction.getFrom(), transaction.getId(), transaction.getTo(),
                                             transaction.getType());
-                                } catch (SQLException e) {
-                                    // Log error or handle exception
-                                    return null;
-                                }
+                                    } catch (SQLException e) {
+                                        logger.error("SQL error processing transaction {}: {}", 
+                                            transaction.getId(), e.getMessage());
+                                        return null;
+                                    } catch (Exception e) {
+                                        logger.error("Unexpected error processing transaction {}: {}", 
+                                            transaction.getId(), e.getMessage());
+                                        return null;
+                                    }
                             })
                             .filter(Objects::nonNull)
                             .toList();
