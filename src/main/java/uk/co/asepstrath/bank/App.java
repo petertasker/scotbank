@@ -37,6 +37,7 @@ public class App extends Jooby {
             String path = ctx.getRequestPath();
             // add any JS/ CSS files here
             if (path.startsWith("/css")) return;
+            if (path.endsWith("/js")) return;
 
             Session session = ctx.sessionOrNull();
             boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(SESSION_ACCOUNT_ID).isPresent();
@@ -80,7 +81,7 @@ public class App extends Jooby {
         assets("/css/*", "/css");
         assets("/assets/*", "/assets");
         assets("/service_worker.js","/service_worker.js");
-
+        assets("/transaction-chart.js","/transaction-chart.js");
         /*
         Now we set up our controllers and their dependencies
          */
