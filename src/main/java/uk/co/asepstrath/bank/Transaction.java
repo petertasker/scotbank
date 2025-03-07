@@ -191,7 +191,16 @@ public class Transaction {
 
         payer.withdraw(getAmount());
         accountRepository.updateBalance(connection, payer);
-        return true;
+
+        try {
+            payer.withdraw(getAmount());
+            accountRepository.updateBalance(connection, payer);
+            return true;
+        } catch (ArithmeticException e) {
+            logger.info("Payment failed due to arithmetic exception: {}", e.getMessage());
+            return false;
+        }
+        // return true;
     }
 
     /**

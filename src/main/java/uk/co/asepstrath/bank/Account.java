@@ -59,6 +59,9 @@ public class Account {
      * @throws ArithmeticException Bad user input when withdrawing
      */
     public void withdraw(BigDecimal amount) throws ArithmeticException {
+        if (amount == null) {
+            throw new ArithmeticException("Withdrawal amount cannot be null");
+        }
         if (amount.compareTo(balance) > 0) { // if amount is greater than current Balance throw exception
             throw new ArithmeticException("Insufficient Funds: cannot withdrawal amount more than available balance");
         }
