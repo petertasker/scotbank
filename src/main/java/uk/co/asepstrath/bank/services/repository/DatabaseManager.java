@@ -10,11 +10,14 @@ import uk.co.asepstrath.bank.services.data.*;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
@@ -143,5 +146,6 @@ public class DatabaseManager implements DatabaseOperations {
 
         return "Psw@" + encodedHash.substring(0,8) + "$$";
     }
+
 
 }

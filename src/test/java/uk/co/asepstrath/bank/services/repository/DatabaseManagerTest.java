@@ -42,6 +42,8 @@ class DatabaseManagerTest {
     void setUp() throws SQLException {
         mockDataSource = mock(DataSource.class);
         mockConnection = mock(Connection.class);
+        mockPreparedStatement = mock(PreparedStatement.class);
+        mockResultSet = mock(ResultSet.class);
         mockLogger = mock(Logger.class);
 
         mockAccountRepository = mock(AccountRepository.class);
@@ -54,10 +56,17 @@ class DatabaseManagerTest {
         mockTransactionDataService = mock(DataService.class);
         mockManagerDataService = mock(DataService.class);
 
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        //when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getBigDecimal("Balance")).thenReturn(new BigDecimal("100"));
+        when(mockResultSet.getString("Name")).thenReturn("John Doe");
+        when(mockResultSet.getBoolean("RoundUpEnabled")).thenReturn(false);
+
         databaseManager = new DatabaseManager(mockDataSource, mockLogger);
 
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        //when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
     @Test

@@ -65,6 +65,7 @@ public class AccountRepository extends BaseRepository {
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
             statement.executeUpdate();
+            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(), account.isRoundUpEnabled(),Password);
         }
     }
 

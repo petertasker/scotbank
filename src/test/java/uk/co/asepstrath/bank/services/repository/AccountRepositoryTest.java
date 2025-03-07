@@ -77,7 +77,7 @@ class AccountRepositoryTest {
 
         Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
         assertThrows(SQLException.class, () -> {
-            accountRepository.insert(connection, account);
+            accountRepository.insert(connection, account,"Password123");
         });
     }
 
