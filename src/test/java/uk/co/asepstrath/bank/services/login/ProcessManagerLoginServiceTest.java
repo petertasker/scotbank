@@ -1,9 +1,7 @@
 package uk.co.asepstrath.bank.services.login;
 
-import io.jooby.Context;
-import io.jooby.ModelAndView;
-import io.jooby.Session;
-import io.jooby.ValueNode;
+import io.jooby.*;
+import io.jooby.exception.StatusCodeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -135,13 +133,17 @@ class ProcessManagerLoginServiceTest {
 
         when(dataSource.getConnection()).thenThrow(new SQLException("Database error!!"));
 
-        processManagerLoginService.processManagerLogin(context);
+        // Assert that the correct exception is thrown
+        StatusCodeException exception = assertThrows(StatusCodeException.class, () -> {
+            processManagerLoginService.processManagerLogin(context);
+        });
 
-        // Verify that redirect was called with the expected route
-        verify(context).sendRedirect(ROUTE_MANAGER + ROUTE_LOGIN);
+        // Verify exception properties
+        assertEquals(StatusCode.SERVER_ERROR, exception.getStatusCode());
+        assertEquals("A database error occurred", exception.getMessage());
 
         // Verify that an error was logged
-        verify(logger).error(anyString(), any(SQLException.class));
+        verify(logger).error(eq("Database error during manager login"), any(SQLException.class));
     }
 
 }
