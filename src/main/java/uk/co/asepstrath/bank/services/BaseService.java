@@ -7,17 +7,18 @@ import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-
+import java.util.Locale;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
+import java.text.DecimalFormat;
 import static uk.co.asepstrath.bank.Constants.*;
 
 public abstract class BaseService {
@@ -34,7 +35,17 @@ public abstract class BaseService {
         this.logger = logger;
         this.dataSource = null;
     }
+    protected String formatCurrency(BigDecimal amount) {
+        if (amount == null) {
+            return "£0.00"; // Default value if balance is null
+        }
 
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.UK);
+        DecimalFormat decimalFormat = (DecimalFormat) formatter;
+        decimalFormat.applyPattern("#,###.00");
+
+        return decimalFormat.format(amount);
+    }
     /**
      * Renders an endpoint
      *
@@ -163,7 +174,8 @@ public abstract class BaseService {
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
-        model.put("balance", balance);
+
+        model.put("balance", formatCurrency(balance));
     }
 
     /**
