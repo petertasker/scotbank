@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class AccountDataServiceTest {
+class AccountDataServiceFetcherTest {
 
     private AccountDataService accountDataService;
     private UnirestWrapper unirestWrapper;
@@ -22,9 +22,8 @@ class AccountDataServiceTest {
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        accountDataService = new AccountDataService();
-        // Inject the mocked UnirestWrapper into AccountDataService
-        accountDataService.setUnirestWrapper(unirestWrapper);
+        accountDataService = new AccountDataService(unirestWrapper);
+
     }
 
     @Test

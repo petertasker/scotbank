@@ -12,17 +12,17 @@ import java.util.List;
 /**
  * Fetches Account data from external API
  */
-public class AccountDataService implements DataService<Account> {
+public class AccountDataService extends DataService implements DataServiceFetcher<Account> {
     private final ObjectMapper mapper;
-    private UnirestWrapper unirestWrapper;
 
     public AccountDataService() {
+        super(new UnirestWrapper());
         this.mapper = new ObjectMapper();
-        this.unirestWrapper = new UnirestWrapper();
     }
 
-    public void setUnirestWrapper(UnirestWrapper wrapper) {
-        this.unirestWrapper = wrapper;
+    public AccountDataService(UnirestWrapper unirestWrapper) {
+        super(unirestWrapper);
+        this.mapper = new ObjectMapper();
     }
 
     /**
@@ -33,7 +33,7 @@ public class AccountDataService implements DataService<Account> {
     @Override
     public List<Account> fetchData() throws IOException {
         try {
-            HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/accounts");
+            HttpResponse<String> response = getUnirestWrapper().get("https://api.asep-strath.co.uk/api/accounts");
 
             if (response.isSuccess()) {
                 return mapper.readValue(response.getBody(), new TypeReference<>() {

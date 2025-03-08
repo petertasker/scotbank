@@ -21,29 +21,20 @@ import java.util.Objects;
 /**
  * Fetches Transaction data from external API
  */
-public class TransactionDataService implements DataService<Transaction> {
-
+public class TransactionDataService extends DataService implements DataServiceFetcher<Transaction> {
     private final Logger logger;
-    private UnirestWrapper unirestWrapper;
     private Connection connection;
 
-
-    public TransactionDataService() {
+    public TransactionDataService(UnirestWrapper unirestWrapper) {
+        super(unirestWrapper);
         this.logger = LoggerFactory.getLogger(TransactionDataService.class);
-        this.unirestWrapper = new UnirestWrapper();
     }
 
     public TransactionDataService(DataSource dataSource) throws SQLException {
-        super();
+        super(new UnirestWrapper());
         this.connection = dataSource.getConnection();
         this.logger = LoggerFactory.getLogger(TransactionDataService.class);
-        this.unirestWrapper = new UnirestWrapper();
     }
-
-    public void setUnirestWrapper(UnirestWrapper wrapper) {
-        this.unirestWrapper = wrapper;
-    }
-
 
     /**
      * Fetches a List of Transactions from an external API
@@ -53,60 +44,36 @@ public class TransactionDataService implements DataService<Transaction> {
     @Override
     public List<Transaction> fetchData() throws XMLStreamException {
         List<Transaction> allTransactions = new ArrayList<>();
+        XmlMapper xmlMapper = configureXmlMapper();
+
         int page = 0;
+        boolean hasMorePages = true;
+
         try {
-            XmlMapper xmlMapper = new XmlMapper();
-            xmlMapper.registerModule(new JodaModule());
-
-            boolean hasMorePages = true;
             while (hasMorePages) {
-                HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", page);
+                HttpResponse<String> response = fetchPage(page);
 
-                if (response.isSuccess()) {
-                    XmlParser pageResult = xmlMapper.readValue(response.getBody(), XmlParser.class);
-                    List<Transaction> pageTransactions = pageResult.getTransactions()
-                            .stream()
-                            .map(transaction -> {
-                                try {
-                                    if (transaction.getAmount() == null) {
-                                        logger.warn("Skipping transaction with null amount: {}", transaction.getId());
-                                        return null;
-                                    }
-                                    return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
-                                            transaction.getFrom(), transaction.getId(), transaction.getTo(),
-                                            transaction.getType());
-                                    } catch (SQLException e) {
-                                        logger.error("SQL error processing transaction {}: {}", 
-                                            transaction.getId(), e.getMessage());
-                                        return null;
-                                    } catch (Exception e) {
-                                        logger.error("Unexpected error processing transaction {}: {}", 
-                                            transaction.getId(), e.getMessage());
-                                        return null;
-                                    }
-                            })
-                            .filter(Objects::nonNull)
-                            .toList();
-
-                    if (!pageTransactions.isEmpty()) {
-                        allTransactions.addAll(pageTransactions);
-
-                        // Check if we've reached the end of available pages
-                        hasMorePages = pageResult.isHasNext() && page < pageResult.getTotalPages() - 1;
-
-                        if (hasMorePages) {
-                            page++;
-                            logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
-                        } else {
-                            logger.info("Reached last page ({})", page);
-                        }
-                    } else {
-                        logger.info("No more transactions found on page {}", page);
-                        hasMorePages = false;
-                    }
-                } else {
+                if (!response.isSuccess()) {
                     logger.info("Failed to fetch page {}: {}", page, response.getStatus());
-                    hasMorePages = false;
+                    break;
+                }
+
+                XmlParser pageResult = parseResponse(xmlMapper, response);
+                List<Transaction> pageTransactions = processTransactions(pageResult);
+
+                if (pageTransactions.isEmpty()) {
+                    logger.info("No more transactions found on page {}", page);
+                    break;
+                }
+
+                allTransactions.addAll(pageTransactions);
+                hasMorePages = determineIfMorePages(pageResult, page);
+
+                if (hasMorePages) {
+                    page++;
+                    logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
+                } else {
+                    logger.info("Reached last page ({})", page);
                 }
             }
         } catch (IOException e) {
@@ -116,4 +83,73 @@ public class TransactionDataService implements DataService<Transaction> {
         return allTransactions;
     }
 
+    /**
+     * Configures and returns an XmlMapper with necessary modules
+     */
+    private XmlMapper configureXmlMapper() {
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.registerModule(new JodaModule());
+        return xmlMapper;
+    }
+
+    /**
+     * Fetches a single page of transaction data
+     */
+    private HttpResponse<String> fetchPage(int page) {
+        return unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", page);
+    }
+
+    /**
+     * Parses the API response into an XmlParser object
+     */
+    private XmlParser parseResponse(XmlMapper xmlMapper, HttpResponse<String> response) throws IOException {
+        return xmlMapper.readValue(response.getBody(), XmlParser.class);
+    }
+
+    /**
+     * Processes transactions from a page result
+     */
+    private List<Transaction> processTransactions(XmlParser pageResult) {
+        return pageResult.getTransactions()
+                .stream()
+                .map(this::createTransactionSafely)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
+     * Safely creates a Transaction object, handling errors
+     */
+    private Transaction createTransactionSafely(Transaction transaction) {
+        try {
+            if (transaction.getAmount() == null) {
+                logger.warn("Skipping transaction with null amount: {}", transaction.getId());
+                return null;
+            }
+            return new Transaction(
+                    connection,
+                    transaction.getTimestamp(),
+                    transaction.getAmount(),
+                    transaction.getFrom(),
+                    transaction.getId(),
+                    transaction.getTo(),
+                    transaction.getType()
+            );
+        } catch (SQLException e) {
+            logger.error("SQL error processing transaction {}: {}",
+                    transaction.getId(), e.getMessage());
+            return null;
+        } catch (Exception e) {
+            logger.error("Unexpected error processing transaction {}: {}",
+                    transaction.getId(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Determines if there are more pages to fetch
+     */
+    private boolean determineIfMorePages(XmlParser pageResult, int currentPage) {
+        return pageResult.isHasNext() && currentPage < pageResult.getTotalPages() - 1;
+    }
 }
