@@ -41,9 +41,18 @@ public class ErrorController extends BaseController {
     }
 
     @GET
+    @Path(ROUTE_505_SERVER_ERROR)
+    public ModelAndView<Map<String, Object>> serverError() {
+        logger.info("Displaying 505 error page");
+        return errorService.renderInternalServerErrorPage();
+    }
+
+
+    @GET
     @Path(ROUTE_GENERIC_ERROR)
     public ModelAndView<Map<String, Object>> somethingWentWrong() {
         logger.info("Displaying generic error page");
         return errorService.renderGenericErrorPage();
     }
+
 }

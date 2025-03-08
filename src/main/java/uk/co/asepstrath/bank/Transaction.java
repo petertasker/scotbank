@@ -137,7 +137,6 @@ public class Transaction {
                 }
             };
         } catch (ArithmeticException e) {
-            logger.info("Arithmetic exception in transaction");
             return false;
         }
     }
@@ -197,10 +196,8 @@ public class Transaction {
             accountRepository.updateBalance(connection, payer);
             return true;
         } catch (ArithmeticException e) {
-            logger.info("Payment failed due to arithmetic exception: {}", e.getMessage());
             return false;
         }
-        // return true;
     }
 
     /**

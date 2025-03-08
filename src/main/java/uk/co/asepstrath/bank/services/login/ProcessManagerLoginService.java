@@ -3,6 +3,8 @@ package uk.co.asepstrath.bank.services.login;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Manager;
@@ -66,10 +68,9 @@ public class ProcessManagerLoginService extends BaseService {
                 }
             }
 
-        } catch (SQLException ex) {
-            logger.error("Database error during manager login", ex);
-            handleLoginFailure(ctx, "Database error during manager login");
-            return null;
+        } catch (SQLException e) {
+            logger.error("Database error during manager login", e);
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "A database error occurred");
         }
     }
 
