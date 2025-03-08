@@ -10,7 +10,10 @@ import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.ManagerRepository;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +31,6 @@ public class ViewManagerDashboardService extends ManagerService {
         managerRepository = new ManagerRepository(logger);
     }
 
-
     /**
      * Renders the manager's dashboard
      * @return The "/manager/dashboard" endpoint
@@ -43,11 +45,35 @@ public class ViewManagerDashboardService extends ManagerService {
             Session session = getSession(ctx);
             model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
             model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
-            model.put(ACCOUNT_OBJECT_LIST, accounts);
-            model.put(ACCOUNT_OBJECT_LIST_EXISTS, !accounts.isEmpty());
+
+            // Format the account balances without modifying the Account object
+            formatAccountBalancesForDisplay(model, accounts);
+
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         } catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
     }
+
+    /**
+     * Formats account balances for display in the model (without modifying Account objects)
+     */
+    private void formatAccountBalancesForDisplay(Map<String, Object> model, List<Account> accounts) {
+        List<Map<String, Object>> displayAccounts = new ArrayList<>();
+
+        for (Account account : accounts) {
+
+            Map<String, Object> displayAx = new HashMap<>();
+            String formattedBalance = formatCurrency(account.getBalance());
+
+            // Add the formatted balance to the model, not modifying the Account object
+            displayAx.put("accountid", account.getAccountID());
+            displayAx.put("name", account.getName());
+            displayAx.put("balance", formattedBalance);
+            displayAccounts.add(displayAx);
+        }
+        model.put(ACCOUNT_OBJECT_LIST_EXISTS, !displayAccounts.isEmpty());
+        model.put(ACCOUNT_OBJECT_LIST, displayAccounts);
+    }
+
 }

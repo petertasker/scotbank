@@ -76,9 +76,29 @@ public class AccountViewService extends AccountService {
      */
     private void loadTransactionHistory(Map<String, Object> model, String accountId) throws SQLException {
         try (Connection connection = getConnection()) {
+            // Get original transactions
             List<Transaction> transactions = fetchTransactions(connection, accountId);
-            model.put(TRANSACTION_OBJECT_LIST, transactions);
             model.put(TRANSACTION_OBJECT_LIST_EXISTS, !transactions.isEmpty());
+
+            // Create new list with display-ready transactions
+            List<Map<String, Object>> displayTransactions = new ArrayList<>();
+
+            for (Transaction transaction : transactions) {
+                Map<String, Object> displayTx = new HashMap<>();
+                displayTx.put("id", transaction.getId());
+                displayTx.put("timestamp", transaction.getTimestamp());
+                displayTx.put("from", transaction.getFrom());
+                displayTx.put("to", transaction.getTo());
+                displayTx.put("type", transaction.getType());
+                displayTx.put("status", transaction.getStatus());
+
+                // Format the amount
+                displayTx.put("amount", formatCurrency(transaction.getAmount()));
+
+                displayTransactions.add(displayTx);
+            }
+
+            model.put(TRANSACTION_OBJECT_LIST, displayTransactions);
         }
     }
 
