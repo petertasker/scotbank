@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
+import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +25,14 @@ public class ManagerRepository extends BaseRepository {
         CREATE TABLE Managers (
             ManagerID VARCHAR(255) NOT NULL,
             Name VARCHAR(255) NOT NULL,
+            ManagerPassword VARCHAR(512) NOT NULL,
             PRIMARY KEY (ManagerID)
         )
         """;
 
 
     private static final String SQL_INSERT_MANAGER =
-            "INSERT INTO Managers (ManagerID, Name) VALUES (?, ?)";
+            "INSERT INTO Managers (ManagerID, Name, ManagerPassword) VALUES (?, ?, ?)";
 
     private static final String SQL_SELECT_ALL_ACCOUNTS =
             "SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts";
@@ -49,11 +53,14 @@ public class ManagerRepository extends BaseRepository {
      * @param manager manager object
      * @throws SQLException Database connection failure
      */
-    public void insert(Connection connection, Manager manager) throws SQLException {
+    public void insert(Connection connection, Manager manager, String password) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String hashedPassword = HashingPasswordService.hashPassword(password);
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MANAGER)) {
             statement.setString(1, manager.getManagerID());
             statement.setString(2, manager.getName());
+            statement.setString(3, hashedPassword);
             statement.executeUpdate();
+            logger.info("Manager: {}, Name: {}, Password: {}", manager.getManagerID(), manager.getName(), password);
         }
     }
 

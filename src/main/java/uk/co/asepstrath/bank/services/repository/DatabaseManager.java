@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 
+import static uk.co.asepstrath.bank.Constants.DEFAULT_MANAGER_PASSWORD;
 import static uk.co.asepstrath.bank.Constants.DEFAULT_PASSWORD;
 
 /**
@@ -132,7 +133,12 @@ public class DatabaseManager implements DatabaseOperations {
         // Insert some hard coded managers
         List<Manager> managers = managerDataService.fetchData();
         for (Manager manager : managers) {
-            managerRepository.insert(connection, manager);
+            try {
+                String managerPassword = generateManagerPassword(manager.getManagerID());
+                managerRepository.insert(connection, manager, managerPassword);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                throw new RuntimeException(e);
+            }
         }
         logger.info("Managers inserted");
     }
@@ -145,6 +151,16 @@ public class DatabaseManager implements DatabaseOperations {
         String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
 
         return "Psw@" + encodedHash.substring(0,8) + "$$";
+    }
+
+    public static String generateManagerPassword(String managerID) throws NoSuchAlgorithmException {
+        String plainTextPassword = managerID + DEFAULT_MANAGER_PASSWORD;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(plainTextPassword.getBytes(StandardCharsets.UTF_8));
+
+        String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
+
+        return "Manager@" + encodedHash.substring(0,8) + "$$";
     }
 
 
