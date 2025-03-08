@@ -21,12 +21,18 @@ import java.util.Objects;
 import java.text.DecimalFormat;
 import static uk.co.asepstrath.bank.Constants.*;
 
-public abstract class BaseService {
+public abstract class BaseService implements
+        FormBigDecimalRetriever,
+        FormValueRetriever,
+        ViewRenderer,
+        CurrencyFormatter,
+        SessionMessageManager
+{
 
     private final DataSource dataSource;
     protected final Logger logger;
 
-    public BaseService(DataSource dataSource, Logger logger) {
+    protected BaseService(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -36,7 +42,8 @@ public abstract class BaseService {
         this.dataSource = null;
     }
 
-    protected String formatCurrency(BigDecimal amount) {
+    @Override
+    public String formatCurrency(BigDecimal amount) {
         if (amount == null) {
             return "£0.00"; // Default value if balance is null
         }
@@ -47,6 +54,8 @@ public abstract class BaseService {
 
         return decimalFormat.format(amount);
     }
+
+
     /**
      * Renders an endpoint
      *
@@ -54,7 +63,8 @@ public abstract class BaseService {
      * @param model    The map of which is modelled onto the view
      * @return an endpoint
      */
-    protected ModelAndView<Map<String, Object>> render(String viewName, Map<String, Object> model) {
+    @Override
+    public ModelAndView<Map<String, Object>> render(String viewName, Map<String, Object> model) {
         return new ModelAndView<>(viewName, model);
     }
 
@@ -68,33 +78,20 @@ public abstract class BaseService {
     }
 
 
-    /**
-     * Add a customer message to the session to be displayed after a redirect
-     *
-     * @param ctx     Session context
-     * @param key     the key value of the message
-     * @param message Custom message
-     */
-    protected void addMessageToSession(Context ctx, String key, String message) {
+    @Override
+    public void addMessageToSession(Context ctx, String key, String message) {
         Session session = ctx.session();
         session.put(key, message);
     }
 
-
-    protected void transferSessionAttributeToModel(Context ctx, String attributeName, Map<String, Object> model) {
+    @Override
+    public void transferSessionAttributeToModel(Context ctx, String attributeName, Map<String, Object> model) {
         Session session = ctx.session();
         model.put(attributeName, session.get(attributeName));
         logger.info("Removing session attribute: {}, {} ", attributeName, session.get(attributeName));
         session.remove(attributeName);
         logger.info("Removed session attribute: {}, {}", attributeName, model.get(attributeName));
 
-    }
-
-    protected void ensureManagerIsLoggedIn(Context ctx) {
-        Session session = getSession(ctx);
-        if (session.get(SESSION_MANAGER_NAME).isMissing() || session.get(SESSION_MANAGER_ID).isMissing()) {
-            throw new StatusCodeException(StatusCode.FORBIDDEN, "Manager access required");
-        }
     }
 
 
@@ -120,30 +117,6 @@ public abstract class BaseService {
     }
 
     /**
-     * Gets the value from a context form
-     *
-     * @param ctx  Session context
-     * @param name the name of the form input
-     * @return String value of the form input
-     */
-    protected String getFormValue(Context ctx, String name) {
-        return ctx.form(name).valueOrNull();
-    }
-
-    /**
-     * Gets a BigDecimal from a context form
-     *
-     * @param ctx  Session context
-     * @param name the name of the form input
-     * @return BigDecimal value of the form input
-     */
-    public BigDecimal getFormBigDecimal(Context ctx, String name) {
-        String value = Objects.requireNonNull(ctx.form(name).valueOrNull()).trim();
-        return new BigDecimal(value);
-    }
-
-
-    /**
      * Redirects the user, usually used when succeeding a process
      *
      * @param ctx Session context
@@ -154,42 +127,27 @@ public abstract class BaseService {
     }
 
     /**
-     * Puts the balance of an Account Object in the model to be rendered
+     * Gets the value from a context form
      *
-     * @param model     A Map
-     * @param accountId The unique identifier of the Account Object
+     * @param ctx  Session context
+     * @param name the name of the form input
+     * @return String value of the form input
      */
-    protected void putBalanceInModel(Map<String, Object> model, String accountId) {
-        BigDecimal balance = BigDecimal.ZERO;
-        try (PreparedStatement statement = getConnection().prepareStatement("select Balance from Accounts where AccountID = ?")) {
-            statement.setString(1, accountId);
-            ResultSet rs = statement.executeQuery();
-            try (rs) {
-                if (rs.next()) {
-                    balance = rs.getBigDecimal("Balance");
-                    logger.info("Account balance: {}", balance);
-                } else {
-                    logger.info("Account balance is empty");
-                }
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-
-        model.put("balance", formatCurrency(balance));
+    @Override
+    public String getFormValue(Context ctx, String name) {
+        return ctx.form(name).valueOrNull();
     }
-
-
 
     /**
-     * Gets the Account Object unique identifier from the session
+     * Gets a BigDecimal from a context form
      *
-     * @param ctx Session context
-     * @return Session accountId
+     * @param ctx  Session context
+     * @param name the name of the form input
+     * @return BigDecimal value of the form input
      */
-    protected String getAccountIdFromSession(Context ctx) {
-        Session session = getSession(ctx);
-        return String.valueOf(session.get(SESSION_ACCOUNT_ID));
+    @Override
+    public BigDecimal getFormBigDecimal(Context ctx, String name) {
+        String value = Objects.requireNonNull(ctx.form(name).valueOrNull()).trim();
+        return new BigDecimal(value);
     }
-
 }

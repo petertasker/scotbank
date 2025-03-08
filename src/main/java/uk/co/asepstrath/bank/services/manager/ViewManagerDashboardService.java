@@ -19,7 +19,7 @@ import static uk.co.asepstrath.bank.Constants.*;
 /**
  * The manager dashboard viewing service
  */
-public class ViewManagerDashboardService extends BaseService {
+public class ViewManagerDashboardService extends ManagerService {
 
     private final ManagerRepository managerRepository;
 

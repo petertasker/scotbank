@@ -46,7 +46,7 @@ public class AccountWithdrawService extends AccountService {
     public ModelAndView<Map<String, Object>> renderWithdraw(Context ctx) {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
-        putBalanceInModel(model, accountId);
+        putAccountBalancesInModel(model, accountId);
         transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
         return render(TEMPLATE_WITHDRAW, model);
     }

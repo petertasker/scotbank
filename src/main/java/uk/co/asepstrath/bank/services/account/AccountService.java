@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank.services.account;
 
 import io.jooby.Context;
+import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Constants;
@@ -12,10 +13,11 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
-import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
-import static uk.co.asepstrath.bank.Constants.SESSION_SUCCESS_MESSAGE;
+import static uk.co.asepstrath.bank.Constants.*;
 
 public class AccountService extends BaseService {
 
@@ -85,4 +87,49 @@ public class AccountService extends BaseService {
         }
     }
 
+    /**
+     * Gets the Account Object unique identifier from the session
+     *
+     * @param ctx Session context
+     * @return Session accountId
+     */
+    protected String getAccountIdFromSession(Context ctx) {
+        Session session = getSession(ctx);
+        return String.valueOf(session.get(SESSION_ACCOUNT_ID));
+    }
+
+    /**
+     * Puts both regular and roundUp balance in the model
+     * @param model The model to add the balances to
+     * @param accountId The account ID to get the balances for
+     */
+    protected void putAccountBalancesInModel(Map<String, Object> model, String accountId) {
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "SELECT Balance, RoundUpAmount, RoundUpEnabled FROM Accounts WHERE AccountID = ?")) {
+                statement.setString(1, accountId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        // Regular balance
+                        BigDecimal balance = resultSet.getBigDecimal("Balance");
+                        model.put("balance", formatCurrency(balance));
+                        logger.info("Account balance: {}", balance);
+
+                        // RoundUp balance
+                        boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
+                        model.put("roundUpEnabled", roundUpEnabled);
+
+                        if (roundUpEnabled) {
+                            BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                            model.put("roundUpBalance", formatCurrency(roundUpAmount));
+                        }
+                    } else {
+                        logger.info("Account balance is empty");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+    }
 }

@@ -10,18 +10,17 @@ import java.util.List;
 /**
  * Fetches Business data from external API
  */
-public class BusinessDataService implements DataService<Business> {
-
-    private UnirestWrapper unirestWrapper;
-
+public class BusinessDataService extends DataService implements DataServiceFetcher<Business> {
 
     public BusinessDataService() {
-        this.unirestWrapper = new UnirestWrapper();
+
     }
 
-    public void setUnirestWrapper(UnirestWrapper wrapper) {
-        this.unirestWrapper = wrapper;
+    public BusinessDataService(UnirestWrapper unirestWrapper) {
+        super(unirestWrapper);
     }
+
+
 
     /**
      * Gets business data from the API

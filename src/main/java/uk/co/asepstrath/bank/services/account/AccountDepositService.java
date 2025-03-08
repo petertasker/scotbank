@@ -26,12 +26,10 @@ import static uk.co.asepstrath.bank.Constants.*;
 public class AccountDepositService extends AccountService {
 
     private final AccountRepository accountRepository;
-    private final TransactionRepository transactionRepository;
 
     public AccountDepositService(DataSource datasource, Logger logger) {
         super(datasource, logger);
         accountRepository = new AccountRepository(logger);
-        transactionRepository = new TransactionRepository(logger);
     }
 
     /**
@@ -42,7 +40,7 @@ public class AccountDepositService extends AccountService {
     public ModelAndView<Map<String, Object>> renderDeposit(Context ctx) {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
-        putBalanceInModel(model, accountId);
+        putAccountBalancesInModel(model, accountId);
         transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
         return render(TEMPLATE_DEPOSIT, model);
     }
