@@ -23,10 +23,10 @@ import static uk.co.asepstrath.bank.Constants.*;
 
 public abstract class BaseService {
 
-    protected final DataSource dataSource;
+    private final DataSource dataSource;
     protected final Logger logger;
 
-    protected BaseService(DataSource dataSource, Logger logger) {
+    public BaseService(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
     }
@@ -35,6 +35,7 @@ public abstract class BaseService {
         this.logger = logger;
         this.dataSource = null;
     }
+
     protected String formatCurrency(BigDecimal amount) {
         if (amount == null) {
             return "£0.00"; // Default value if balance is null
@@ -178,21 +179,7 @@ public abstract class BaseService {
         model.put("balance", formatCurrency(balance));
     }
 
-    /**
-     * Updates the balance of an Account on the database end
-     *
-     * @param account an Account Object
-     * @throws SQLException Database connection failure
-     */
-    public void updateDatabaseBalance(Account account) throws SQLException {
 
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
-            statement.setBigDecimal(1, account.getBalance());
-            statement.setString(2, account.getAccountID());
-            statement.executeUpdate();
-        }
-    }
 
     /**
      * Gets the Account Object unique identifier from the session

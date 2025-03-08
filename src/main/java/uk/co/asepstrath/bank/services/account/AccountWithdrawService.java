@@ -23,15 +23,13 @@ import static uk.co.asepstrath.bank.Constants.*;
 /**
  * The Account withdrawal service
  */
-public class AccountWithdrawService extends BaseService {
+public class AccountWithdrawService extends AccountService {
 
     private final AccountRepository accountRepository;
-    private TransactionRepository transactionRepository;
 
     public AccountWithdrawService(DataSource datasource, Logger logger) {
         super(datasource, logger);
         accountRepository = new AccountRepository(logger);
-        transactionRepository = new TransactionRepository(logger);
     }
 
     public AccountWithdrawService(DataSource datasource, Logger logger, AccountRepository accountRepository) {
@@ -69,32 +67,8 @@ public class AccountWithdrawService extends BaseService {
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
             Account account = accountRepository.getAccount(connection, accountId);
             Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId, UUID.randomUUID().toString(), null, "WITHDRAWAL");
-
-            // Check if transaction would cause an overflow before insertion
-            try {
-                connection.setAutoCommit(false); // Start transaction
-                transactionRepository.insert(connection, transaction);
-            } catch (ArithmeticException e) {
-                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
-                logger.info("Transaction blocked due to potential balance overflow");
-                connection.setAutoCommit(true);
-                redirect(ctx, ROUTE_ACCOUNT);
-            } finally {
-                connection.setAutoCommit(true);
-            }
-
-            try {
-                account.withdraw(amount);
-                updateDatabaseBalance(account);
-                logger.info("Successfully withdrawn from account");
-                addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully withdrawn from account!");
-            } catch (ArithmeticException e) {
-                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Transaction failed: " + e.getMessage());
-                logger.error("Transaction failed", e);
-            } finally {
-                redirect(ctx, ROUTE_ACCOUNT);
-            }
+            executeTransaction(ctx, connection, transaction);
+            executeWithdrawal(ctx, account, amount);
         }
-
     }
 }
