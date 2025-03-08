@@ -9,10 +9,11 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.services.BaseService;
-
+import java.text.DecimalFormat;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.text.NumberFormat;
 import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.*;
@@ -109,7 +110,7 @@ public class AccountViewService extends BaseService {
 
                         if (roundUpEnabled) {
                             BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
-                            model.put("roundUpBalance", roundUpAmount);
+                            model.put("roundUpBalance", formatCurrency(roundUpAmount));
                         }
                     }
                 }
