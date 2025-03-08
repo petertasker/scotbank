@@ -97,6 +97,7 @@ public final class Constants {
      * Default Password Use
      */
     public static final String DEFAULT_PASSWORD = "MyFixedPassword";
+    public static final String DEFAULT_MANAGER_PASSWORD = "MyFixedManagerPassword";
 }
 
 
