@@ -42,13 +42,13 @@
             <hr>
             {{#each transactions}}
                 <div class="transaction">
-                    <p><strong>Date:</strong>{{timestamp}}</p>
-                    <p><strong>ID:</strong>{{id}}</p>
-                    <p><strong>Amount:</strong>£{{amount}}</p>
-                    <p><strong>From:</strong>{{from}}</p>
-                    <p><strong>To:</strong>{{to}}</p>
-                    <p><strong>Type:</strong>{{type}}</p>
-                    <p><strong>Status:</strong>{{#if status}}Accepted{{else}}Declined{{/if}}</p>
+                    <p><strong>Date: </strong>{{timestamp}}</p>
+                    <p><strong>ID: </strong>{{id}}</p>
+                    <p><strong>Amount: </strong>£{{amount}}</p>
+                    <p><strong>From: </strong>{{from}}</p>
+                    <p><strong>To: </strong>{{to}}</p>
+                    <p><strong>Type: </strong>{{type}}</p>
+                    <p><strong>Status: </strong>{{#if status}}Accepted{{else}}Declined{{/if}}</p>
                 </div>
             {{/each}}
         </div>

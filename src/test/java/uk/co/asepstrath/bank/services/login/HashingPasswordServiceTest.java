@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank.services.login;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;

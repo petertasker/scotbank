@@ -122,7 +122,7 @@ class ProcessLoginServiceTest {
     }
 
     @Test
-    void testProcessLoginSuccess() throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
+    void testProcessLoginSuccess() throws SQLException{
         String accountId = "account";
         String name = "Peter Tasker";
         String password = "password123";

@@ -2,9 +2,7 @@ package uk.co.asepstrath.bank.services.error;
 
 import io.jooby.ModelAndView;
 import io.jooby.StatusCode;
-import jdk.jshell.Snippet;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.services.BaseService;
 
 import java.util.Map;

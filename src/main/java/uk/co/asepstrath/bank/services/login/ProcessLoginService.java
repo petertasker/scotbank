@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.login;
 
 import io.jooby.Context;
-import io.jooby.ModelAndView;
 import io.jooby.Session;
 import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;

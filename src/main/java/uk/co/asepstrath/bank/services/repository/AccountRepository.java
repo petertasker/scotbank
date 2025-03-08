@@ -57,8 +57,8 @@ public class AccountRepository extends BaseRepository {
      * @param account An Account object
      * @throws SQLException Database connection failure
      */
-    public void insert(Connection connection, Account account, String Password) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String hashedPassword = HashingPasswordService.hashPassword(Password);
+    public void insert(Connection connection, Account account, String password) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String hashedPassword = HashingPasswordService.hashPassword(password);
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             statement.setString(1, account.getAccountID());
             statement.setString(2, hashedPassword);
@@ -66,7 +66,7 @@ public class AccountRepository extends BaseRepository {
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
             statement.executeUpdate();
-            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(), account.isRoundUpEnabled(),Password);
+            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(), account.isRoundUpEnabled(),password);
         }
     }
 

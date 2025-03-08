@@ -58,7 +58,6 @@ class DatabaseManagerTest {
 
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        //when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         when(mockResultSet.getBigDecimal("Balance")).thenReturn(new BigDecimal("100"));

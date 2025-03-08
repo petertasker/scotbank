@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class TransactionDataServiceTest {
+class TransactionDataServiceTest {
 
    private TransactionDataService transactionDataService;
    private UnirestWrapper unirestWrapper;
@@ -28,7 +28,7 @@ public class TransactionDataServiceTest {
    }
 
    @Test
-   void testFetchDataSuccess() throws XMLStreamException, SQLException {
+   void testFetchDataSuccess() throws XMLStreamException {
        // Mocking HttpResponse
        HttpResponse<String> initialResponse = mock(HttpResponse.class);
        HttpResponse<String> pageResponse = mock(HttpResponse.class);
