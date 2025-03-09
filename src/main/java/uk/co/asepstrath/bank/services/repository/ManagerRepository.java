@@ -25,14 +25,14 @@ public class ManagerRepository extends BaseRepository {
         CREATE TABLE Managers (
             ManagerID VARCHAR(255) NOT NULL,
             Name VARCHAR(255) NOT NULL,
-            ManagerPassword VARCHAR(512) NOT NULL,
+            Password VARCHAR(512) NOT NULL,
             PRIMARY KEY (ManagerID)
         )
         """;
 
 
     private static final String SQL_INSERT_MANAGER =
-            "INSERT INTO Managers (ManagerID, Name, ManagerPassword) VALUES (?, ?, ?)";
+            "INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)";
 
     private static final String SQL_SELECT_ALL_ACCOUNTS =
             "SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts";

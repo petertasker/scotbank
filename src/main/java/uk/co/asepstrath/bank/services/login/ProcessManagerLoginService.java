@@ -47,14 +47,14 @@ public class ProcessManagerLoginService extends BaseService {
 
         try (
                 Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement("SELECT ManagerID, Name, ManagerPassword FROM Managers WHERE ManagerID = ?")
+                PreparedStatement stmt = conn.prepareStatement("SELECT ManagerID, Name, Password FROM Managers WHERE ManagerID = ?")
         ) {
             stmt.setString(1, formManagerID);
 
             Manager manager = null;
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String hashedPassword = rs.getString("ManagerPassword");
+                    String hashedPassword = rs.getString("Password");
                     // Manager found - create session
                     if (HashingPasswordService.verifyPassword(password,hashedPassword)){
                         manager = new Manager(

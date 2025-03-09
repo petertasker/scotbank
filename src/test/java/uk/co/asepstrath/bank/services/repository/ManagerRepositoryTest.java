@@ -69,13 +69,21 @@ class ManagerRepositoryTest {
         Manager manager = new Manager("M123", "John Doe");
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
 
+
         // Act
+<<<<<<< Updated upstream
         String managerPsw = "SamplePassword";
         String hashedManagerPassword = HashingPasswordService.hashPassword(managerPsw);
         repository.insert(mockConnection, manager, hashedManagerPassword);
 
         // Assert
         verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name, ManagerPassword) VALUES (?, ?, ?)");
+=======
+        repository.insert(mockConnection, manager, "password");
+
+        // Assert
+        verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)");
+>>>>>>> Stashed changes
         verify(mockPreparedStatement).setString(1, "M123");
         verify(mockPreparedStatement).setString(2, "John Doe");
         verify(mockPreparedStatement).executeUpdate();
