@@ -1,16 +1,20 @@
 package uk.co.asepstrath.bank.services.data;
 
 import kong.unirest.core.HttpResponse;
+
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Transaction;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -148,6 +152,101 @@ class TransactionDataServiceFetcherTest {
         Field field = object.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(object, value);
+    }
+
+    @Test
+    void testFetchDataWithMultiplePages() throws XMLStreamException {
+        // Create mock responses for two pages
+        HttpResponse<String> firstPageResponse = mock(HttpResponse.class);
+        HttpResponse<String> lastPageResponse = mock(HttpResponse.class);
+        
+        when(firstPageResponse.isSuccess()).thenReturn(true);
+        when(lastPageResponse.isSuccess()).thenReturn(true);
+        
+        // First transaction on the first XML Page
+        String firstPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<pageResult>" +
+                "  <hasNext>true</hasNext>" +
+                "  <hasPrevious>false</hasPrevious>" +
+                "  <page>0</page>" +
+                "  <results xsi:type=\"transactionModel\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+                "    <timestamp>2023-04-10 08:43</timestamp>" +
+                "    <amount>48.00</amount>" +
+                "    <from>ae89778c-0e6e-4bf7-937f-462d66c55974</from>" +
+                "    <id>026b53d4-990a-4373-a88d-e491de65489f</id>" +
+                "    <to>YAN</to>" +
+                "    <type>PAYMENT</type>" +
+                "  </results>" +
+                "  <size>100</size>" +
+                "  <totalPages>154</totalPages>" +
+                "</pageResult>";
+        
+        // First transaction on the last XML Page
+        String lastPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<pageResult>" +
+                "  <hasNext>false</hasNext>" +
+                "  <hasPrevious>true</hasPrevious>" +
+                "  <page>153</page>" +
+                "  <results xsi:type=\"transactionModel\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+                "    <timestamp>2023-11-28 08:43</timestamp>" +
+                "    <amount>255.25</amount>" +
+                "    <from>c9b72caa-4f29-4795-b17c-87c3332aa8a1</from>" +
+                "    <id>8b2740bb-ed24-43d3-bf02-3264107db16c</id>" +
+                "    <type>WITHDRAWAL</type>" +
+                "  </results>" +
+                "  <size>100</size>" +
+                "  <totalPages>154</totalPages>" +
+                "</pageResult>";
+        
+        when(firstPageResponse.getBody()).thenReturn(firstPageXml);
+        when(lastPageResponse.getBody()).thenReturn(lastPageXml);
+        
+        // Configure the wrapper to return different responses for different pages
+        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0))
+            .thenReturn(firstPageResponse);
+        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 1))
+            .thenReturn(lastPageResponse);
+        
+        // Execute the method
+        List<Transaction> transactions = transactionDataService.fetchData();
+        
+        // Verify results
+        assertNotNull(transactions);
+        verify(unirestWrapper).get("https://api.asep-strath.co.uk/api/transactions", "page", 0);
+        verify(unirestWrapper, never()).get("https://api.asep-strath.co.uk/api/transactions", "page", 153);
+    }
+
+    @Test
+    void testCreateTransactionSafelyWithSQLException() throws Exception {
+        // Create mocks
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        
+        // Set up mock to throw SQLException
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Test SQL Exception"));
+        
+        TransactionDataService service = new TransactionDataService(mockDataSource);
+        
+        // Create a transaction that will trigger SQL code in createTransactionSafely
+        Transaction transaction = new Transaction();
+        setPrivateField(transaction, "timestamp", new DateTime());
+        setPrivateField(transaction, "amount", new BigDecimal("100.00"));
+        setPrivateField(transaction, "id", "sql-error-id");
+        setPrivateField(transaction, "from", "mock-from");
+        setPrivateField(transaction, "to", "mock-to");
+        setPrivateField(transaction, "type", "TRANSFER");
+        
+        // Access private createTransactionSafely method
+        Method createMethod = TransactionDataService.class.getDeclaredMethod(
+            "createTransactionSafely", Transaction.class);
+        createMethod.setAccessible(true);
+        
+        // Call the method - should return null due to SQL exception
+        Transaction result = (Transaction) createMethod.invoke(service, transaction);
+        
+        // Verify result is null due to exception
+        assertNull(result);
     }
 }
 
