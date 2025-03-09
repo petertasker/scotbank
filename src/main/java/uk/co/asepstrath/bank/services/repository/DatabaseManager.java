@@ -162,6 +162,4 @@ public class DatabaseManager implements DatabaseOperations {
         }
         logger.info("Managers inserted");
     }
-
-
 }
