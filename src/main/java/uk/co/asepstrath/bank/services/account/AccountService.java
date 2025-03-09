@@ -36,8 +36,8 @@ public class AccountService extends BaseService {
      */
     void updateDatabaseBalance(Account account) throws SQLException {
 
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(
+                "UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             statement.setBigDecimal(1, account.getBalance());
             statement.setString(2, account.getAccountID());
             statement.executeUpdate();
@@ -49,12 +49,14 @@ public class AccountService extends BaseService {
         try {
             connection.setAutoCommit(false); // Start transaction
             transactionRepository.insert(connection, transaction);
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
             logger.info("Transaction blocked due to potential balance overflow");
             connection.setAutoCommit(true);
             redirect(ctx, ROUTE_ACCOUNT);
-        } finally {
+        }
+        finally {
             connection.setAutoCommit(true);
         }
     }
@@ -65,10 +67,12 @@ public class AccountService extends BaseService {
             updateDatabaseBalance(account);
             logger.info("Successfully deposited into account");
             addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully deposited into account!");
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             logger.info("Unable to deposit into account");
             addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
-        } finally {
+        }
+        finally {
             redirect(ctx, ROUTE_ACCOUNT);
         }
     }
@@ -79,10 +83,12 @@ public class AccountService extends BaseService {
             updateDatabaseBalance(account);
             logger.info("Successfully withdrawn from account");
             addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully withdrawn from account!");
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Transaction failed: " + e.getMessage());
             logger.error("Transaction failed", e);
-        } finally {
+        }
+        finally {
             redirect(ctx, ROUTE_ACCOUNT);
         }
     }
@@ -100,7 +106,8 @@ public class AccountService extends BaseService {
 
     /**
      * Puts both regular and roundUp balance in the model
-     * @param model The model to add the balances to
+     *
+     * @param model     The model to add the balances to
      * @param accountId The account ID to get the balances for
      */
     protected void putAccountBalancesInModel(Map<String, Object> model, String accountId) {
@@ -123,12 +130,14 @@ public class AccountService extends BaseService {
                             BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
                             model.put("roundUpBalance", formatCurrency(roundUpAmount));
                         }
-                    } else {
+                    }
+                    else {
                         logger.info("Account balance is empty");
                     }
                 }
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.error(e.getMessage());
         }
     }

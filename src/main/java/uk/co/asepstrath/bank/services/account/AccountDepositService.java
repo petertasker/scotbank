@@ -4,21 +4,19 @@ import io.jooby.Context;
 import io.jooby.ModelAndView;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
-
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
-import uk.co.asepstrath.bank.services.repository.TransactionRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.UUID;
 
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_DEPOSIT;
 
 /**
  * The Account deposit service
@@ -34,6 +32,7 @@ public class AccountDepositService extends AccountService {
 
     /**
      * Displays the deposit endpoint
+     *
      * @param ctx Session context
      * @return The "/account/deposit" endpoint
      */
@@ -59,7 +58,8 @@ public class AccountDepositService extends AccountService {
 
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
             Account account = accountRepository.getAccount(connection, accountId);
-            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
+            Transaction transaction = new Transaction(connection, DateTime.now(), amount, null,
+                    UUID.randomUUID().toString(), accountId, "DEPOSIT");
             executeTransaction(ctx, connection, transaction);
             executeDeposit(ctx, account, amount);
         }

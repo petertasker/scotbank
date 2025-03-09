@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 
+import static uk.co.asepstrath.bank.Constants.DEFAULT_MANAGER_PASSWORD;
 import static uk.co.asepstrath.bank.Constants.DEFAULT_PASSWORD;
 
 /**
@@ -56,11 +57,31 @@ public class DatabaseManager implements DatabaseOperations {
 
     }
 
+    public static String generatePassword(String accountID) throws NoSuchAlgorithmException {
+        String plainTextPassword = accountID + DEFAULT_PASSWORD;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(plainTextPassword.getBytes(StandardCharsets.UTF_8));
+
+        String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
+
+        return "Psw@" + encodedHash.substring(0, 8) + "$$";
+    }
+
+    public static String generateManagerPassword(String managerID) throws NoSuchAlgorithmException {
+        String plainTextPassword = managerID + DEFAULT_MANAGER_PASSWORD;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(plainTextPassword.getBytes(StandardCharsets.UTF_8));
+
+        String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
+
+        return "Manager@" + encodedHash.substring(0, 8) + "$$";
+    }
+
     /**
      * Instantiates the creation and insertion of API data
      *
-     * @throws SQLException If database connection or queries fail
-     * @throws IOException If API parsing fails
+     * @throws SQLException       If database connection or queries fail
+     * @throws IOException        If API parsing fails
      * @throws XMLStreamException If XML parsing fails
      */
     public void initialise() throws SQLException, IOException, XMLStreamException {
@@ -70,9 +91,9 @@ public class DatabaseManager implements DatabaseOperations {
         }
     }
 
-
     /**
      * Creates all the tables used in the database
+     *
      * @param connection Database connection
      * @throws SQLException Database connection failure
      */
@@ -93,9 +114,10 @@ public class DatabaseManager implements DatabaseOperations {
 
     /**
      * Inserts initial API data into the database
+     *
      * @param connection Database connection
-     * @throws SQLException Database connection failure
-     * @throws IOException API parsing failure
+     * @throws SQLException       Database connection failure
+     * @throws IOException        API parsing failure
      * @throws XMLStreamException API parsing failure
      */
     @Override
@@ -105,8 +127,9 @@ public class DatabaseManager implements DatabaseOperations {
         for (Account account : accounts) {
             try {
                 String password = generatePassword(account.getAccountID());
-                accountRepository.insert(connection, account,password);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                accountRepository.insert(connection, account, password);
+            }
+            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 throw new SQLException("Unable to insert account");
             }
         }
@@ -129,19 +152,15 @@ public class DatabaseManager implements DatabaseOperations {
         // Insert some hard coded managers
         List<Manager> managers = managerDataService.fetchData();
         for (Manager manager : managers) {
-            managerRepository.insert(connection, manager);
+            try {
+                String managerPassword = generateManagerPassword(manager.getManagerID());
+                managerRepository.insert(connection, manager, managerPassword);
+            }
+            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                throw new RuntimeException(e);
+            }
         }
         logger.info("Managers inserted");
-    }
-
-    public static String generatePassword(String accountID) throws NoSuchAlgorithmException {
-        String plainTextPassword = accountID + DEFAULT_PASSWORD;
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(plainTextPassword.getBytes(StandardCharsets.UTF_8));
-
-        String encodedHash = Base64.getEncoder().withoutPadding().encodeToString(hash);
-
-        return "Psw@" + encodedHash.substring(0,8) + "$$";
     }
 
 

@@ -20,6 +20,7 @@ public class Business {
 
     /**
      * Gets the Unique ID of the Business
+     *
      * @return The Business ID
      */
     public String getID() {
@@ -28,25 +29,28 @@ public class Business {
 
     /**
      * Gets the name of the Business
+     *
      * @return The Business name
      */
-    public String getName(){
+    public String getName() {
         return name;
     }
 
     /**
      * Gets the category of the Business
+     *
      * @return The business category
      */
-    public String getCategory(){
+    public String getCategory() {
         return category;
     }
 
     /**
      * Returns the boolean value of sanctioned
+     *
      * @return Sanctioned
      */
-    public boolean isSanctioned(){
+    public boolean isSanctioned() {
         return sanctioned;
     }
 }

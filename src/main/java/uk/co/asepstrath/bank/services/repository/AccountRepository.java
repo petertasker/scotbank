@@ -18,16 +18,16 @@ import java.sql.SQLException;
 public class AccountRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
-            CREATE TABLE Accounts (
-            AccountID VARCHAR(255) NOT NULL,
-            Password VARCHAR(255) NOT NULL,
-            Balance DECIMAL(12,2) NOT NULL,
-            Name VARCHAR(255) NOT NULL,
-            RoundUpEnabled BIT NOT NULL,
-            RoundUpAmount DECIMAL(12,2) NULL DEFAULT 0,
-            PRIMARY KEY (AccountID)
-        )
-        """;
+                CREATE TABLE Accounts (
+                AccountID VARCHAR(255) NOT NULL,
+                Password VARCHAR(255) NOT NULL,
+                Balance DECIMAL(12,2) NOT NULL,
+                Name VARCHAR(255) NOT NULL,
+                RoundUpEnabled BIT NOT NULL,
+                RoundUpAmount DECIMAL(12,2) NULL DEFAULT 0,
+                PRIMARY KEY (AccountID)
+            )
+            """;
 
     private static final String SQL_INSERT_ACCOUNT =
             "INSERT INTO Accounts (AccountID, Password, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?, ?)";
@@ -44,6 +44,7 @@ public class AccountRepository extends BaseRepository {
 
     /**
      * Creates the Account table
+     *
      * @param connection Database connection
      * @throws SQLException Database connection failure
      */
@@ -53,11 +54,13 @@ public class AccountRepository extends BaseRepository {
 
     /**
      * Inserts an Account into the Account table
+     *
      * @param connection Database Connection
-     * @param account An Account object
+     * @param account    An Account object
      * @throws SQLException Database connection failure
      */
-    public void insert(Connection connection, Account account, String password) throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public void insert(Connection connection, Account account, String password) throws SQLException,
+            NoSuchAlgorithmException, InvalidKeySpecException {
         String hashedPassword = HashingPasswordService.hashPassword(password);
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             statement.setString(1, account.getAccountID());
@@ -66,20 +69,23 @@ public class AccountRepository extends BaseRepository {
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
             statement.executeUpdate();
-            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(), account.isRoundUpEnabled(),password);
+            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(),
+                    account.isRoundUpEnabled(), password);
         }
     }
 
     /**
      * Updates the balance of an Account
+     *
      * @param connection Database connection
-     * @param account An Account object
+     * @param account    An Account object
      * @throws SQLException Database connection failure
      */
     public void updateBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BALANCE)) {
             statement.setBigDecimal(1, account.getBalance());
-            statement.setBigDecimal(2, account.getRoundUpBalance() != null ? account.getRoundUpBalance() : BigDecimal.ZERO);
+            statement.setBigDecimal(2,
+                    account.getRoundUpBalance() != null ? account.getRoundUpBalance() : BigDecimal.ZERO);
             statement.setString(3, account.getAccountID());
             statement.executeUpdate();
         }
@@ -87,8 +93,9 @@ public class AccountRepository extends BaseRepository {
 
     /**
      * Gets an Account object from the database
+     *
      * @param connection Database connection
-     * @param accountID Unique identifier of an account
+     * @param accountID  Unique identifier of an account
      * @return An Account object parsed from the database
      * @throws SQLException Database connection failure
      */

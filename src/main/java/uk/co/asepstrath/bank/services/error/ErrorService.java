@@ -24,9 +24,9 @@ public class ErrorService extends BaseService {
         model.put(SESSION_SERVER_ERROR_MESSAGE, "You don't have permission to access this resource.");
         model.put(SESSION_SERVER_ERROR_SUGGESTION, "Please login with appropriate credentials.");
         return render(TEMPLATE_ERROR, model);
-   }
+    }
 
-   // 404
+    // 404
     public ModelAndView<Map<String, Object>> renderNotFoundPage() {
         logger.debug("Rendering 404 not found page");
         Map<String, Object> model = createModel();
@@ -44,7 +44,8 @@ public class ErrorService extends BaseService {
         model.put(SESSION_SERVER_ERROR_TITLE, "Method Not Allowed");
         model.put(SESSION_SERVER_ERROR_CODE, StatusCode.METHOD_NOT_ALLOWED_CODE);
         model.put(SESSION_SERVER_ERROR_MESSAGE, "The requested method is not supported for this resource.");
-        model.put(SESSION_SERVER_ERROR_SUGGESTION, "Please use a different method or contact support if you believe this is an error.");
+        model.put(SESSION_SERVER_ERROR_SUGGESTION,
+                "Please use a different method or contact support if you believe this is an error.");
         return render(TEMPLATE_ERROR, model);
     }
 
@@ -55,7 +56,8 @@ public class ErrorService extends BaseService {
         model.put(SESSION_SERVER_ERROR_TITLE, "Something Went Wrong");
         model.put(SESSION_SERVER_ERROR_CODE, StatusCode.BAD_REQUEST_CODE);
         model.put(SESSION_SERVER_ERROR_MESSAGE, "We encountered an unexpected issue while processing your request.");
-        model.put(SESSION_SERVER_ERROR_SUGGESTION, "Please try again later or contact customer support if the problem persists.");
+        model.put(SESSION_SERVER_ERROR_SUGGESTION,
+                "Please try again later or contact customer support if the problem persists.");
         return render(TEMPLATE_ERROR, model);
     }
 
@@ -66,7 +68,8 @@ public class ErrorService extends BaseService {
         model.put(SESSION_SERVER_ERROR_TITLE, "Internal Server Error");
         model.put(SESSION_SERVER_ERROR_CODE, StatusCode.SERVER_ERROR_CODE);
         model.put(SESSION_SERVER_ERROR_MESSAGE, "An internal database error occurred.");
-        model.put(SESSION_SERVER_ERROR_SUGGESTION, "Please try again later or contact support if the problem persists.");
+        model.put(SESSION_SERVER_ERROR_SUGGESTION,
+                "Please try again later or contact support if the problem persists.");
         return render(TEMPLATE_ERROR, model);
     }
 }

@@ -6,11 +6,9 @@ import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
-import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.ManagerRepository;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +31,7 @@ public class ViewManagerDashboardService extends ManagerService {
 
     /**
      * Renders the manager's dashboard
+     *
      * @return The "/manager/dashboard" endpoint
      */
     public ModelAndView<Map<String, Object>> renderDashboard(Context ctx) {
@@ -50,7 +49,8 @@ public class ViewManagerDashboardService extends ManagerService {
             formatAccountBalancesForDisplay(model, accounts);
 
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
     }

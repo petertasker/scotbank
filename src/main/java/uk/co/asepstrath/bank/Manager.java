@@ -5,8 +5,8 @@ package uk.co.asepstrath.bank;
  */
 public class Manager {
 
-    private String managerID;
-    private String name;
+    private final String managerID;
+    private final String name;
 
     public Manager(String managerID, String name) {
         this.managerID = managerID;
@@ -15,6 +15,7 @@ public class Manager {
 
     /**
      * Gets the unique ID of the Manager
+     *
      * @return ManagerID
      */
     public String getManagerID() {
@@ -23,6 +24,7 @@ public class Manager {
 
     /**
      * Gets the name of the Manager
+     *
      * @return name
      */
     public String getName() {
@@ -31,6 +33,7 @@ public class Manager {
 
     /**
      * Returns a String interpretation of a Manager
+     *
      * @return A String of the Manager
      */
     public String toString() {

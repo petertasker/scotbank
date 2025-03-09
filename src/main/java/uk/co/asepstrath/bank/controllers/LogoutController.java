@@ -6,7 +6,6 @@ import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.logout.LogoutService;
 
-
 import static uk.co.asepstrath.bank.Constants.ROUTE_LOGOUT;
 
 @Path(ROUTE_LOGOUT)

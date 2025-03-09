@@ -1,4 +1,5 @@
 package uk.co.asepstrath.bank.controllers;
+
 import io.jooby.ModelAndView;
 import io.jooby.annotation.GET;
 import io.jooby.annotation.Path;
