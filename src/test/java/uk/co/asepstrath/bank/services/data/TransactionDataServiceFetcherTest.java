@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class TransactionDataServiceTest {
+class TransactionDataServiceFetcherTest {
 
    private TransactionDataService transactionDataService;
    private UnirestWrapper unirestWrapper;
@@ -23,8 +23,7 @@ class TransactionDataServiceTest {
    @BeforeEach
    void setUp() {
        unirestWrapper = mock(UnirestWrapper.class);
-       transactionDataService = new TransactionDataService();
-       transactionDataService.setUnirestWrapper(unirestWrapper);
+       transactionDataService = new TransactionDataService(unirestWrapper);
    }
 
    @Test

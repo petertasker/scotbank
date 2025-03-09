@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Fetches some hard-coded managers
  */
-public class ManagerDataService implements DataService<Manager> {
+public class ManagerDataService implements DataServiceFetcher<Manager> {
 
     /**
      * Generates a list of manager objects

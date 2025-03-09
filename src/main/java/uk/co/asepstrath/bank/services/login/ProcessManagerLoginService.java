@@ -6,7 +6,6 @@ import io.jooby.Session;
 import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.services.BaseService;
 
@@ -40,7 +39,7 @@ public class ProcessManagerLoginService extends BaseService {
         String formManagerID = getFormValue(ctx, "managerid");
         String password = getFormValue(ctx, "password");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
-            addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
             redirect(ctx, ROUTE_MANAGER + ROUTE_LOGIN);
             return null;
         }
@@ -81,7 +80,7 @@ public class ProcessManagerLoginService extends BaseService {
     }
 
     private void handleLoginFailure(Context ctx, String message) {
-        addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, message);
+        addMessageToSession(ctx, SESSION_ERROR_MESSAGE, message);
         redirect(ctx, ROUTE_MANAGER + ROUTE_LOGIN);
     }
 

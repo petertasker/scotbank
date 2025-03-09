@@ -5,6 +5,7 @@ import io.jooby.ModelAndView;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 
+import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
@@ -22,15 +23,13 @@ import static uk.co.asepstrath.bank.Constants.*;
 /**
  * The Account deposit service
  */
-public class AccountDepositService extends BaseService {
+public class AccountDepositService extends AccountService {
 
     private final AccountRepository accountRepository;
-    private final TransactionRepository transactionRepository;
 
     public AccountDepositService(DataSource datasource, Logger logger) {
         super(datasource, logger);
         accountRepository = new AccountRepository(logger);
-        transactionRepository = new TransactionRepository(logger);
     }
 
     /**
@@ -41,7 +40,7 @@ public class AccountDepositService extends BaseService {
     public ModelAndView<Map<String, Object>> renderDeposit(Context ctx) {
         Map<String, Object> model = createModel();
         String accountId = getAccountIdFromSession(ctx);
-        putBalanceInModel(model, accountId);
+        putAccountBalancesInModel(model, accountId);
         transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
         return render(TEMPLATE_DEPOSIT, model);
     }
@@ -61,31 +60,8 @@ public class AccountDepositService extends BaseService {
             BigDecimal amount = getFormBigDecimal(ctx, "depositamount");
             Account account = accountRepository.getAccount(connection, accountId);
             Transaction transaction = new Transaction(connection, DateTime.now(), amount, null, UUID.randomUUID().toString(), accountId, "DEPOSIT");
-
-            try {
-                connection.setAutoCommit(false);
-                transactionRepository.insert(connection, transaction);
-            } catch (ArithmeticException e) {
-                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
-                logger.info("Transaction blocked due to potential balance overflow");
-                connection.setAutoCommit(true);
-                redirect(ctx, ROUTE_ACCOUNT);
-            } finally {
-                connection.setAutoCommit(true);
-            }
-
-
-            try {
-                account.deposit(amount);
-                updateDatabaseBalance(account);
-                logger.info("Successfully deposited into account");
-                addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "Successfully deposited into account!");
-            } catch (ArithmeticException e) {
-                logger.info("Unable to deposit into account");
-                addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, e.getMessage());
-            } finally {
-                redirect(ctx, ROUTE_ACCOUNT);
-            }
+            executeTransaction(ctx, connection, transaction);
+            executeDeposit(ctx, account, amount);
         }
     }
 }

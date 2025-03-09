@@ -28,58 +28,33 @@ public class ProcessLoginService extends BaseService {
         super(dataSource, logger);
     }
 
-    /**
-     * Processes user login
-     * @param ctx Session context
-     * Redirects to the "/account" endpoint on success
-     */
-    public void processLogin(Context ctx) throws SQLException {
-        // Check if form value exists and is not empty
+    public void processLogin(Context ctx) {
         String formID = getFormValue(ctx, "accountid");
         String password = getFormValue(ctx, "password");
 
+        // Check for empty accountID
         if (formID == null || formID.trim().isEmpty()) {
-            addMessageToSession(ctx, Constants.SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
             redirect(ctx, ROUTE_LOGIN);
             return;
         }
 
+        // Check for empty password
         if (password == null || password.trim().isEmpty()) {
-            addMessageToSession(ctx,SESSION_ERROR_MESSAGE, "Password must not br empty");
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Password cannot be empty.");
             redirect(ctx, ROUTE_LOGIN);
             return;
         }
 
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT AccountID, Password, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
+        try {
+            Account account = authenticateUser(formID, password);
 
-            ps.setString(1, formID);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                logger.info("Processing account login");
-
-                Account account = null;
-                if (rs.next()) {  // Changed while to if since we expect one result
-                    String hashedPassword = rs.getString("Password");
-                    if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
-                        logger.info("Found account");
-                        account = new Account(
-                                rs.getString("AccountID"),
-                                rs.getString("Name"),
-                                rs.getBigDecimal("Balance"),
-                                rs.getBoolean("RoundUpEnabled")
-                        );
-
-                        // Add accountID to session
-                        Session session = ctx.session();
-                        session.put(SESSION_ACCOUNT_ID, account.getAccountID());
-                        session.put(SESSION_ACCOUNT_NAME, account.getName());
-                        redirect(ctx, ROUTE_ACCOUNT);
-                        return; // Added return to exit the method
-                    }
-                }
-
-                // If we get here, either no account was found or password didn't match
+            if (account != null) {
+                // Authentication successful - set up session and redirect
+                createUserSession(ctx, account);
+                redirect(ctx, ROUTE_ACCOUNT);
+            } else {
+                // Authentication failed
                 addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Incorrect username or password.");
                 redirect(ctx, ROUTE_LOGIN);
             }
@@ -87,5 +62,47 @@ public class ProcessLoginService extends BaseService {
             logger.error("Database error: {}", e.getMessage(), e);
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Failed to reach database");
         }
+    }
+
+    /**
+     * Authenticates a user by ID and password
+     * @return Account if authenticated, null otherwise
+     */
+    private Account authenticateUser(String accountId, String password)
+            throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "SELECT AccountID, Password, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
+
+            ps.setString(1, accountId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                logger.info("Processing account login");
+
+                if (rs.next()) {
+                    String hashedPassword = rs.getString("Password");
+                    if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
+                        logger.info("Found account");
+                        return new Account(
+                                rs.getString("AccountID"),
+                                rs.getString("Name"),
+                                rs.getBigDecimal("Balance"),
+                                rs.getBoolean("RoundUpEnabled")
+                        );
+                    }
+                }
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Creates a session for an authenticated user
+     */
+    private void createUserSession(Context ctx, Account account) {
+        Session session = ctx.session();
+        session.put(SESSION_ACCOUNT_ID, account.getAccountID());
+        session.put(SESSION_ACCOUNT_NAME, account.getName());
     }
 }

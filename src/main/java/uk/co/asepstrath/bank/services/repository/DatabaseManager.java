@@ -10,14 +10,11 @@ import uk.co.asepstrath.bank.services.data.*;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
@@ -38,10 +35,10 @@ public class DatabaseManager implements DatabaseOperations {
     private final TransactionRepository transactionRepository;
     private final ManagerRepository managerRepository;
 
-    private final DataService<Account> accountDataService;
-    private final DataService<Business> businessDataService;
-    private final DataService<Transaction> transactionDataService;
-    private final DataService<Manager> managerDataService;
+    private final DataServiceFetcher<Account> accountDataService;
+    private final DataServiceFetcher<Business> businessDataService;
+    private final DataServiceFetcher<Transaction> transactionDataService;
+    private final DataServiceFetcher<Manager> managerDataService;
 
     public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
         this.dataSource = dataSource;

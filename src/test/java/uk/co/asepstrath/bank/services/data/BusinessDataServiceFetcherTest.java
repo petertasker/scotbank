@@ -13,7 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BusinessDataServiceTest {
+class BusinessDataServiceFetcherTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
@@ -21,8 +21,7 @@ class BusinessDataServiceTest {
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        businessDataService = new BusinessDataService();
-        businessDataService.setUnirestWrapper(unirestWrapper);
+        businessDataService = new BusinessDataService(unirestWrapper);
     }
 
     @Test
