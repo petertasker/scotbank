@@ -59,15 +59,15 @@ class TransactionDataServiceFetcherTest {
         // Mock the behavior of UnirestWrapper to return the XML responses
         when(firstPageResponse.getBody()).thenReturn(firstPageXml);
 
-        when(unirestWrapper.get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(0))).thenReturn(firstPageResponse);
+        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0)).thenReturn(firstPageResponse);
    
         // Execute the method under test
         List<Transaction> transactions = transactionDataService.fetchData();
         
         // Verify the results
         assertNotNull(transactions);
-        verify(unirestWrapper).get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(0));
-        verify(unirestWrapper, never()).get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(1));
+        verify(unirestWrapper).get("https://api.asep-strath.co.uk/api/transactions", "page", 0);
+        verify(unirestWrapper, never()).get("https://api.asep-strath.co.uk/api/transactions", "page", 1);
     }
 
     @Test
@@ -87,7 +87,7 @@ class TransactionDataServiceFetcherTest {
     }
 
     @Test
-    void testFetchDataWithXmlParsingError() throws XMLStreamException {
+    void testFetchDataWithXmlParsingError()  {
         // Mock a response that will cause an XML parsing error
         when(mockResponse.isSuccess()).thenReturn(true);
         when(mockResponse.getBody()).thenReturn("Invalid XML");
