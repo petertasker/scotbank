@@ -1,13 +1,18 @@
 package uk.co.asepstrath.bank.services.data;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.util.List;
+public class DataService {
 
-/**
- * Fetches data from an external API
- * @param <T> the object that is being generated
- */
-public interface DataService<T> {
-    List<T> fetchData() throws IOException, XMLStreamException;
+    protected UnirestWrapper unirestWrapper;
+
+    public DataService() {
+        this.unirestWrapper = new UnirestWrapper();
+    }
+
+    public DataService(UnirestWrapper unirestWrapper) {
+        this.unirestWrapper = unirestWrapper;
+    }
+
+    public UnirestWrapper getUnirestWrapper() {
+        return this.unirestWrapper;
+    }
 }

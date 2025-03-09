@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ManagerDataServiceTest {
+class ManagerDataServiceFetcherTest {
     private ManagerDataService managerDataService;
 
     @BeforeEach

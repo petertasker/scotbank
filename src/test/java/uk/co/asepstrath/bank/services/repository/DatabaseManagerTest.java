@@ -1,21 +1,16 @@
 package uk.co.asepstrath.bank.services.repository;
 
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.data.DataService;
+import uk.co.asepstrath.bank.services.data.DataServiceFetcher;
 
 import javax.sql.DataSource;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -33,10 +28,10 @@ class DatabaseManagerTest {
     private TransactionRepository mockTransactionRepository;
     private ManagerRepository mockManagerRepository;
 
-    private DataService<Account> mockAccountDataService;
-    private DataService<Business> mockBusinessDataService;
-    private DataService<Transaction> mockTransactionDataService;
-    private DataService<Manager> mockManagerDataService;
+    private DataServiceFetcher<Account> mockAccountDataService;
+    private DataServiceFetcher<Business> mockBusinessDataService;
+    private DataServiceFetcher<Transaction> mockTransactionDataService;
+    private DataServiceFetcher<Manager> mockManagerDataService;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -51,10 +46,10 @@ class DatabaseManagerTest {
         mockTransactionRepository = mock(TransactionRepository.class);
         mockManagerRepository = mock(ManagerRepository.class);
 
-        mockAccountDataService = mock(DataService.class);
-        mockBusinessDataService = mock(DataService.class);
-        mockTransactionDataService = mock(DataService.class);
-        mockManagerDataService = mock(DataService.class);
+        mockAccountDataService = mock(DataServiceFetcher.class);
+        mockBusinessDataService = mock(DataServiceFetcher.class);
+        mockTransactionDataService = mock(DataServiceFetcher.class);
+        mockManagerDataService = mock(DataServiceFetcher.class);
 
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
