@@ -1,6 +1,8 @@
 package uk.co.asepstrath.bank.services.data;
 
 import kong.unirest.core.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Business;
 
 import java.io.IOException;
@@ -11,6 +13,8 @@ import java.util.List;
  * Fetches Business data from external API
  */
 public class BusinessDataService extends DataService implements DataServiceFetcher<Business> {
+
+    private static final Logger log = LoggerFactory.getLogger(BusinessDataService.class);
 
     public BusinessDataService() {
 
@@ -56,6 +60,7 @@ public class BusinessDataService extends DataService implements DataServiceFetch
                     businesses.add(new Business(id, name, category, sanctioned));
                 }
             }
+            log.info("Successfully fetched businesses data");
             return businesses;
 
         }

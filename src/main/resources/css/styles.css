@@ -244,7 +244,7 @@ p[style*="color: green"] {
     margin-top: var(--spacing-md);
 }
 
-.transaction {
+.transaction, .account {
     background-color: var(--transaction-bg);
     border-radius: var(--border-radius-sm);
     padding: 15px;

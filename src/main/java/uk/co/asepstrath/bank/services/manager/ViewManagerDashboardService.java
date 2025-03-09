@@ -48,7 +48,8 @@ public class ViewManagerDashboardService extends ManagerService {
             formatAccountBalancesForDisplay(model, accounts);
 
             List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
-
+            model.put(BIG_SPENDERS_LIST, topSpenders);
+            model.put(BIG_SPENDERS_LIST_EXISTS, !topSpenders.isEmpty());
 
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         }

@@ -66,9 +66,8 @@ public class AccountDataService extends DataService implements DataServiceFetche
             params.put("include", "postcode");
 
             HttpResponse<String> response = wrapper.get("https://api.asep-strath.co.uk/api/accounts", params, accountHeaders);
-
-            log.info(response.getBody());
             if (response.isSuccess()) {
+                log.info("Successfully retrieved account data");
                 return mapper.readValue(response.getBody(), new TypeReference<>() {
                 });
             }

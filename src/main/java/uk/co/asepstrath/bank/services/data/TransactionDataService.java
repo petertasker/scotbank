@@ -71,17 +71,16 @@ public class TransactionDataService extends DataService implements DataServiceFe
 
                 if (hasMorePages) {
                     page++;
-                    logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
                 }
                 else {
-                    logger.info("Reached last page ({})", page);
+                    logger.info("Reached last page ({}) of transactions", page);
                 }
             }
         }
         catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
-
+        logger.info("Successfully fetched transactions data");
         return allTransactions;
     }
 

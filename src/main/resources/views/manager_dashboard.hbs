@@ -2,41 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 <body>
 <div class="content-wrapper">
     <h1>Welcome, {{managername}}</h1>
-    <p>Your manager ID is {{managerid}}</p>
 
-    <a href="/logout" class="btn btn-primary">Logout</a>
+    <div class="account-info">
+        <p class="account-id">Manager ID: {{managerid}}</p>
+    </div>
 
-    <h2>Manager Dashboard - List of Accounts</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Account ID</th>
-            <th>Name</th>
-            <th>Balance</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#if hasaccounts}}
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" onclick="window.location.href = '/logout'">Logout</button>
+        <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
+    </div>
+
+    {{#if success}}
+        <p style="color: green">{{success}}</p>
+    {{/if}}
+    {{#if error}}
+        <p style="color: red">{{error}}</p>
+    {{/if}}
+
+    {{#if hasaccounts}}
+        <div class="accounts-section">
+            <h2>Managed Accounts</h2>
+            <hr>
             {{#each accounts}}
-                <tr>
-                    <td>{{accountid}}</td>
-                    <td>{{name}}</td>
-                    <td>£{{balance}}</td>
-                </tr>
+                <div class="account">
+                    <p><strong>Account ID: </strong>{{accountid}}</p>
+                    <p><strong>Name: </strong>{{name}}</p>
+                    <p><strong>Balance: </strong>£{{balance}}</p>
+                    <p><strong>Last Activity: </strong>{{lastActivity}}</p>
+                </div>
             {{/each}}
-        {{else}}
-            <tr>
-                <td colspan="3">No accounts found.</td>
-            </tr>
-        {{/if}}
-        </tbody>
-    </table>
+        </div>
+
+        <!-- Insights Section Wrapper -->
+        <div id="insights">
+            <!-- Top Spenders Insight Section -->
+            <div class="insights-section" id="top-spenders">
+                <h2>Spending Insights: Top Spenders</h2>
+                <hr>
+                <div class="insights-container">
+                    <div class="insight-card">
+                        <h4>Top Ten Spenders by Total Amount</h4>
+                        <div class="spenders-data">
+                            {{#if hasbigspenders}}
+                                <div class="spenders-container">
+                                    <div class="spenders-list">
+                                        {{#each bigspenders}}
+                                            <div class="spender-item">
+                                                <span class="spender-name">{{Name}}:</span>
+                                                <span class="spender-postcode">({{Postcode}})</span>
+                                                <span class="spender-amount">£{{TotalAmount}}</span>
+                                            </div>
+                                        {{/each}}
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="top-spenders-chart"></canvas>
+                                    </div>
+                                </div>
+                            {{else}}
+                                <p>No spending data available.</p>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{else}}
+        <p>No accounts found under your management.</p>
+    {{/if}}
 </div>
+<script>
+    // Smooth scroll function without updating URL
+    function scrollToInsights() {
+        const insightsSection = document.getElementById('insights');
+        if (insightsSection) {
+            insightsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Chart initialization code
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize charts here
+    });
+</script>
 </body>
 </html>
