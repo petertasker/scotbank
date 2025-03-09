@@ -63,11 +63,10 @@ public final class Constants {
      * Account Variables
      */
     public static final BigDecimal ACCOUNT_OBJECT_MAX_BALANCE = BigDecimal.valueOf(999_999_999.99);
-    /**
-     * Manager Variables
-     */
     public static final String ACCOUNT_OBJECT_LIST = "accounts";
     public static final String ACCOUNT_OBJECT_LIST_EXISTS = "hasaccounts";
+    public static final String BUSINESS_COUNTS = "businesscounts";
+    public static final String BUSINESS_AMOUNT_SUMS = "businesssums";
     /**
      * Password Hashing Constants
      */
@@ -80,6 +79,7 @@ public final class Constants {
      */
     public static final String DEFAULT_PASSWORD = "MyFixedPassword";
     public static final String DEFAULT_MANAGER_PASSWORD = "MyFixedManagerPassword";
+
     private Constants() {
 
     }

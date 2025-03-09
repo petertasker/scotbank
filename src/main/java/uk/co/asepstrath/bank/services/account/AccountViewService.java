@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -100,6 +101,8 @@ public class AccountViewService extends AccountService {
                 displayTransactions.add(displayTx);
             }
 
+            addPaymentCountPerBusinessToModel(connection, accountId, model);
+            addPaymentSumPerBusinessToModel(connection, accountId, model);
             model.put(TRANSACTION_OBJECT_LIST, displayTransactions);
         }
     }
@@ -147,4 +150,79 @@ public class AccountViewService extends AccountService {
         return new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType,
                 transactionAccepted);
     }
+
+    /**
+     * Counts the number of businesses per category for all payments made by a specific account
+     *
+     * @param connection Database connection
+     * @param accountId  The ID of the logged-in account
+     */
+    private void addPaymentCountPerBusinessToModel(Connection connection, String accountId,
+                                                  Map<String, Object> model) throws SQLException {
+        Map<String, Integer> insightMap = new HashMap<>();
+
+        String query = """
+                SELECT
+                    b.Category,
+                    COUNT(DISTINCT b.BusinessID) AS BusinessCount,
+                FROM Transactions t
+                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+                WHERE t.SenderID = ?
+                AND t.TransactionAccepted = TRUE
+                AND t.ReceiverBusinessID IS NOT NULL
+                AND t.TransactionType = 'PAYMENT'
+                GROUP BY b.Category
+                ORDER BY BusinessCount DESC""";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, accountId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String category = resultSet.getString("Category");
+                    int count = resultSet.getInt("BusinessCount");
+                    insightMap.put(category, count);
+                }
+            }
+        }
+        logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
+        model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
+                .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
+                .collect(Collectors.toList()));
+
+    }
+
+    private void addPaymentSumPerBusinessToModel(Connection connection, String accountID, Map<String, Object> model) throws
+            SQLException {
+        Map<String, BigDecimal> insightMap = new HashMap<>();
+        String query = """
+                SELECT
+                    b.Category,
+                    SUM(t.Amount) AS TotalAmount
+                FROM Transactions t
+                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+                WHERE t.SenderID = ?
+                AND t.TransactionAccepted = TRUE
+                AND t.ReceiverBusinessID IS NOT NULL
+                AND t.TransactionType = 'PAYMENT'
+                GROUP BY b.Category
+                ORDER BY TotalAmount DESC""";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, accountID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String category = resultSet.getString("Category");
+                    BigDecimal totalAmount = resultSet.getBigDecimal("TotalAmount");
+                    insightMap.put(category, totalAmount);
+                }
+            }
+        }
+        logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
+        model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
+                .map(entry -> Map.of("category", entry.getKey(), "totalAmount", entry.getValue()))
+                .collect(Collectors.toList()));
+    }
+
+
 }
