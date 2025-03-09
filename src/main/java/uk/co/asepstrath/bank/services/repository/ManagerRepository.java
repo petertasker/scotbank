@@ -125,7 +125,6 @@ public class ManagerRepository extends BaseRepository {
         } catch (SQLException e) {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Failed to get top ten spenders");
         }
-        logger.info(results.toString());
         return results;
     }
 

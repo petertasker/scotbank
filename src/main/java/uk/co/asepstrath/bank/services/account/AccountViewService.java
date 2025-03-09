@@ -38,6 +38,7 @@ public class AccountViewService extends AccountService {
      */
     @GET
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
+        ensureAccountIsLoggedIn(ctx);
         Map<String, Object> model = createModel();
         Session session = getSession(ctx);
 

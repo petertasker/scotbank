@@ -2,6 +2,8 @@ package uk.co.asepstrath.bank.services.account;
 
 import io.jooby.Context;
 import io.jooby.Session;
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Constants;
@@ -139,6 +141,13 @@ public class AccountService extends BaseService {
         }
         catch (SQLException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    protected void ensureAccountIsLoggedIn(Context ctx) {
+        Session session = getSession(ctx);
+        if (session.get(SESSION_ACCOUNT_NAME).isMissing() || session.get(SESSION_ACCOUNT_ID).isMissing()) {
+            throw new StatusCodeException(StatusCode.FORBIDDEN, "Account is not logged in");
         }
     }
 }

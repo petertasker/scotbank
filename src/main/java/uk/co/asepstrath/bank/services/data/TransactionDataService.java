@@ -50,6 +50,7 @@ public class TransactionDataService extends DataService implements DataServiceFe
         boolean hasMorePages = true;
 
         try {
+            logger.info("Fetching transactions from database...");
             while (hasMorePages) {
                 HttpResponse<String> response = fetchPage(page);
 
