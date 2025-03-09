@@ -1,7 +1,8 @@
 package uk.co.asepstrath.bank.services.login;
 
-import io.jooby.*;
-import io.jooby.exception.StatusCodeException;
+import io.jooby.Context;
+import io.jooby.Session;
+import io.jooby.ValueNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -9,16 +10,11 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
 import javax.sql.DataSource;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static uk.co.asepstrath.bank.Constants.*;

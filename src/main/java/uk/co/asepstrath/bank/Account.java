@@ -25,11 +25,11 @@ public class Account {
     public Account(
             @JsonProperty("id") String accountID,
             @JsonProperty("name") String name,
-            @JsonProperty("startingBalance") BigDecimal startingBalance,
+            @JsonProperty("startingBalance") BigDecimal balance,
             @JsonProperty("roundUpEnabled") boolean roundUpEnabled
     ) {
         this.accountID = accountID;
-        this.balance = startingBalance;
+        this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
         this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
