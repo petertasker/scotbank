@@ -19,18 +19,20 @@ public class AccountRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
                 CREATE TABLE Accounts (
-                AccountID VARCHAR(255) NOT NULL,
+                AccountID VARCHAR(64) NOT NULL,
                 Password VARCHAR(255) NOT NULL,
                 Balance DECIMAL(12,2) NOT NULL,
-                Name VARCHAR(255) NOT NULL,
+                Name VARCHAR(128) NOT NULL,
                 RoundUpEnabled BIT NOT NULL,
                 RoundUpAmount DECIMAL(12,2) NULL DEFAULT 0,
+                Postcode VARCHAR(8) NOT NULL,
                 PRIMARY KEY (AccountID)
             )
             """;
 
     private static final String SQL_INSERT_ACCOUNT =
-            "INSERT INTO Accounts (AccountID, Password, Balance, Name, RoundUpEnabled) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO Accounts (AccountID, Password, Balance, Name, RoundUpEnabled, Postcode) VALUES (?, ?, ?, ?, " +
+                    "?, ?)";
 
     private static final String SQL_UPDATE_BALANCE =
             "UPDATE Accounts SET Balance = ?, RoundUpAmount = ? WHERE AccountID = ?";
@@ -68,9 +70,13 @@ public class AccountRepository extends BaseRepository {
             statement.setBigDecimal(3, account.getBalance());
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
+            statement.setString(6, account.getPostcode(true));
             statement.executeUpdate();
-            logger.info("Inserted account {}, round up enabled: {}, Default password: {}", account.getAccountID(),
-                    account.isRoundUpEnabled(), password);
+            logger.info("Inserted account {}, round up enabled: {}, Default password: {}, postcode: {}",
+                    account.getAccountID(),
+                    account.isRoundUpEnabled(),
+                    password,
+                    account.getPostcode(true));
         }
     }
 

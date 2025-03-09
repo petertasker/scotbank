@@ -20,20 +20,32 @@ public class Account {
     private final String name;
     private BigDecimal balance;
     private BigDecimal roundUpBalance;
+    private String postcode;
 
     @JsonCreator
     public Account(
             @JsonProperty("id") String accountID,
             @JsonProperty("name") String name,
             @JsonProperty("startingBalance") BigDecimal balance,
-            @JsonProperty("roundUpEnabled") boolean roundUpEnabled
+            @JsonProperty("roundUpEnabled") boolean roundUpEnabled,
+            @JsonProperty("postcode") String postcode
     ) {
         this.accountID = accountID;
         this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
         this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
+        this.postcode = postcode;
     }
+
+    public Account(String accountID, String name, BigDecimal balance, boolean roundUpEnabled) {
+        this.accountID = accountID;
+        this.balance = balance;
+        this.name = name;
+        this.roundUpEnabled = roundUpEnabled;
+        this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
+    }
+
 
     /**
      * Deposits money into an account
@@ -154,4 +166,10 @@ public class Account {
         this.balance = balance;
     }
 
+    public String getPostcode(boolean isAdmin) {
+        if (isAdmin) {
+            return postcode;
+        }
+        throw new SecurityException("Account does not have postcode permission");
+    }
 }
