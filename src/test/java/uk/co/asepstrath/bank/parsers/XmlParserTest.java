@@ -21,8 +21,7 @@ package uk.co.asepstrath.bank.parsers;
 //
 /// /    @Test
 /// /    public void testXmlParserFromFile() throws IOException {
-/// /        File xmlFile = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("transactionsxml
-")).getFile());
+/// /        File xmlFile = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("transactionsxml")).getFile());
 /// /        assertTrue(xmlFile.exists());
 /// /        assertTrue(xmlFile.canRead());
 /// /
