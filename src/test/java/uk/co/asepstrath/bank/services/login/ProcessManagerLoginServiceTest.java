@@ -120,6 +120,7 @@ class ProcessManagerLoginServiceTest {
         String managerId = "admin0";
         String name = "Peter Tasker";
         String password = "petertasker";
+        String hashedPassword = HashingPasswordService.hashPassword(password);
 
         // Mock the context and input values
         ValueNode valueNode = mock(ValueNode.class);
@@ -134,25 +135,28 @@ class ProcessManagerLoginServiceTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString("ManagerID")).thenReturn(managerId);
         when(resultSet.getString("Name")).thenReturn(name);
-        when(resultSet.getString("Password")).thenReturn(password);
+        when(resultSet.getString("Password")).thenReturn(hashedPassword);
 
         // Mock the HashingPasswordService to bypass hashing
         HashingPasswordService hashingPasswordService = mock(HashingPasswordService.class);
+        try(var mockStaticHash = mockStatic(HashingPasswordService.class)) {
+            mockStaticHash.when(() -> HashingPasswordService.verifyPassword(password,hashedPassword)).thenReturn(true);
+            // Execute the method
+            ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 
-        // Execute the method
-        ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
+            // Verify expected result
+            assertNull(result);
 
-        // Verify expected result
-        assertNull(result);
+            // Verify session updates
+            verify(session).put(SESSION_MANAGER_ID, managerId);
+            verify(session).put(SESSION_MANAGER_NAME, name);
 
-        // Verify session updates
-        verify(session).put(SESSION_MANAGER_ID, managerId);
-        verify(session).put(SESSION_MANAGER_NAME, name);
+            // Verify database interaction
+            verify(dataSource).getConnection();
+            verify(preparedStatement).setString(1, managerId);
+            verify(preparedStatement).executeQuery();
+        }
 
-        // Verify database interaction
-        verify(dataSource).getConnection();
-        verify(preparedStatement).setString(1, managerId);
-        verify(preparedStatement).executeQuery();
     }
 
 
