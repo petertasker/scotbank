@@ -19,14 +19,14 @@ package uk.co.asepstrath.bank.parsers;
 //        xmlMapper = new XmlMapper();
 //    }
 //
-/// /    @Test
-/// /    public void testXmlParserFromFile() throws IOException {
-/// /        File xmlFile = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("transactionsxml")).getFile());
-/// /        assertTrue(xmlFile.exists());
-/// /        assertTrue(xmlFile.canRead());
-/// /
-/// /        XmlParser xmlParser = xmlMapper.readValue(xmlFile, XmlParser.class);
-/// /
-/// /        assertTrue(Objects.nonNull(xmlParser));
-/// /    }
+//    @Test
+//    public void testXmlParserFromFile() throws IOException {
+//        File xmlFile = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("transactionsxml")).getFile());
+//        assertTrue(xmlFile.exists());
+//        assertTrue(xmlFile.canRead());
+//
+//        XmlParser xmlParser = xmlMapper.readValue(xmlFile, XmlParser.class);
+//
+//        assertTrue(Objects.nonNull(xmlParser));
+//    }
 //}
