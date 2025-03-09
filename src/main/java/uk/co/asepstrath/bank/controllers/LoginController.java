@@ -6,12 +6,11 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.login.DisplayLoginService;
+import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
 import java.sql.SQLException;
 import java.util.Map;
-
-import uk.co.asepstrath.bank.services.login.DisplayLoginService;
-import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
 import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
 import static uk.co.asepstrath.bank.Constants.ROUTE_PROCESS;
@@ -24,7 +23,8 @@ public class LoginController extends BaseController {
     private final DisplayLoginService displayLoginService;
     private final ProcessLoginService processLoginService;
 
-    public LoginController(DisplayLoginService displayLoginService, ProcessLoginService processLoginService, Logger logger) {
+    public LoginController(DisplayLoginService displayLoginService, ProcessLoginService processLoginService,
+                           Logger logger) {
         super(logger);
         this.displayLoginService = displayLoginService;
         this.processLoginService = processLoginService;
@@ -32,6 +32,7 @@ public class LoginController extends BaseController {
 
     /**
      * Displays the login endpoint
+     *
      * @return ModelAndView
      */
     @GET
@@ -41,8 +42,9 @@ public class LoginController extends BaseController {
 
     /**
      * Directs the login process
+     *
      * @param ctx Session context
-     * Redirects to "/account" on success
+     *            Redirects to "/account" on success
      */
     @POST
     @Path(ROUTE_PROCESS)

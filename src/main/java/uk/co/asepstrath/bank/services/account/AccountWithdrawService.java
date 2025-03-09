@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
-import uk.co.asepstrath.bank.services.repository.TransactionRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -18,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_WITHDRAW;
 
 /**
  * The Account withdrawal service
@@ -66,7 +64,8 @@ public class AccountWithdrawService extends AccountService {
 
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
             Account account = accountRepository.getAccount(connection, accountId);
-            Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId, UUID.randomUUID().toString(), null, "WITHDRAWAL");
+            Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId,
+                    UUID.randomUUID().toString(), null, "WITHDRAWAL");
             executeTransaction(ctx, connection, transaction);
             executeWithdrawal(ctx, account, amount);
         }

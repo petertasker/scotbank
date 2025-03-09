@@ -8,13 +8,12 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
+import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,16 +60,20 @@ class ManagerRepositoryTest {
     }
 
     @Test
-    void testInsertManager() throws SQLException {
+    void testInsertManager() throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
         // Arrange
         Manager manager = new Manager("M123", "John Doe");
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
 
+
         // Act
-        repository.insert(mockConnection, manager);
+        String managerPsw = "SamplePassword";
+        String hashedManagerPassword = HashingPasswordService.hashPassword(managerPsw);
+        repository.insert(mockConnection, manager, hashedManagerPassword);
 
         // Assert
-        verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name) VALUES (?, ?)");
+        verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)");
+
         verify(mockPreparedStatement).setString(1, "M123");
         verify(mockPreparedStatement).setString(2, "John Doe");
         verify(mockPreparedStatement).executeUpdate();

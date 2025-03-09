@@ -10,6 +10,8 @@ import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.services.BaseService;
 
 import javax.sql.DataSource;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,6 +30,7 @@ public class ProcessManagerLoginService extends BaseService {
 
     /**
      * Processes the manager login
+     *
      * @param ctx Session context
      * @return the "/manager/login" endpoint on failure
      * Redirects to "/manager/dashboard" on success
@@ -35,6 +38,7 @@ public class ProcessManagerLoginService extends BaseService {
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {
         // Validate manager ID
         String formManagerID = getFormValue(ctx, "managerid");
+        String password = getFormValue(ctx, "password");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
             addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "Account ID cannot be empty.");
             redirect(ctx, ROUTE_MANAGER + ROUTE_LOGIN);
@@ -43,34 +47,40 @@ public class ProcessManagerLoginService extends BaseService {
 
         try (
                 Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement("SELECT ManagerID, Name FROM Managers WHERE ManagerID = ?")
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT ManagerID, Name, Password FROM Managers WHERE ManagerID = ?")
         ) {
             stmt.setString(1, formManagerID);
 
+            Manager manager = null;
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    String hashedPassword = rs.getString("Password");
                     // Manager found - create session
-                    Manager manager = new Manager(
-                            rs.getString("ManagerID"),
-                            rs.getString("Name")
-                    );
+                    if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
+                        manager = new Manager(
+                                rs.getString("ManagerID"),
+                                rs.getString("Name")
+                        );
 
-                    createManagerSession(ctx, manager);
-                    logger.info("Process Manager Login Success");
-                    redirect(ctx, ROUTE_MANAGER + ROUTE_DASHBOARD);
-                    return null;
-
-                } else {
+                        createManagerSession(ctx, manager);
+                        logger.info("Process Manager Login Success");
+                        redirect(ctx, ROUTE_MANAGER + ROUTE_DASHBOARD);
+                        return null;
+                    }
+                }
+                else {
                     // Manager not found
                     handleLoginFailure(ctx, "Invalid account ID.");
                     return null;
                 }
             }
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             logger.error("Database error during manager login", e);
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "A database error occurred");
         }
+        return null;
     }
 
     private void handleLoginFailure(Context ctx, String message) {

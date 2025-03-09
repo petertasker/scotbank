@@ -6,9 +6,10 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.services.BaseService;
 
-import static uk.co.asepstrath.bank.Constants.*;
-
 import java.util.Map;
+
+import static uk.co.asepstrath.bank.Constants.SESSION_SUCCESS_MESSAGE;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
 
 /**
  * The Display login service
@@ -21,6 +22,7 @@ public class DisplayLoginService extends BaseService {
 
     /**
      * Renders the login endpoint
+     *
      * @return The "/login" endpoint
      */
     public ModelAndView<Map<String, Object>> displayLogin(Context ctx) {

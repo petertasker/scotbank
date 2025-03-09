@@ -6,13 +6,13 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.account.AccountViewService;
 import uk.co.asepstrath.bank.services.account.AccountDepositService;
+import uk.co.asepstrath.bank.services.account.AccountViewService;
 import uk.co.asepstrath.bank.services.account.AccountWithdrawService;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -88,8 +88,8 @@ public class AccountController extends BaseController {
      * Engages the deposit process
      *
      * @param ctx Session Context
-     * Redirects to "/account" on success
-     * Redirects to "/deposit" on failure
+     *            Redirects to "/account" on success
+     *            Redirects to "/deposit" on failure
      * @throws SQLException on deposit failure
      */
     @POST

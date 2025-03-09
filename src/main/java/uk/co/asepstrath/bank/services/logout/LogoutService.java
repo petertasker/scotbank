@@ -4,7 +4,8 @@ import io.jooby.Context;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.BaseService;
 
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
+import static uk.co.asepstrath.bank.Constants.SESSION_SUCCESS_MESSAGE;
 
 /**
  * The log-out service
@@ -16,6 +17,7 @@ public class LogoutService extends BaseService {
 
     /**
      * Logs the user out
+     *
      * @param ctx Session context
      */
     public void logout(Context ctx) {

@@ -1,28 +1,23 @@
 package uk.co.asepstrath.bank;
 
-import io.jooby.*;
-import io.jooby.jackson.JacksonModule;
-import io.jooby.netty.NettyServer;
+import io.jooby.Jooby;
+import io.jooby.Session;
+import io.jooby.StatusCode;
 import io.jooby.handlebars.HandlebarsModule;
 import io.jooby.helper.UniRestExtension;
 import io.jooby.hikari.HikariModule;
+import io.jooby.jackson.JacksonModule;
+import io.jooby.netty.NettyServer;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.controllers.*;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 
-import uk.co.asepstrath.bank.controllers.LoginController_;
-import uk.co.asepstrath.bank.controllers.AccountController_;
-import uk.co.asepstrath.bank.controllers.LogoutController_;
-import uk.co.asepstrath.bank.controllers.ManagerController_;
-import uk.co.asepstrath.bank.controllers.ErrorController_;
-
-
-
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.SQLException;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -36,12 +31,18 @@ public class App extends Jooby {
         before(ctx -> {
             String path = ctx.getRequestPath();
             // add any JS/ CSS files here
-            if (path.startsWith("/css")) return;
-            if (path.endsWith("/js")) return;
+            if (path.startsWith("/css")) {
+                return;
+            }
+            if (path.endsWith("/js")) {
+                return;
+            }
 
             Session session = ctx.sessionOrNull();
-            boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(SESSION_ACCOUNT_ID).isPresent();
-            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(SESSION_MANAGER_ID).isPresent();
+            boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(
+                    SESSION_ACCOUNT_ID).isPresent();
+            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
+                    SESSION_MANAGER_ID).isPresent();
 
             if (!userLoggedIn && !managerLoggedIn && !path.startsWith(ROUTE_LOGIN)
                     && !path.startsWith("/manager/login")) {
@@ -83,8 +84,8 @@ public class App extends Jooby {
          */
         assets("/css/*", "/css");
         assets("/assets/*", "/assets");
-        assets("/service_worker.js","/service_worker.js");
-        assets("/transaction-chart.js","/transaction-chart.js");
+        assets("/service_worker.js", "/service_worker.js");
+        assets("/transaction-chart.js", "/transaction-chart.js");
         /*
         Now we set up our controllers and their dependencies
          */

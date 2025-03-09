@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank;
 
-import io.jooby.*;
+import io.jooby.Context;
+import io.jooby.Route;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -62,9 +63,15 @@ class AppClassTest {
         boolean hasServiceWorkerAsset = false;
 
         for (Route route : routes) {
-            if (route.getPattern().equals("/css/*")) hasCssAssets = true;
-            if (route.getPattern().equals("/assets/*")) hasAssetsAssets = true;
-            if (route.getPattern().equals("/service_worker.js")) hasServiceWorkerAsset = true;
+            if (route.getPattern().equals("/css/*")) {
+                hasCssAssets = true;
+            }
+            if (route.getPattern().equals("/assets/*")) {
+                hasAssetsAssets = true;
+            }
+            if (route.getPattern().equals("/service_worker.js")) {
+                hasServiceWorkerAsset = true;
+            }
         }
 
         assertTrue(hasCssAssets, "CSS assets should be mapped");
@@ -80,11 +87,21 @@ class AppClassTest {
 
         for (Route route : routes) {
             String pattern = route.getPattern();
-            if (pattern.startsWith(ROUTE_LOGIN)) hasLoginRoutes = true;
-            if (pattern.startsWith(ROUTE_ACCOUNT)) hasAccountRoutes = true;
-            if (pattern.startsWith(ROUTE_MANAGER)) hasManagerRoutes = true;
-            if (pattern.startsWith(ROUTE_LOGOUT)) hasLogoutRoutes = true;
-            if (pattern.startsWith(ROUTE_ERROR)) hasErrorRoutes = true;
+            if (pattern.startsWith(ROUTE_LOGIN)) {
+                hasLoginRoutes = true;
+            }
+            if (pattern.startsWith(ROUTE_ACCOUNT)) {
+                hasAccountRoutes = true;
+            }
+            if (pattern.startsWith(ROUTE_MANAGER)) {
+                hasManagerRoutes = true;
+            }
+            if (pattern.startsWith(ROUTE_LOGOUT)) {
+                hasLogoutRoutes = true;
+            }
+            if (pattern.startsWith(ROUTE_ERROR)) {
+                hasErrorRoutes = true;
+            }
         }
 
         assertTrue(hasLoginRoutes, "Login routes should be registered");

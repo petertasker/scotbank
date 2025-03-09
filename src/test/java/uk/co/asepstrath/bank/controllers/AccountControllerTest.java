@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,11 +17,11 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AccountControllerTest {
 
@@ -157,7 +158,6 @@ class AccountControllerTest {
         assertNotNull(result);
 
     }
-
 
 
 }

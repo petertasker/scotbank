@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Fetches data from an external API
+ *
  * @param <T> the object that is being generated
  */
 public interface DataServiceFetcher<T> {

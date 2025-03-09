@@ -19,19 +19,15 @@ import static org.mockito.Mockito.*;
 
 class BusinessRepositoryTest {
 
+    BusinessRepository businessRepository;
     @Mock
     private Connection connection;
-
     @Mock
     private PreparedStatement preparedStatement;
-
     @Mock
     private ResultSet resultSet;
-
     @Mock
     private Logger logger;
-
-    BusinessRepository businessRepository;
 
     @BeforeEach
     public void setUp() {

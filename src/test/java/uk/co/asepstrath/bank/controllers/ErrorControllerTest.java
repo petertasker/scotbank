@@ -37,7 +37,8 @@ class ErrorControllerTest {
             java.lang.reflect.Field field = ErrorController.class.getDeclaredField("errorService");
             field.setAccessible(true);
             field.set(errorController, spyErrorService);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException("Failed to inject spy service", e);
         }
     }
