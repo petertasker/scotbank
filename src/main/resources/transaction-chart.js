@@ -42,13 +42,12 @@ function getBusinessCategoryData(type) {
         }
 
         if (!isNaN(value)) {
-            data.push({ category, value });
+            data.push({category, value});
         }
     });
 
     return data;
 }
-
 
 
 function createBusinessPieChart(data, chartId) {

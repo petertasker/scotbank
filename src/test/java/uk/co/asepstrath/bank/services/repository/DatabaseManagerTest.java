@@ -1,7 +1,6 @@
 package uk.co.asepstrath.bank.services.repository;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +11,10 @@ import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.data.*;
-import uk.co.asepstrath.bank.services.login.HashingPasswordService;
+import uk.co.asepstrath.bank.services.data.AccountDataService;
+import uk.co.asepstrath.bank.services.data.BusinessDataService;
+import uk.co.asepstrath.bank.services.data.ManagerDataService;
+import uk.co.asepstrath.bank.services.data.TransactionDataService;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
@@ -22,10 +23,13 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 class DatabaseManagerTest {
@@ -63,22 +67,23 @@ class DatabaseManagerTest {
 
         // inject mock repositories into a private field
         setPrivateField(databaseManager, "accountRepository", accountRepository);
-        setPrivateField(databaseManager,"businessRepository", businessRepository);
-        setPrivateField(databaseManager,"transactionRepository", transactionRepository);
-        setPrivateField(databaseManager,"managerRepository", managerRepository);
+        setPrivateField(databaseManager, "businessRepository", businessRepository);
+        setPrivateField(databaseManager, "transactionRepository", transactionRepository);
+        setPrivateField(databaseManager, "managerRepository", managerRepository);
 
         // inject mock data services into private fields
-        setPrivateField(databaseManager,"accountDataService", accountDataService);
-        setPrivateField(databaseManager,"businessDataService", businessDataService);
-        setPrivateField(databaseManager,"transactionDataService", transactionDataService);
-        setPrivateField(databaseManager,"managerDataService", managerDataService);
+        setPrivateField(databaseManager, "accountDataService", accountDataService);
+        setPrivateField(databaseManager, "businessDataService", businessDataService);
+        setPrivateField(databaseManager, "transactionDataService", transactionDataService);
+        setPrivateField(databaseManager, "managerDataService", managerDataService);
     }
 
     // using reflection to create private fields
-    private void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+    private void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException,
+            IllegalAccessException {
         Field field = databaseManager.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
-        field.set(object,value);
+        field.set(object, value);
     }
 
     @Test
@@ -92,12 +97,13 @@ class DatabaseManagerTest {
     }
 
     @Test
-    void testInsertionTables() throws IOException, XMLStreamException, SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
-        Account accounts = new Account("ABC123","John Doe", new BigDecimal(100),true);
-        Business businesses = new Business("B123","Something","Retail",false);
-        DateTime date  = new DateTime(2025,5,20,16,20, 0);
-        Transaction transactions = new Transaction(date, new BigDecimal(50),"ABC123","T123","B123","PAYMENT",true);
-        Manager managers = new Manager("Manager123","Nothing");
+    void testInsertionTables() throws IOException, XMLStreamException, SQLException, NoSuchAlgorithmException,
+            InvalidKeySpecException {
+        Account accounts = new Account("ABC123", "John Doe", new BigDecimal(100), true);
+        Business businesses = new Business("B123", "Something", "Retail", false);
+        DateTime date = new DateTime(2025, 5, 20, 16, 20, 0);
+        Transaction transactions = new Transaction(date, new BigDecimal(50), "ABC123", "T123", "B123", "PAYMENT", true);
+        Manager managers = new Manager("Manager123", "Nothing");
 
         // mock the services
         when(accountDataService.fetchData()).thenReturn(List.of(accounts));
@@ -113,7 +119,7 @@ class DatabaseManagerTest {
         verify(accountRepository).insert(connection, accounts, accountPassword);
         verify(businessRepository).insert(connection, businesses);
         verify(transactionRepository).insert(connection, transactions);
-        verify(managerRepository).insert(connection, managers,managerPassword);
+        verify(managerRepository).insert(connection, managers, managerPassword);
     }
 
     @Test

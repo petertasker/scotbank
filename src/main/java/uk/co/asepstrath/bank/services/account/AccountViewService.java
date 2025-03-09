@@ -158,7 +158,7 @@ public class AccountViewService extends AccountService {
      * @param accountId  The ID of the logged-in account
      */
     private void addPaymentCountPerBusinessToModel(Connection connection, String accountId,
-                                                  Map<String, Object> model) throws SQLException {
+                                                   Map<String, Object> model) throws SQLException {
         Map<String, Integer> insightMap = new HashMap<>();
 
         String query = """
@@ -192,7 +192,8 @@ public class AccountViewService extends AccountService {
 
     }
 
-    private void addPaymentSumPerBusinessToModel(Connection connection, String accountID, Map<String, Object> model) throws
+    private void addPaymentSumPerBusinessToModel(Connection connection, String accountID,
+                                                 Map<String, Object> model) throws
             SQLException {
         Map<String, BigDecimal> insightMap = new HashMap<>();
         String query = """

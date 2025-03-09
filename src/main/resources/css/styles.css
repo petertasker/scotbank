@@ -301,7 +301,7 @@ hr {
 .business-counts {
     display: flex;
     flex-direction: row;
-    gap: 20px;  /* Space between the list and chart */
+    gap: 20px; /* Space between the list and chart */
     justify-content: space-between; /* Ensures content spreads across the container */
     margin-bottom: var(--spacing-md);
 }
@@ -328,12 +328,11 @@ hr {
 }
 
 
-
 .business-category-container {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 20px;  /* Space between text and chart */
+    gap: 20px; /* Space between text and chart */
     width: 100%;
 }
 
