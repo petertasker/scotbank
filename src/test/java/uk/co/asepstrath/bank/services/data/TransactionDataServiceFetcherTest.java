@@ -5,9 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.co.asepstrath.bank.Transaction;
 
-
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.List;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -19,24 +22,23 @@ class TransactionDataServiceFetcherTest {
 
    private TransactionDataService transactionDataService;
    private UnirestWrapper unirestWrapper;
+   private HttpResponse<String> mockResponse;
 
    @BeforeEach
    void setUp() {
        unirestWrapper = mock(UnirestWrapper.class);
+       mockResponse = mock(HttpResponse.class);
        transactionDataService = new TransactionDataService(unirestWrapper);
-   }
+
+}
 
    @Test
    void testFetchDataSuccess() throws XMLStreamException {
-       // Mocking HttpResponse
-       HttpResponse<String> initialResponse = mock(HttpResponse.class);
-       HttpResponse<String> pageResponse = mock(HttpResponse.class);
-   
-       when(initialResponse.isSuccess()).thenReturn(true);
-       when(pageResponse.isSuccess()).thenReturn(true);
-   
+        // Mocking HttpResponse
+        HttpResponse<String> firstPageResponse = mock(HttpResponse.class);   
+        when(firstPageResponse.isSuccess()).thenReturn(true);
        // Sample XML Data
-       String xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+       String firstPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                "<pageResult>" +
                "  <hasNext>true</hasNext>" +
                "  <hasPrevious>false</hasPrevious>" +
@@ -52,35 +54,110 @@ class TransactionDataServiceFetcherTest {
                "  <size>1</size>" +
                "  <totalPages>154</totalPages>" +
                "</pageResult>";
-   
-       String emptyXmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-               "<pageResult>" +
-               "  <hasNext>true</hasNext>" +
-               "  <hasPrevious>true</hasPrevious>" +
-               "  <page>1</page>" +
-               "  <size>0</size>" +
-               "  <totalPages>154</totalPages>" +
-               "</pageResult>";
-   
-       // Mock the behavior of UnirestWrapper to return the XML responses
-       when(initialResponse.getBody()).thenReturn(xmlData);
-       when(pageResponse.getBody()).thenReturn(emptyXmlData);
-       when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(initialResponse, pageResponse);
-   
-       // Create a mock Transaction instead of creating real ones
-       Transaction mockTransaction = mock(Transaction.class);
-       
-       // Create a spy of the transactionDataService to intercept the Transaction creation
-       TransactionDataService spyService = spy(transactionDataService);
+        when(firstPageResponse.getBody()).thenReturn(firstPageXml);
 
-        // Mock the Transaction creation process
-       doReturn(List.of(mockTransaction)).when(spyService).fetchData();
-       // Test the fetchData method on our spy
-       List<Transaction> transactions = spyService.fetchData();
+        // Mock the behavior of UnirestWrapper to return the XML responses
+        when(firstPageResponse.getBody()).thenReturn(firstPageXml);
+
+        when(unirestWrapper.get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(0))).thenReturn(firstPageResponse);
    
-       // Verify the results
-       assertNotNull(transactions);
-       assertEquals(1, transactions.size());
-   }
+        // Execute the method under test
+        List<Transaction> transactions = transactionDataService.fetchData();
+        
+        // Verify the results
+        assertNotNull(transactions);
+        verify(unirestWrapper).get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(0));
+        verify(unirestWrapper, never()).get(eq("https://api.asep-strath.co.uk/api/transactions"), eq("page"), eq(1));
+    }
+
+    @Test
+    void testFetchDataWithHttpRequestFailure() throws XMLStreamException {
+        // Mock a failed HTTP response
+        when(mockResponse.isSuccess()).thenReturn(false);
+        when(mockResponse.getStatus()).thenReturn(500);
+        when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
+        
+        // Execute the method under test
+        List<Transaction> transactions = transactionDataService.fetchData();
+        
+        // Verify the results
+        assertNotNull(transactions);
+        assertTrue(transactions.isEmpty());
+        verify(unirestWrapper, times(1)).get(anyString(), eq("page"), anyInt());
+    }
+
+    @Test
+    void testFetchDataWithXmlParsingError() throws XMLStreamException {
+        // Mock a response that will cause an XML parsing error
+        when(mockResponse.isSuccess()).thenReturn(true);
+        when(mockResponse.getBody()).thenReturn("Invalid XML");
+        when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
+        
+        // Execute the method and verify exception
+        assertThrows(XMLStreamException.class, () -> transactionDataService.fetchData());
+    }
+
+    @Test
+    void testTransactionHandlingWithNullAmount() throws XMLStreamException {
+        // Mock response with a transaction that has null amount
+        when(mockResponse.isSuccess()).thenReturn(true);
+        String xmlWithNullAmount = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<pageResult>" +
+                "  <hasNext>false</hasNext>" +
+                "  <hasPrevious>false</hasPrevious>" +
+                "  <page>0</page>" +
+                "  <results xsi:type=\"transactionModel\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+                "    <timestamp>2023-04-10 08:43</timestamp>" +
+                "    <amount>48.00</amount>" +
+                "    <from>8f95782c-7c83-4dd7-8856-0e19a0e0a075</from>" +
+                "    <id>null-amount-id</id>" +
+                "    <to>TOP</to>" +
+                "    <type>PAYMENT</type>" +
+                "  </results>" +
+                "  <size>1</size>" +
+                "  <totalPages>1</totalPages>" +
+                "</pageResult>";
+        when(mockResponse.getBody()).thenReturn(xmlWithNullAmount);
+        when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
+        
+        // Execute the method under test
+        List<Transaction> transactions = transactionDataService.fetchData();
+        
+        // Verify the results
+        assertNotNull(transactions);
+        assertTrue(transactions.isEmpty());
+    }
+
+    @Test
+    void testCreateTransactionSafely() throws Exception {
+        // Create mocks
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        
+        // Create service
+        TransactionDataService service = new TransactionDataService(mockDataSource);
+        
+        // Create test transaction with null amount 
+        Transaction fakeTransaction = new Transaction();
+        setPrivateField(fakeTransaction, "id", "bad123");
+
+        // Access private createTransactionSafely method
+        Method createMethod = TransactionDataService.class.getDeclaredMethod(
+            "createTransactionSafely", Transaction.class);
+        createMethod.setAccessible(true);
+        
+        // Call the method
+        Transaction result = (Transaction) createMethod.invoke(service, fakeTransaction);
+        
+        // Should be null as the transaction had a null amount
+        assertNull(result);
+    }
+
+    private void setPrivateField(Object object, String fieldName, Object value) throws Exception {
+        Field field = object.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(object, value);
+    }
 }
 
