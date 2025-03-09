@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 import static uk.co.asepstrath.bank.Constants.*;
 
 class ProcessManagerLoginServiceTest {
@@ -137,8 +136,8 @@ class ProcessManagerLoginServiceTest {
 
         // Mock the HashingPasswordService to bypass hashing
         HashingPasswordService hashingPasswordService = mock(HashingPasswordService.class);
-        try(var mockStaticHash = mockStatic(HashingPasswordService.class)) {
-            mockStaticHash.when(() -> HashingPasswordService.verifyPassword(password,hashedPassword)).thenReturn(true);
+        try (var mockStaticHash = mockStatic(HashingPasswordService.class)) {
+            mockStaticHash.when(() -> HashingPasswordService.verifyPassword(password, hashedPassword)).thenReturn(true);
             // Execute the method
             ModelAndView<Map<String, Object>> result = processManagerLoginService.processManagerLogin(context);
 

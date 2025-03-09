@@ -1,9 +1,11 @@
 package uk.co.asepstrath.bank;
-import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 
 import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
 
@@ -14,20 +16,20 @@ public class Account {
 
     private static final Logger log = LoggerFactory.getLogger(Account.class);
     private final String accountID;
-    private BigDecimal balance;
     private final boolean roundUpEnabled;
     private final String name;
+    private BigDecimal balance;
     private BigDecimal roundUpBalance;
 
     @JsonCreator
     public Account(
-            @JsonProperty("id")  String accountID,
+            @JsonProperty("id") String accountID,
             @JsonProperty("name") String name,
-            @JsonProperty("startingBalance") BigDecimal startingBalance,
+            @JsonProperty("startingBalance") BigDecimal balance,
             @JsonProperty("roundUpEnabled") boolean roundUpEnabled
-        ) {
+    ) {
         this.accountID = accountID;
-        this.balance = startingBalance;
+        this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
         this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
@@ -35,6 +37,7 @@ public class Account {
 
     /**
      * Deposits money into an account
+     *
      * @param amount The deposit value
      * @throws ArithmeticException Bad user input when depositing
      */
@@ -55,6 +58,7 @@ public class Account {
 
     /**
      * Withdraws money from an account
+     *
      * @param amount The Withdrawal value
      * @throws ArithmeticException Bad user input when withdrawing
      */
@@ -80,6 +84,7 @@ public class Account {
 
     /**
      * Gets balance from the account
+     *
      * @return Account balance
      */
     public BigDecimal getBalance() {
@@ -88,6 +93,7 @@ public class Account {
 
     /**
      * Gets the account ID from the account
+     *
      * @return Account ID
      */
     public String getAccountID() {
@@ -96,6 +102,7 @@ public class Account {
 
     /**
      * Gets the name of the account
+     *
      * @return Account name
      */
     public String getName() {
@@ -112,8 +119,10 @@ public class Account {
         }
         log.info("Round up balance: {}", roundUpBalance);
     }
+
     /**
      * Gets the boolean value of roundUpEnabled
+     *
      * @return roundUpEnabled
      */
     public boolean isRoundUpEnabled() {
@@ -128,6 +137,7 @@ public class Account {
 
     /**
      * Returns a String interpretation of an Account
+     *
      * @return A String of the Account
      */
     public String toString() {
@@ -137,9 +147,10 @@ public class Account {
 
     /**
      * Updates balance of an account
+     *
      * @param balance new balance
      */
-    public void updateBalance(BigDecimal balance){
+    public void updateBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

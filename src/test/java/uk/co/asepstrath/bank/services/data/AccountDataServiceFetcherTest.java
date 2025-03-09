@@ -33,7 +33,8 @@ class AccountDataServiceFetcherTest {
         when(mockResponse.isSuccess()).thenReturn(true);
 
         // JSON structure that matches your Account class JsonProperty annotations
-        when(mockResponse.getBody()).thenReturn("[{\"id\":\"1\", \"name\":\"Account1\", \"startingBalance\":100.0, \"roundUpEnabled\":true}]");
+        when(mockResponse.getBody()).thenReturn(
+                "[{\"id\":\"1\", \"name\":\"Account1\", \"startingBalance\":100.0, \"roundUpEnabled\":true}]");
 
         // Configure mock wrapper to return the mock response
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);

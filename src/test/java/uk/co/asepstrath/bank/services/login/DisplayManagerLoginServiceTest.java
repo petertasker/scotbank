@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_MANAGER_LOGIN;
 
 class DisplayManagerLoginServiceTest {
 
@@ -60,9 +60,8 @@ class DisplayManagerLoginServiceTest {
     }
 
 
-
     @Test
-     void testDisplayLoginWithSessionError() {
+    void testDisplayLoginWithSessionError() {
         // Setup error message in session
         when(sessionValue.isPresent()).thenReturn(true);
         when(sessionValue.value()).thenReturn("Error message");

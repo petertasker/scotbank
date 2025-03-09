@@ -3,34 +3,28 @@ package uk.co.asepstrath.bank.services;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
-import io.jooby.StatusCode;
-import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import java.util.Locale;
+
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.text.DecimalFormat;
-import static uk.co.asepstrath.bank.Constants.*;
 
 public abstract class BaseService implements
         FormBigDecimalRetriever,
         FormValueRetriever,
         ViewRenderer,
         CurrencyFormatter,
-        SessionMessageManager
-{
+        SessionMessageManager {
 
-    private final DataSource dataSource;
     protected final Logger logger;
+    private final DataSource dataSource;
 
     protected BaseService(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;

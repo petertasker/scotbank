@@ -1,12 +1,14 @@
 package uk.co.asepstrath.bank.controllers;
 
-import io.jooby.*;
-import org.junit.jupiter.api.Test;
+import io.jooby.Context;
+import io.jooby.ModelAndView;
+import io.jooby.Session;
+import io.jooby.Value;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
@@ -16,7 +18,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -42,10 +46,9 @@ class LoginControllerTest {
     private DisplayLoginService mockDisplayLoginService = mock(DisplayLoginService.class);
     @Mock
     private ProcessLoginService mockProcessLoginService = mock(ProcessLoginService.class);
+    LoginController loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
     @Mock
     private ModelAndView<Map<String, Object>> mockModelAndView;
-
-    LoginController loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
     private ProcessLoginService processLoginService;
 
     @BeforeEach
@@ -68,7 +71,7 @@ class LoginControllerTest {
 
     /*
      * Changing testing from testing the entire controller to just testing each class.
-    */
+     */
 
     @Test
     void testDisplayLogin() {
@@ -94,7 +97,7 @@ class LoginControllerTest {
         // Verify no other interactions 
         verifyNoMoreInteractions(mockProcessLoginService);
         // Verify no unexpected interactions with the session
-        verifyNoMoreInteractions(mockSession);        
+        verifyNoMoreInteractions(mockSession);
     }
 
 }

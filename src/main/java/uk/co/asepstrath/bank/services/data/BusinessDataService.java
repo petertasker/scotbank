@@ -21,9 +21,9 @@ public class BusinessDataService extends DataService implements DataServiceFetch
     }
 
 
-
     /**
      * Gets business data from the API
+     *
      * @return List of Business objects
      * @throws IOException Failed to fetch data from API
      */
@@ -41,7 +41,7 @@ public class BusinessDataService extends DataService implements DataServiceFetch
             boolean skipHeader = true;
 
             for (String inputLine : lines) {
-                if (skipHeader){
+                if (skipHeader) {
                     skipHeader = false;
                     continue;
                 }
@@ -58,7 +58,8 @@ public class BusinessDataService extends DataService implements DataServiceFetch
             }
             return businesses;
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new IOException("Failed to parse business data: ", e);
         }
     }

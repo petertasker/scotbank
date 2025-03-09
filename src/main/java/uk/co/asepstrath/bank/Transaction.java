@@ -40,8 +40,9 @@ public class Transaction {
     }
 
     // For transactions where the status is resolved
-    public Transaction(DateTime timestamp, BigDecimal amount, String from, String id, String to, String type, boolean transactionStatus) {
-        this.timestamp= timestamp;
+    public Transaction(DateTime timestamp, BigDecimal amount, String from, String id, String to, String type,
+                       boolean transactionStatus) {
+        this.timestamp = timestamp;
         this.amount = amount;
         this.from = from;
         this.id = id;
@@ -52,8 +53,9 @@ public class Transaction {
     }
 
     // For transactions where the status is unresolved
-    public Transaction(Connection connection, DateTime timestamp, BigDecimal amount, String from, String id, String to, String type) throws SQLException {
-        this.timestamp= timestamp;
+    public Transaction(Connection connection, DateTime timestamp, BigDecimal amount, String from, String id, String to,
+                       String type) throws SQLException {
+        this.timestamp = timestamp;
         this.amount = amount;
         this.from = from;
         this.id = id;
@@ -66,6 +68,7 @@ public class Transaction {
 
     /**
      * Gets the DateTime of the Transaction
+     *
      * @return the "timestamp" of the Transaction
      */
     public DateTime getTimestamp() {
@@ -74,6 +77,7 @@ public class Transaction {
 
     /**
      * Gets the amount value of the Transaction
+     *
      * @return the "amount" of the Transaction
      */
     public BigDecimal getAmount() {
@@ -82,6 +86,7 @@ public class Transaction {
 
     /**
      * Gets the sender of the Transaction
+     *
      * @return the "from" of the Transaction
      */
     public String getFrom() {
@@ -90,6 +95,7 @@ public class Transaction {
 
     /**
      * Gets the unique ID of the Transaction
+     *
      * @return the "id" of the Transaction
      */
     public String getId() {
@@ -98,6 +104,7 @@ public class Transaction {
 
     /**
      * Gets the recipient of the Transaction
+     *
      * @return the "to" of the Transaction
      */
     public String getTo() {
@@ -106,6 +113,7 @@ public class Transaction {
 
     /**
      * Gets the type of transaction (Transfer, Payment...)
+     *
      * @return The "type" of Transaction
      */
     public String getType() {
@@ -114,6 +122,7 @@ public class Transaction {
 
     /**
      * Gets the boolean value of if the Transaction was accepted or declined
+     *
      * @return the status of the Transaction
      */
     public boolean getStatus() {
@@ -136,7 +145,8 @@ public class Transaction {
                     yield true;
                 }
             };
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             return false;
         }
     }
@@ -152,7 +162,9 @@ public class Transaction {
 
     private boolean handleDeposit(Connection connection) throws SQLException {
         Account account = accountRepository.getAccount(connection, getTo());
-        if (account == null) return false;
+        if (account == null) {
+            return false;
+        }
 
         account.deposit(getAmount());
         accountRepository.updateBalance(connection, account);
@@ -175,7 +187,9 @@ public class Transaction {
         Account sender = accountRepository.getAccount(connection, getFrom());
         Account receiver = accountRepository.getAccount(connection, getTo());
 
-        if (sender == null || receiver == null) return false;
+        if (sender == null || receiver == null) {
+            return false;
+        }
 
         sender.withdraw(getAmount());
         receiver.deposit(getAmount());
@@ -186,7 +200,9 @@ public class Transaction {
 
     private boolean handlePayment(Connection connection) throws SQLException {
         Account payer = accountRepository.getAccount(connection, getFrom());
-        if (payer == null) return false;
+        if (payer == null) {
+            return false;
+        }
 
         payer.withdraw(getAmount());
         accountRepository.updateBalance(connection, payer);
@@ -195,17 +211,20 @@ public class Transaction {
             payer.withdraw(getAmount());
             accountRepository.updateBalance(connection, payer);
             return true;
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             return false;
         }
     }
 
     /**
      * Returns a String interpretation of a Transaction
+     *
      * @return A String of the Transaction
      */
     public String toString() {
-        return "Transaction [timestamp=" + timestamp + ", amount=" + amount + ", from=" + from + ", id=" + id + ", to=" + to + ", type=" + type + ", transactionStatus=" + transactionStatus + "]";
+        return "Transaction [timestamp=" + timestamp + ", amount=" + amount + ", from=" + from + ", id=" + id + ", " +
+                "to=" + to + ", type=" + type + ", transactionStatus=" + transactionStatus + "]";
     }
 
     private void setBalance(BigDecimal amount) {

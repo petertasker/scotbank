@@ -10,9 +10,10 @@ import uk.co.asepstrath.bank.Constants;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.TEMPLATE_LOGIN;
 
 class DisplayLoginServiceTest {
 
