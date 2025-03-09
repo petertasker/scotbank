@@ -10,6 +10,7 @@
     --error-bg: rgba(255, 0, 0, 0.1);
     --success-bg: rgba(0, 255, 0, 0.1);
     --transaction-bg: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(255, 255, 255, 0.15);
 
     /* Sizes */
     --border-radius-lg: 40px;
@@ -60,6 +61,21 @@ h1 {
     font-size: 32px;
     text-align: center;
     margin-bottom: var(--spacing-sm);
+}
+
+h2 {
+    font-size: 24px;
+    margin: var(--spacing-sm) 0;
+}
+
+h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 
 /* Account info */
@@ -245,6 +261,116 @@ hr {
     margin: 20px 0;
 }
 
+/* Insights Section Styles */
+.insights-section {
+    width: 100%;
+    margin-top: var(--spacing-lg);
+}
+
+.insights-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin-top: var(--spacing-sm);
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.insights-text, .insights-graph {
+    flex: 1;
+    min-width: 300px;
+    background-color: var(--transaction-bg);
+    border-radius: var(--border-radius-sm);
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.insight-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-sm);
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    margin: 15px 0;
+    width: 100%;
+}
+
+.insight-card p {
+    margin: 8px 0;
+}
+
+.business-counts {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;  /* Space between the list and chart */
+    justify-content: space-between; /* Ensures content spreads across the container */
+    margin-bottom: var(--spacing-md);
+}
+
+.business-category-item {
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.business-category-item:last-child {
+    border-bottom: none;
+}
+
+
+.business-category-list {
+    flex-shrink: 0; /* Prevents shrinking */
+    display: flex;
+    flex-direction: column; /* Ensures the items stack vertically */
+    justify-content: flex-start;
+    flex-grow: 1;
+}
+
+
+
+.business-category-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 20px;  /* Space between text and chart */
+    width: 100%;
+}
+
+.category-name {
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.category-count,
+.category-sum {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+
+.chart-container {
+    flex-grow: 1;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    height: 100%;
+}
+
+.pie-chart-container {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .content-wrapper {
@@ -262,5 +388,18 @@ hr {
 
     .transaction-form input[type="number"] {
         width: 150px;
+    }
+
+    .insights-container {
+        flex-direction: column;
+    }
+
+    .insights-text, .insights-graph {
+        width: 100%;
+    }
+
+    .business-counts {
+        flex-direction: column; /* Stacks the items on smaller screens */
+        align-items: center; /* Centers the content */
     }
 }

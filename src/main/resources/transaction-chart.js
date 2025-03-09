@@ -1,100 +1,108 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Select all transaction divs
-    const transactions = document.querySelectorAll('.transaction');
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM loaded, checking for business category data');
 
-    // Exit if no transactions found
-    if (!transactions.length) return;
+    const businessCountData = getBusinessCategoryData('count');
+    const businessSumData = getBusinessCategoryData('sum');
 
-    // Convert to array of transaction objects
-    const transactionData = Array.from(transactions).map(transactionDiv => {
-        return {
-            timestamp: transactionDiv.querySelector('p:nth-child(1)').textContent.replace('Date:', '').trim(),
-            id: transactionDiv.querySelector('p:nth-child(2)').textContent.replace('ID:', '').trim(),
-            amount: parseFloat(transactionDiv.querySelector('p:nth-child(3)').textContent.replace('Amount:£', '').trim()),
-            from: transactionDiv.querySelector('p:nth-child(4)').textContent.replace('From:', '').trim(),
-            to: transactionDiv.querySelector('p:nth-child(5)').textContent.replace('To:', '').trim(),
-            type: transactionDiv.querySelector('p:nth-child(6)').textContent.replace('Type:', '').trim(),
-            status: transactionDiv.querySelector('p:nth-child(7)').textContent.includes('Accepted')
-        };
-    });
+    console.log('Business category count data:', businessCountData);
+    console.log('Business category sum data:', businessSumData);
 
-    // Count transactions by type
-    const typeCounts = {
-        'DEPOSIT': 0,
-        'WITHDRAWAL': 0,
-        'PAYMENT': 0,
-        'TRANSFER': 0
-    };
+    if (businessCountData.length > 0) {
+        createBusinessPieChart(businessCountData, 'business-account-chart');
+    } else {
+        console.error('No business category count data found');
+    }
 
-    transactionData.forEach(transaction => {
-        if (typeCounts.hasOwnProperty(transaction.type)) {
-            typeCounts[transaction.type]++;
+    if (businessSumData.length > 0) {
+        createBusinessPieChart(businessSumData, 'business-sum-chart');
+    } else {
+        console.error('No business category sum data found');
+    }
+});
+
+function getBusinessCategoryData(type) {
+    let selector;
+    if (type === 'count') {
+        selector = '#payments-by-category .business-category-item';
+    } else if (type === 'sum') {
+        selector = '#payments-sum-by-category .business-category-item';
+    }
+
+    const categoryElements = document.querySelectorAll(selector);
+    const data = [];
+
+    categoryElements.forEach(element => {
+        const category = element.querySelector('.category-name').textContent.replace(':', '').trim();
+        let value;
+
+        if (type === 'count') {
+            value = parseInt(element.querySelector('.category-count').textContent.trim());
+        } else if (type === 'sum') {
+            value = parseFloat(element.querySelector('.category-sum').textContent.trim().replace('£', '').replace(',', ''));
+        }
+
+        if (!isNaN(value)) {
+            data.push({ category, value });
         }
     });
 
-    // Create container for the chart
-    const chartContainer = document.createElement('div');
-    chartContainer.className = 'chart-container';
-    chartContainer.style.width = '400px';
-    chartContainer.style.height = '400px';
-    chartContainer.style.margin = '20px auto';
+    return data;
+}
 
-    // Create canvas for the chart
-    const canvas = document.createElement('canvas');
-    canvas.id = 'transactionPieChart';
-    chartContainer.appendChild(canvas);
 
-    // Add the chart container after the transactions section
-    const transactionsSection = document.querySelector('.transactions-section');
-    transactionsSection.appendChild(chartContainer);
 
-    // Create the chart
-    createPieChart(typeCounts);
-});
+function createBusinessPieChart(data, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
 
-function createPieChart(typeCounts) {
-    // Load Chart.js from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-    script.onload = function() {
-        const ctx = document.getElementById('transactionPieChart').getContext('2d');
+    const labels = data.map(item => item.category);
+    const values = data.map(item => item.value);
+    const colors = generateColorPalette(data.length);
 
-        const data = Object.values(typeCounts);
-        const labels = Object.keys(typeCounts);
+    Chart.register(ChartDataLabels);
 
-        // Colors for each transaction type
-        const backgroundColors = [
-            'rgba(75, 192, 192, 0.7)',  // DEPOSIT
-            'rgba(255, 99, 132, 0.7)',  // WITHDRAWAL
-            'rgba(255, 205, 86, 0.7)',  // PAYMENT
-            'rgba(54, 162, 235, 0.7)'   // TRANSFER
-        ];
-
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: backgroundColors,
-                    borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    display: true,
+                    color: 'white',
+                    font: {
+                        size: 14,
+                        weight: 'bold'
                     },
-                    title: {
-                        display: true,
-                        text: 'Transaction Types'
+                    formatter: (value, context) => {
+                        let total = context.chart.getDatasetMeta(0).total;
+                        let percentage = ((value / total) * 100).toFixed(1) + '%';
+                        return percentage;
+                    },
+                    anchor: 'center',
+                    align: 'center'
+                },
+                legend: {
+                    labels: {
+                        color: 'white'
                     }
                 }
             }
-        });
-    };
+        }
+    });
+}
 
-    document.head.appendChild(script);
+function generateColorPalette(count) {
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+        const hue = (i * 360 / count) % 360;
+        colors.push(`hsla(${hue}, 70%, 60%, 0.7)`);
+    }
+    return colors;
 }

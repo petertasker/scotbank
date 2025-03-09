@@ -54,6 +54,7 @@ public class App extends Jooby {
 
         // Unbelievable that I cannot switch on this
         error((ctx, cause, code) -> {
+            getLog().error("Error occurred: {}, Status code: {}",cause.getMessage(), code, cause);
             if (code == StatusCode.FORBIDDEN) {
                 ctx.setResponseCode(403).sendRedirect(ROUTE_ERROR + ROUTE_403_FORBIDDEN);
             }
