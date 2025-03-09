@@ -29,8 +29,7 @@ class TransactionDataServiceFetcherTest {
        unirestWrapper = mock(UnirestWrapper.class);
        mockResponse = mock(HttpResponse.class);
        transactionDataService = new TransactionDataService(unirestWrapper);
-
-}
+    }
 
    @Test
    void testFetchDataSuccess() throws XMLStreamException {
@@ -54,14 +53,11 @@ class TransactionDataServiceFetcherTest {
                "  <size>1</size>" +
                "  <totalPages>154</totalPages>" +
                "</pageResult>";
-        when(firstPageResponse.getBody()).thenReturn(firstPageXml);
 
-        // Mock the behavior of UnirestWrapper to return the XML responses
         when(firstPageResponse.getBody()).thenReturn(firstPageXml);
-
+        when(firstPageResponse.getBody()).thenReturn(firstPageXml);
         when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0)).thenReturn(firstPageResponse);
-   
-        // Execute the method under test
+
         List<Transaction> transactions = transactionDataService.fetchData();
         
         // Verify the results
@@ -77,17 +73,15 @@ class TransactionDataServiceFetcherTest {
         when(mockResponse.getStatus()).thenReturn(500);
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
         
-        // Execute the method under test
         List<Transaction> transactions = transactionDataService.fetchData();
         
-        // Verify the results
         assertNotNull(transactions);
         assertTrue(transactions.isEmpty());
         verify(unirestWrapper, times(1)).get(anyString(), eq("page"), anyInt());
     }
 
     @Test
-    void testFetchDataWithXmlParsingError()  {
+    void testFetchDataWithXmlParsingError() {
         // Mock a response that will cause an XML parsing error
         when(mockResponse.isSuccess()).thenReturn(true);
         when(mockResponse.getBody()).thenReturn("Invalid XML");
@@ -119,8 +113,6 @@ class TransactionDataServiceFetcherTest {
                 "</pageResult>";
         when(mockResponse.getBody()).thenReturn(xmlWithNullAmount);
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
-        
-        // Execute the method under test
         List<Transaction> transactions = transactionDataService.fetchData();
         
         // Verify the results
@@ -130,12 +122,10 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafely() throws Exception {
-        // Create mocks
         DataSource mockDataSource = mock(DataSource.class);
         Connection mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         
-        // Create service
         TransactionDataService service = new TransactionDataService(mockDataSource);
         
         // Create test transaction with null amount 
