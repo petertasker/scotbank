@@ -21,6 +21,7 @@ public class DisplayManagerLoginService extends BaseService {
 
     /**
      * Renders the "/manager/login" endpoint
+     *
      * @return the "/manager/login" endpoint
      */
     public ModelAndView<Map<String, Object>> displayManagerLogin(Context ctx) {

@@ -13,11 +13,7 @@ import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,19 +67,13 @@ class ManagerRepositoryTest {
 
 
         // Act
-<<<<<<< Updated upstream
         String managerPsw = "SamplePassword";
         String hashedManagerPassword = HashingPasswordService.hashPassword(managerPsw);
         repository.insert(mockConnection, manager, hashedManagerPassword);
 
         // Assert
-        verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name, ManagerPassword) VALUES (?, ?, ?)");
-=======
-        repository.insert(mockConnection, manager, "password");
-
-        // Assert
         verify(mockConnection).prepareStatement("INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)");
->>>>>>> Stashed changes
+
         verify(mockPreparedStatement).setString(1, "M123");
         verify(mockPreparedStatement).setString(2, "John Doe");
         verify(mockPreparedStatement).executeUpdate();

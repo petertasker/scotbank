@@ -27,6 +27,7 @@ public class AccountDataService extends DataService implements DataServiceFetche
 
     /**
      * Gets account data from the API
+     *
      * @return List of Account objects
      * @throws IOException Failed to fetch data from API
      */
@@ -38,10 +39,12 @@ public class AccountDataService extends DataService implements DataServiceFetche
             if (response.isSuccess()) {
                 return mapper.readValue(response.getBody(), new TypeReference<>() {
                 });
-            } else {
+            }
+            else {
                 throw new JsonParseException(null, "Failed to fetch accounts: " + response.getStatus());
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new JsonParseException(null, "Failed to parse account data");
         }
     }

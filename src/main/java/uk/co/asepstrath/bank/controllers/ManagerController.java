@@ -6,9 +6,9 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.login.DisplayManagerLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessManagerLoginService;
 import uk.co.asepstrath.bank.services.manager.ViewManagerDashboardService;
-import uk.co.asepstrath.bank.services.login.DisplayManagerLoginService;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -35,6 +35,7 @@ public class ManagerController extends BaseController {
 
     /**
      * Displays all accounts on the system
+     *
      * @return The "/dashboard" endpoint
      */
     @GET
@@ -45,6 +46,7 @@ public class ManagerController extends BaseController {
 
     /**
      * Displays the manager login endpoint
+     *
      * @return The "/manager/login" endpoint
      */
     @GET
@@ -55,6 +57,7 @@ public class ManagerController extends BaseController {
 
     /**
      * Engages the manager login process
+     *
      * @param ctx Session contrxt
      * @return The "/manager/login" endpoint on failure
      * Redirects to "/manager/dashboard" on success

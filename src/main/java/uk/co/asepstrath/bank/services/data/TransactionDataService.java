@@ -11,7 +11,6 @@ import uk.co.asepstrath.bank.parsers.XmlParser;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ public class TransactionDataService extends DataService implements DataServiceFe
 
     /**
      * Fetches a List of Transactions from an external API
+     *
      * @return A list of transaction objects
      * @throws XMLStreamException failed to parse XML data from API
      */
@@ -72,11 +72,13 @@ public class TransactionDataService extends DataService implements DataServiceFe
                 if (hasMorePages) {
                     page++;
                     logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
-                } else {
+                }
+                else {
                     logger.info("Reached last page ({})", page);
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
 
@@ -110,10 +112,7 @@ public class TransactionDataService extends DataService implements DataServiceFe
      * Processes transactions from a page result
      */
     private List<Transaction> processTransactions(XmlParser pageResult) {
-        return pageResult.getTransactions()
-                .stream()
-                .map(this::createTransactionSafely)
-                .filter(Objects::nonNull)
+        return pageResult.getTransactions().stream().map(this::createTransactionSafely).filter(Objects::nonNull)
                 .toList();
     }
 
@@ -126,22 +125,15 @@ public class TransactionDataService extends DataService implements DataServiceFe
                 logger.warn("Skipping transaction with null amount: {}", transaction.getId());
                 return null;
             }
-            return new Transaction(
-                    connection,
-                    transaction.getTimestamp(),
-                    transaction.getAmount(),
-                    transaction.getFrom(),
-                    transaction.getId(),
-                    transaction.getTo(),
-                    transaction.getType()
-            );
-        } catch (SQLException e) {
-            logger.error("SQL error processing transaction {}: {}",
-                    transaction.getId(), e.getMessage());
+            return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
+                    transaction.getFrom(), transaction.getId(), transaction.getTo(), transaction.getType());
+        }
+        catch (SQLException e) {
+            logger.error("SQL error processing transaction {}: {}", transaction.getId(), e.getMessage());
             return null;
-        } catch (Exception e) {
-            logger.error("Unexpected error processing transaction {}: {}",
-                    transaction.getId(), e.getMessage());
+        }
+        catch (Exception e) {
+            logger.error("Unexpected error processing transaction {}: {}", transaction.getId(), e.getMessage());
             return null;
         }
     }

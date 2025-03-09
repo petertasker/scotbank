@@ -7,5 +7,6 @@ import java.sql.SQLException;
 
 public interface DatabaseOperations {
     void createTables(Connection connection) throws SQLException;
+
     void insertData(Connection connection) throws SQLException, IOException, XMLStreamException;
 }

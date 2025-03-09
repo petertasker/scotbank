@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -61,7 +62,8 @@ class ErrorServiceTest {
         Map<String, Object> model = result.getModel();
         assertEquals("Page Not Found", model.get(SESSION_SERVER_ERROR_TITLE));
         assertEquals(StatusCode.NOT_FOUND_CODE, model.get(SESSION_SERVER_ERROR_CODE));
-        assertEquals("The page you're looking for doesn't exist or has been moved.", model.get(SESSION_SERVER_ERROR_MESSAGE));
+        assertEquals("The page you're looking for doesn't exist or has been moved.",
+                model.get(SESSION_SERVER_ERROR_MESSAGE));
         assertEquals("Please check the URL or return to the homepage.", model.get(SESSION_SERVER_ERROR_SUGGESTION));
 
     }
@@ -82,8 +84,10 @@ class ErrorServiceTest {
         Map<String, Object> model = result.getModel();
         assertEquals("Method Not Allowed", model.get(SESSION_SERVER_ERROR_TITLE));
         assertEquals(StatusCode.METHOD_NOT_ALLOWED_CODE, model.get(SESSION_SERVER_ERROR_CODE));
-        assertEquals("The requested method is not supported for this resource.", model.get(SESSION_SERVER_ERROR_MESSAGE));
-        assertEquals("Please use a different method or contact support if you believe this is an error.", model.get(SESSION_SERVER_ERROR_SUGGESTION));
+        assertEquals("The requested method is not supported for this resource.",
+                model.get(SESSION_SERVER_ERROR_MESSAGE));
+        assertEquals("Please use a different method or contact support if you believe this is an error.",
+                model.get(SESSION_SERVER_ERROR_SUGGESTION));
 
     }
 
@@ -103,8 +107,10 @@ class ErrorServiceTest {
         Map<String, Object> model = result.getModel();
         assertEquals("Something Went Wrong", model.get(SESSION_SERVER_ERROR_TITLE));
         assertEquals(StatusCode.BAD_REQUEST_CODE, model.get(SESSION_SERVER_ERROR_CODE));
-        assertEquals("We encountered an unexpected issue while processing your request.", model.get(SESSION_SERVER_ERROR_MESSAGE));
-        assertEquals("Please try again later or contact customer support if the problem persists.", model.get(SESSION_SERVER_ERROR_SUGGESTION));
+        assertEquals("We encountered an unexpected issue while processing your request.",
+                model.get(SESSION_SERVER_ERROR_MESSAGE));
+        assertEquals("Please try again later or contact customer support if the problem persists.",
+                model.get(SESSION_SERVER_ERROR_SUGGESTION));
 
     }
 
@@ -121,6 +127,7 @@ class ErrorServiceTest {
         assertEquals("Internal Server Error", model.get(SESSION_SERVER_ERROR_TITLE));
         assertEquals(StatusCode.SERVER_ERROR_CODE, model.get(SESSION_SERVER_ERROR_CODE));
         assertEquals("An internal database error occurred.", model.get(SESSION_SERVER_ERROR_MESSAGE));
-        assertEquals("Please try again later or contact support if the problem persists.", model.get(SESSION_SERVER_ERROR_SUGGESTION));
+        assertEquals("Please try again later or contact support if the problem persists.",
+                model.get(SESSION_SERVER_ERROR_SUGGESTION));
     }
 }

@@ -30,6 +30,7 @@ public class ProcessManagerLoginService extends BaseService {
 
     /**
      * Processes the manager login
+     *
      * @param ctx Session context
      * @return the "/manager/login" endpoint on failure
      * Redirects to "/manager/dashboard" on success
@@ -46,7 +47,8 @@ public class ProcessManagerLoginService extends BaseService {
 
         try (
                 Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement("SELECT ManagerID, Name, Password FROM Managers WHERE ManagerID = ?")
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT ManagerID, Name, Password FROM Managers WHERE ManagerID = ?")
         ) {
             stmt.setString(1, formManagerID);
 
@@ -55,7 +57,7 @@ public class ProcessManagerLoginService extends BaseService {
                 if (rs.next()) {
                     String hashedPassword = rs.getString("Password");
                     // Manager found - create session
-                    if (HashingPasswordService.verifyPassword(password,hashedPassword)){
+                    if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
                         manager = new Manager(
                                 rs.getString("ManagerID"),
                                 rs.getString("Name")
@@ -66,13 +68,15 @@ public class ProcessManagerLoginService extends BaseService {
                         redirect(ctx, ROUTE_MANAGER + ROUTE_DASHBOARD);
                         return null;
                     }
-                } else {
+                }
+                else {
                     // Manager not found
                     handleLoginFailure(ctx, "Invalid account ID.");
                     return null;
                 }
             }
-        } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        }
+        catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             logger.error("Database error during manager login", e);
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "A database error occurred");
         }

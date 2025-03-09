@@ -9,7 +9,8 @@ class ManagerClassTest {
 
     private Manager manager;
 
-    @BeforeEach void setUp() {
+    @BeforeEach
+    void setUp() {
         manager = new Manager("12345", "Mr. Manager");
     }
 

@@ -10,7 +10,10 @@ import uk.co.asepstrath.bank.services.data.DataServiceFetcher;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static org.mockito.Mockito.*;
 
@@ -69,10 +72,13 @@ class DatabaseManagerTest {
 //        when(mockDataSource.getConnection()).thenReturn(mockConnection);
 //
 //        // Setup data mocks
-//        when(mockAccountDataService.fetchData()).thenReturn(List.of(new Account("XYZ123","John Doe", new BigDecimal(100), false)));
-//        when(mockBusinessDataService.fetchData()).thenReturn(List.of(new Business("B123","Something","Retail",false)));
+//        when(mockAccountDataService.fetchData()).thenReturn(List.of(new Account("XYZ123","John Doe", new BigDecimal
+//        (100), false)));
+//        when(mockBusinessDataService.fetchData()).thenReturn(List.of(new Business("B123","Something","Retail",
+//        false)));
 //        DateTime dateTime = new DateTime(2025, 2, 14, 8, 30, 0);
-//        when(mockTransactionDataService.fetchData()).thenReturn(List.of(new Transaction(dateTime,new BigDecimal(50),"XYZ123","T123","B123","PAYMENT",true)));
+//        when(mockTransactionDataService.fetchData()).thenReturn(List.of(new Transaction(dateTime,new BigDecimal(50)
+//        ,"XYZ123","T123","B123","PAYMENT",true)));
 //        when(mockManagerDataService.fetchData()).thenReturn(List.of(new Manager("M123","Manager1")));
 //
 //        // Execute method under test

@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 class HashingPasswordServiceTest {
 
     @Test
@@ -27,5 +28,5 @@ class HashingPasswordServiceTest {
 
         assertNotEquals(hashedPassword, hashedPassword2);
     }
-  
+
 }

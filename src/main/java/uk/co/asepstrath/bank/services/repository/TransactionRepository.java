@@ -14,25 +14,26 @@ import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
 public class TransactionRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE = """
-    CREATE TABLE Transactions (
-        Timestamp DATETIME NOT NULL,
-        Amount DECIMAL(12,2) NOT NULL,
-        SenderID VARCHAR(255) NULL,
-        TransactionID VARCHAR(255) NOT NULL,
-        ReceiverAccountID VARCHAR(255) NULL,
-        ReceiverBusinessID VARCHAR(255) NULL,
-        TransactionType VARCHAR(255) NOT NULL,
-        TransactionAccepted BIT NOT NULL,
-        PRIMARY KEY (TransactionID),
-        FOREIGN KEY (ReceiverAccountID) REFERENCES Accounts(AccountID),
-        FOREIGN KEY (ReceiverBusinessID) REFERENCES Businesses(BusinessID),
-        FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID),
-        CONSTRAINT CHK_Receiver CHECK (ReceiverAccountID IS NOT NULL OR ReceiverBusinessID IS NOT NULL OR SenderID IS NOT NULL)
-    )
-    """;
+            CREATE TABLE Transactions (
+                Timestamp DATETIME NOT NULL,
+                Amount DECIMAL(12,2) NOT NULL,
+                SenderID VARCHAR(255) NULL,
+                TransactionID VARCHAR(255) NOT NULL,
+                ReceiverAccountID VARCHAR(255) NULL,
+                ReceiverBusinessID VARCHAR(255) NULL,
+                TransactionType VARCHAR(255) NOT NULL,
+                TransactionAccepted BIT NOT NULL,
+                PRIMARY KEY (TransactionID),
+                FOREIGN KEY (ReceiverAccountID) REFERENCES Accounts(AccountID),
+                FOREIGN KEY (ReceiverBusinessID) REFERENCES Businesses(BusinessID),
+                FOREIGN KEY (SenderID) REFERENCES Accounts(AccountID),
+                CONSTRAINT CHK_Receiver CHECK (ReceiverAccountID IS NOT NULL OR ReceiverBusinessID IS NOT NULL OR SenderID IS NOT NULL)
+            )
+            """;
 
     private static final String SQL_INSERT_TRANSACTION =
-            "INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, ReceiverBusinessID, TransactionType, TransactionAccepted)\n" +
+            "INSERT INTO Transactions (Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, " +
+                    "ReceiverBusinessID, TransactionType, TransactionAccepted)\n" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 
@@ -42,6 +43,7 @@ public class TransactionRepository extends BaseRepository {
 
     /**
      * Creates the Transaction table
+     *
      * @param connection Database connection
      * @throws SQLException Database connection failure
      */
@@ -51,7 +53,8 @@ public class TransactionRepository extends BaseRepository {
 
     /**
      * Inserts a Transaction into the Transaction table
-     * @param connection Database Connection
+     *
+     * @param connection  Database Connection
      * @param transaction a Transaction object
      * @throws SQLException Database connection failure
      */
@@ -65,7 +68,8 @@ public class TransactionRepository extends BaseRepository {
 
             if (Objects.equals(transaction.getType(), "DEPOSIT")) {
                 stmt.setNull(3, java.sql.Types.VARCHAR);
-            } else {
+            }
+            else {
                 stmt.setString(3, transaction.getFrom());
             }
 
@@ -74,7 +78,8 @@ public class TransactionRepository extends BaseRepository {
             if (Objects.equals(transaction.getType(), "PAYMENT")) {
                 stmt.setNull(5, Types.VARCHAR);
                 stmt.setString(6, transaction.getTo());
-            } else {
+            }
+            else {
                 stmt.setString(5, transaction.getTo());
                 stmt.setNull(6, Types.VARCHAR);
             }

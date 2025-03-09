@@ -15,8 +15,6 @@ import uk.co.asepstrath.bank.Constants;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.*;
+import static uk.co.asepstrath.bank.Constants.ROUTE_ACCOUNT;
+import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
 
 class ProcessLoginServiceTest {
     @Mock
@@ -122,7 +121,7 @@ class ProcessLoginServiceTest {
     }
 
     @Test
-    void testProcessLoginSuccess() throws SQLException{
+    void testProcessLoginSuccess() throws SQLException {
         String accountId = "account";
         String name = "Peter Tasker";
         String password = "password123";

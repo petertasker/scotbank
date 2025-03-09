@@ -59,7 +59,7 @@ class AccountRepositoryTest {
         Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
         String psw = "Password123";
         String hashedPassword = HashingPasswordService.hashPassword(psw);
-        accountRepository.insert(connection, account,hashedPassword);
+        accountRepository.insert(connection, account, hashedPassword);
 
         verify(connection).prepareStatement(contains("INSERT INTO Accounts"));
         verify(preparedStatement).setString(1, "12345");
@@ -77,7 +77,7 @@ class AccountRepositoryTest {
 
         Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
         assertThrows(SQLException.class, () -> {
-            accountRepository.insert(connection, account,"Password123");
+            accountRepository.insert(connection, account, "Password123");
         });
     }
 

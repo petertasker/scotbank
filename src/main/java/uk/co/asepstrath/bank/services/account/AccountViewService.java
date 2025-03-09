@@ -8,13 +8,14 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.services.BaseService;
-import java.text.DecimalFormat;
+
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -23,12 +24,13 @@ import static uk.co.asepstrath.bank.Constants.*;
  */
 public class AccountViewService extends AccountService {
 
-    public AccountViewService(DataSource datasource, Logger logger){
+    public AccountViewService(DataSource datasource, Logger logger) {
         super(datasource, logger);
     }
 
     /**
      * Displays the "/account" endpoint
+     *
      * @param ctx Session Context
      * @return the "/account" endpoint
      * @throws SQLException Transactions not found in database
@@ -108,10 +110,8 @@ public class AccountViewService extends AccountService {
     private List<Transaction> fetchTransactions(Connection connection, String accountId) throws SQLException {
         List<Transaction> transactions = new ArrayList<>();
         String query = "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, " +
-                "ReceiverBusinessID, TransactionType, TransactionAccepted " +
-                "FROM Transactions " +
-                "WHERE SenderID = ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " +
-                "ORDER BY Timestamp DESC";
+                "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
+                "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, accountId);
@@ -144,7 +144,7 @@ public class AccountViewService extends AccountService {
         String transactionType = resultSet.getString("TransactionType");
         boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
 
-        return new Transaction(dateTime, amount, senderID, transactionID,
-                receiverID, transactionType, transactionAccepted);
+        return new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType,
+                transactionAccepted);
     }
 }
