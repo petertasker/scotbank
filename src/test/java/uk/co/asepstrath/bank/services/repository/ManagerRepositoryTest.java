@@ -111,7 +111,7 @@ class ManagerRepositoryTest {
         assertFalse(accounts.get(1).isRoundUpEnabled());
 
         // Verify SQL query
-        verify(mockStatement).executeQuery("SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts");
+        verify(mockStatement).executeQuery("SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts");
     }
 
     @Test

@@ -80,6 +80,8 @@ public class ViewManagerDashboardService extends ManagerService {
             displayAx.put("accountid", account.getAccountID());
             displayAx.put("name", account.getName());
             displayAx.put("balance", formattedBalance);
+            displayAx.put(ACCOUNT_CARD_NUMBER, account.getCard().getCardNumber());
+            displayAx.put(ACCOUNT_CARD_CVV, account.getCard().getCvv());
             displayAccounts.add(displayAx);
         }
         model.put(ACCOUNT_OBJECT_LIST_EXISTS, !displayAccounts.isEmpty());

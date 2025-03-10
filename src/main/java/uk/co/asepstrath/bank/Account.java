@@ -21,6 +21,7 @@ public class Account {
     private BigDecimal balance;
     private BigDecimal roundUpBalance;
     private String postcode;
+    private Card card;
 
     @JsonCreator
     public Account(
@@ -28,7 +29,8 @@ public class Account {
             @JsonProperty("name") String name,
             @JsonProperty("startingBalance") BigDecimal balance,
             @JsonProperty("roundUpEnabled") boolean roundUpEnabled,
-            @JsonProperty("postcode") String postcode
+            @JsonProperty("postcode") String postcode,
+            @JsonProperty("card") Card card
     ) {
         this.accountID = accountID;
         this.balance = balance;
@@ -36,16 +38,22 @@ public class Account {
         this.roundUpEnabled = roundUpEnabled;
         this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
         this.postcode = postcode;
+        this.card = card;
     }
 
-    public Account(String accountID, String name, BigDecimal balance, boolean roundUpEnabled) {
+    public Account(String accountID, String name, BigDecimal balance, boolean roundUpEnabled, Card card) {
         this.accountID = accountID;
         this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
         this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
+        this.card = card;
     }
 
+
+    public Card getCard() {
+        return card;
+    }
 
     /**
      * Deposits money into an account

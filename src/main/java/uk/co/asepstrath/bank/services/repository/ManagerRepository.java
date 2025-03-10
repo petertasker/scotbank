@@ -4,6 +4,7 @@ import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Card;
 import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.services.CurrencyFormatter;
@@ -36,7 +37,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
     private static final String SQL_INSERT_MANAGER =
             "INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)";
     private static final String SQL_SELECT_ALL_ACCOUNTS =
-            "SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts";
+            "SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts";
     private static final String SQL_SELECT_TOP_TEN_SPENDERS = """
             SELECT a.Name, a.Postcode, SUM(t.Amount) AS TotalAmount
             FROM Transactions t
@@ -96,7 +97,11 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
                                 resultSet.getString("AccountID"),
                                 resultSet.getString("Name"),
                                 resultSet.getBigDecimal("Balance"),
-                                resultSet.getBoolean("RoundUpEnabled")
+                                resultSet.getBoolean("RoundUpEnabled"),
+                                new Card(
+                                        resultSet.getString("CardNumber"),
+                                        resultSet.getString("CardCVV")
+                                )
                         )
                 );
             }

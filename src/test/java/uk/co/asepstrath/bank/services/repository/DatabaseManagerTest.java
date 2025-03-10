@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Business;
-import uk.co.asepstrath.bank.Manager;
-import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.*;
 import uk.co.asepstrath.bank.services.data.AccountDataService;
 import uk.co.asepstrath.bank.services.data.BusinessDataService;
 import uk.co.asepstrath.bank.services.data.ManagerDataService;
@@ -99,7 +96,7 @@ class DatabaseManagerTest {
     @Test
     void testInsertionTables() throws IOException, XMLStreamException, SQLException, NoSuchAlgorithmException,
             InvalidKeySpecException {
-        Account accounts = new Account("ABC123", "John Doe", new BigDecimal(100), true);
+        Account accounts = new Account("ABC123", "John Doe", new BigDecimal(100), true, new Card("123", "345"));
         Business businesses = new Business("B123", "Something", "Retail", false);
         DateTime date = new DateTime(2025, 5, 20, 16, 20, 0);
         Transaction transactions = new Transaction(date, new BigDecimal(50), "ABC123", "T123", "B123", "PAYMENT", true);
