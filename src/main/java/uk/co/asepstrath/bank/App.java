@@ -49,6 +49,9 @@ public class App extends Jooby {
             if (path.endsWith("/js")) {
                 return;
             }
+            if (path.endsWith(".ico")) {
+                return;
+            }
 
             Session session = ctx.sessionOrNull();
             boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(
@@ -99,6 +102,8 @@ public class App extends Jooby {
         assets("/assets/*", "/assets");
         assets("/service_worker.js", "/service_worker.js");
         assets("/transaction-chart.js", "/transaction-chart.js");
+        assets("/favicon.svg", "images/favicon.svg");
+        get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
         /*
         Now we set up our controllers and their dependencies
          */

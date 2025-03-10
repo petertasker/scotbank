@@ -22,14 +22,14 @@
                 <p class="roundup-balance">£{{roundUpBalance}}</p>
             </div>
         {{/roundUpEnabled}}
-        <a href="/logout">Logout</a>
     </div>
 
     <div class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal
         </button>
-        <button type="button" class="btn btn-primary" onclick="window.location.href='#insights'">Insights</button>
+        <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
     </div>
 
     {{#if success}}
@@ -123,4 +123,18 @@
     {{/if}}
 </div>
 </body>
+<script>
+    // Smooth scroll function without updating URL
+    function scrollToInsights() {
+        const insightsSection = document.getElementById('insights');
+        if (insightsSection) {
+            insightsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Chart initialization code
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize charts here
+    });
+</script>
 </html>
