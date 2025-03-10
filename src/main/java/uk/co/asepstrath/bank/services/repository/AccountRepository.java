@@ -63,7 +63,11 @@ public class AccountRepository extends BaseRepository {
      */
     public void insert(Connection connection, Account account, String password) throws SQLException,
             NoSuchAlgorithmException, InvalidKeySpecException {
+
+        // Hash plaintext password before storing in the database
         String hashedPassword = HashingPasswordService.hashPassword(password);
+
+        // Attempt to insert a new Account into the database
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             statement.setString(1, account.getAccountID());
             statement.setString(2, hashedPassword);

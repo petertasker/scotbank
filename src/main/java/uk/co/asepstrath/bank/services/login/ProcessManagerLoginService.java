@@ -24,6 +24,7 @@ import static uk.co.asepstrath.bank.Constants.*;
  * The manager login process service
  */
 public class ProcessManagerLoginService extends BaseService {
+
     public ProcessManagerLoginService(DataSource dataSource, Logger logger) {
         super(dataSource, logger);
     }
@@ -36,7 +37,8 @@ public class ProcessManagerLoginService extends BaseService {
      * Redirects to "/manager/dashboard" on success
      */
     public ModelAndView<Map<String, Object>> processManagerLogin(Context ctx) {
-        // Validate manager ID
+
+        // Validate manager form input
         String formManagerID = getFormValue(ctx, "managerid");
         String password = getFormValue(ctx, "password");
         if (formManagerID == null || formManagerID.trim().isEmpty()) {
@@ -56,8 +58,10 @@ public class ProcessManagerLoginService extends BaseService {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String hashedPassword = rs.getString("Password");
-                    // Manager found - create session
+                    // Compare hashed database password to hashed user input password
                     if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
+
+                        // Create an instance of Manager if successful
                         manager = new Manager(
                                 rs.getString("ManagerID"),
                                 rs.getString("Name")
@@ -70,7 +74,7 @@ public class ProcessManagerLoginService extends BaseService {
                     }
                 }
                 else {
-                    // Manager not found
+                    // Details wrong
                     handleLoginFailure(ctx, "Invalid account ID.");
                     return null;
                 }

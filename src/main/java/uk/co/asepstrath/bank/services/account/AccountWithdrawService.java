@@ -61,7 +61,6 @@ public class AccountWithdrawService extends AccountService {
         logger.info("Enter withdraw process");
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection()) {
-
             BigDecimal amount = getFormBigDecimal(ctx, "withdrawalamount");
             Account account = accountRepository.getAccount(connection, accountId);
             Transaction transaction = new Transaction(connection, DateTime.now(), amount, accountId,

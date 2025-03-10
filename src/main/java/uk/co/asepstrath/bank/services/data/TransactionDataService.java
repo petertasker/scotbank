@@ -52,6 +52,8 @@ public class TransactionDataService extends DataService implements DataServiceFe
         try {
             logger.info("Fetching transactions from database...");
             while (hasMorePages) {
+
+                // Make GET request for each page
                 HttpResponse<String> response = fetchPage(page);
 
                 if (!response.isSuccess()) {
@@ -59,17 +61,21 @@ public class TransactionDataService extends DataService implements DataServiceFe
                     break;
                 }
 
+                // Map page responses to a List of Transaction Objects
                 XmlParser pageResult = parseResponse(xmlMapper, response);
                 List<Transaction> pageTransactions = processTransactions(pageResult);
 
+                // Break if for some reason the XML is configured poorly, and the parser is sent to an empty page
                 if (pageTransactions.isEmpty()) {
                     logger.info("No more transactions found on page {}", page);
                     break;
                 }
 
+                // Append page Transactions to List of all Transactions
                 allTransactions.addAll(pageTransactions);
                 hasMorePages = determineIfMorePages(pageResult, page);
 
+                // Go to next page
                 if (hasMorePages) {
                     page++;
                 }

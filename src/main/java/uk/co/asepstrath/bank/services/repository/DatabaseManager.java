@@ -44,6 +44,7 @@ public class DatabaseManager implements DatabaseOperations {
         this.dataSource = dataSource;
         this.logger = logger;
 
+        // Instantiate repository services
         this.accountRepository = new AccountRepository(logger);
         this.businessRepository = new BusinessRepository(logger);
         this.transactionRepository = new TransactionRepository(logger);

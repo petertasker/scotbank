@@ -34,12 +34,15 @@ public class BusinessDataService extends DataService implements DataServiceFetch
     @Override
     public List<Business> fetchData() throws IOException {
         try {
+            // Make GET request
             HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/businesses");
+
 
             if (!response.isSuccess()) {
                 throw new IOException("Failed to fetch businesses: " + response.getStatus());
             }
 
+            // Parse CSV response into a List of Business Objects
             List<Business> businesses = new ArrayList<>();
             String[] lines = response.getBody().split("\n");
             boolean skipHeader = true;
