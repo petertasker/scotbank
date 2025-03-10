@@ -105,8 +105,8 @@ public class App extends Jooby {
         assets("/mapEmbed.js", "/mapEmbed.js");
 
         // Handle favicon inconsistencies between Windows and Linux
-        assets("/favicon.svg", "images/favicon.svg");
-        get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
+        assets("/favicon.svg", "/assets/images/favicon.svg");
+        get("/favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
 
         /*
         Set up controllers and their dependencies
