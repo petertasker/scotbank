@@ -64,7 +64,7 @@ public class AccountDataService extends DataService implements DataServiceFetche
 
             // List wanted parameters
             Map<String, Object> params = new HashMap<>();
-            params.put("include", "postcode");
+            params.put("include", "postcode,cardDetails");
 
             // Make GET request
             HttpResponse<String> response = wrapper.get("https://api.asep-strath.co.uk/api/accounts", params,

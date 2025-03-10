@@ -6,6 +6,7 @@ import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Card;
 import uk.co.asepstrath.bank.services.BaseService;
 
 import javax.sql.DataSource;
@@ -74,7 +75,8 @@ public class ProcessLoginService extends BaseService {
             InvalidKeySpecException {
 
         try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(
-                "SELECT AccountID, Password, Name, Balance, RoundUpEnabled FROM Accounts WHERE AccountID=?")) {
+                "SELECT AccountID, Password, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts WHERE " +
+                        "AccountID=?")) {
 
             ps.setString(1, accountId);
 
@@ -86,7 +88,10 @@ public class ProcessLoginService extends BaseService {
                     if (HashingPasswordService.verifyPassword(password, hashedPassword)) {
                         logger.info("Found account");
                         return new Account(rs.getString("AccountID"), rs.getString("Name"), rs.getBigDecimal("Balance"),
-                                rs.getBoolean("RoundUpEnabled"));
+                                rs.getBoolean("RoundUpEnabled"), new Card(
+                                        rs.getString("CardNumber"),
+                                        rs.getString("CardCVV")
+                        ));
                     }
                 }
                 return null;
