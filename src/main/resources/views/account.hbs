@@ -65,12 +65,12 @@
                 <div class="insights-container">
                     <div class="insight-card">
                         <h4>Number of Payments per Business Category</h4>
-                        <div class="business-counts">
+                        <div class="category-container">
                             {{#if businesscounts}}
-                                <div class="business-category-container">
-                                    <div class="business-category-list">
+                                <div class="category-list-container">
+                                    <div class="category-list">
                                         {{#each businesscounts}}
-                                            <div class="business-category-item">
+                                            <div class="category-item">
                                                 <span class="category-name">{{category}}:</span>
                                                 <span class="category-count">{{count}}</span>
                                             </div>
@@ -95,12 +95,12 @@
                 <div class="insights-container">
                     <div class="insight-card">
                         <h4>Sum of Payments per Business Category</h4>
-                        <div class="business-counts">
+                        <div class="category-container">
                             {{#if businesssums}}
-                                <div class="business-category-container">
-                                    <div class="business-category-list">
+                                <div class="category-list-container">
+                                    <div class="category-list">
                                         {{#each businesssums}}
-                                            <div class="business-category-item">
+                                            <div class="category-item">
                                                 <span class="category-name">{{category}}:</span>
                                                 <span class="category-sum">{{totalAmount}}</span>
                                             </div>
@@ -131,10 +131,5 @@
             insightsSection.scrollIntoView({ behavior: 'smooth' });
         }
     }
-
-    // Chart initialization code
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize charts here
-    });
 </script>
 </html>

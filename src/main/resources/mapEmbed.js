@@ -1,62 +1,114 @@
-document.addEventListener("DOMContentLoaded", function () {
-    function getTopSpenderData(type) {
-        let selector;
-        if (type === 'amount') {
-            selector = '#top-spenders .spender-item';
+function getTopSpenderData() {
+    const spenderElements = document.querySelectorAll('.insights-section .category-item');
+    const data = [];
+
+    spenderElements.forEach(element => {
+        const name = element.querySelector('.spender-name').textContent.replace(':', '').trim();
+        const postcode = element.querySelector('.spender-postcode').textContent.replace('(', '').replace(')', '').trim();
+        const totalAmount = parseFloat(element.querySelector('.spender-amount').textContent.replace('£', '').replace(',', ''));
+
+        if (!isNaN(totalAmount)) {
+            data.push({ name, postcode, totalAmount });
         }
+    });
 
-        const spenderElements = document.querySelectorAll(selector);
-        const data = [];
+    return data;
+}
 
-        spenderElements.forEach(element => {
-            const name = element.querySelector('.spender-name').textContent.trim();
-            const postcode = element.querySelector('.spender-postcode').textContent.replace('(', '').replace(')', '').trim();
-            let totalAmount;
-
-            if (type === 'amount') {
-                totalAmount = parseFloat(element.querySelector('.spender-amount').textContent.replace('£', '').replace(',', ''));
-            }
-
-            if (!isNaN(totalAmount)) {
-                data.push({ name, postcode, totalAmount });
-            }
-        });
-
-        return data;
+// Initialize Google Map
+function initMap() {
+    // Make sure map container exists before proceeding
+    const mapContainer = document.getElementById('top-spenders-map');
+    if (!mapContainer) {
+        console.error("Map container not found!");
+        return;
     }
 
-    // Call the function and log the result after DOM is fully loaded
-    const topSpenders = getTopSpenderData('amount');
-    console.log(topSpenders);
-    // var map;
-    // var geocoder;
+    const topSpenders = getTopSpenderData();
+    console.log("Top spenders data:", topSpenders);
 
+    // Create map centered on Scotland
+    const map = new google.maps.Map(mapContainer, {
+        zoom: 7,
+        center: { lat: 56.4907, lng: -4.2026 } // Center of Scotland
+    });
 
-    // function initMap() {
-    //     map = new google.maps.Map(document.getElementById('map'), {
-    //         zoom: 5,
-    //         center: { lat: 56.4907, lng: -4.2026 } // Scotland
-    //     });
-    //
-    //     geocoder = new google.maps.Geocoder();
-    //     plotSpenders();
-    // }
-    //
-    // function plotSpenders() {
-    //     bigSpenders.forEach(spender => {
-    //         geocoder.geocode({ address: spender.Postcode }, function (results, status) {
-    //             if (status === "OK") {
-    //                 new google.maps.Marker({
-    //                     position: results[0].geometry.location,
-    //                     map: map,
-    //                     title: `${spender.Name}: £${spender.TotalAmount}`
-    //                 });
-    //             } else {
-    //                 console.error("Geocode failed for " + spender.Postcode + ": " + status);
-    //             }
-    //         });
-    //     });
-    // }
-    //
-    // window.initMap = initMap; // Expose initMap globally for Google Maps API
+    // Rest of your map code remains the same
+    // Array to store geocoder requests
+    const geocodingPromises = [];
+
+    // Function to geocode a postcode
+    function geocodePostcode(postcode, name, amount) {
+        return new Promise((resolve, reject) => {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ 'address': postcode + ', UK' }, function(results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    resolve({
+                        position: results[0].geometry.location,
+                        name: name,
+                        postcode: postcode,
+                        amount: amount
+                    });
+                } else {
+                    console.warn(`Geocoding failed for ${postcode}: ${status}`);
+                    reject(status);
+                }
+            });
+        });
+    }
+
+    // Create geocoding promises for each spender
+    topSpenders.forEach(spender => {
+        geocodingPromises.push(geocodePostcode(spender.postcode, spender.name, spender.totalAmount));
+    });
+
+    // Wait for all geocoding to complete
+    Promise.all(geocodingPromises.map(p => p.catch(e => null)))
+        .then(locations => {
+            // Filter out any failed geocoding results
+            const validLocations = locations.filter(loc => loc !== null);
+
+            // Add markers for each location
+            validLocations.forEach(loc => {
+                const marker = new google.maps.Marker({
+                    position: loc.position,
+                    map: map,
+                    title: loc.name
+                });
+
+                // Create info window for each marker
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<div style="color: black;">
+                        <strong>${loc.name}</strong><br>
+                        Postcode: ${loc.postcode}<br>
+                        Amount: £${loc.amount.toLocaleString()}
+                    </div>`
+                });
+
+                // Add click listener to show info window
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            });
+
+            // Adjust map bounds to fit all markers
+            if (validLocations.length > 0) {
+                const bounds = new google.maps.LatLngBounds();
+                validLocations.forEach(loc => {
+                    bounds.extend(loc.position);
+                });
+                map.fitBounds(bounds);
+            }
+        })
+        .catch(error => {
+            console.error("Error creating map markers:", error);
+        });
+}
+
+// Make sure the DOM is loaded before initializing the map
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM loaded, waiting for maps API to load");
 });
+
+// Add global initMap function for Google Maps callback
+window.initMap = initMap;
