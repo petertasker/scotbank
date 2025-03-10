@@ -50,7 +50,7 @@ public class ViewManagerDashboardService extends ManagerService {
             List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
             model.put(BIG_SPENDERS_LIST, topSpenders);
             model.put(BIG_SPENDERS_LIST_EXISTS, !topSpenders.isEmpty());
-
+            model.put("api-maps-key", MAPS_API_KEY);
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         }
         catch (SQLException e) {

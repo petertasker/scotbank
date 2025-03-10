@@ -298,7 +298,7 @@ hr {
     margin: 8px 0;
 }
 
-.business-counts {
+.category-container, .spenders-counts {
     display: flex;
     flex-direction: row;
     gap: 20px; /* Space between the list and chart */
@@ -306,7 +306,7 @@ hr {
     margin-bottom: var(--spacing-md);
 }
 
-.business-category-item {
+.category-item {
     justify-content: space-between;
     padding: 5px 0;
     border-bottom: 1px solid var(--border-color);
@@ -314,12 +314,12 @@ hr {
     align-items: center;
 }
 
-.business-category-item:last-child {
+.category-item:last-child {
     border-bottom: none;
 }
 
 
-.business-category-list {
+.category-list, .spenders-container {
     flex-shrink: 0; /* Prevents shrinking */
     display: flex;
     flex-direction: column; /* Ensures the items stack vertically */
@@ -328,7 +328,7 @@ hr {
 }
 
 
-.business-category-container {
+.category-list-container {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
@@ -336,20 +336,24 @@ hr {
     width: 100%;
 }
 
-.category-name {
+.category-name,
+.spender-name,
+.spender-postcode
+{
     font-weight: 500;
     margin-right: 10px;
 }
 
 .category-count,
-.category-sum {
+.category-sum,
+.spender-amount {
     background-color: rgba(255, 255, 255, 0.2);
     padding: 2px 8px;
     border-radius: 12px;
 }
 
 
-.chart-container {
+.chart-container, .maps-container {
     flex-grow: 1;
     background-color: var(--card-bg);
     border-radius: var(--border-radius-sm);
@@ -399,7 +403,7 @@ hr {
         width: 100%;
     }
 
-    .business-counts {
+    .category-container, .spenders-counts {
         flex-direction: column; /* Stacks the items on smaller screens */
         align-items: center; /* Centers the content */
     }
