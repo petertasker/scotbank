@@ -84,6 +84,7 @@ public final class Constants {
 
     // I signed up for the Google Maps API key with a limited 10,000 accesses a month, please be gentle!
     public static final String MAPS_API_KEY = "AIzaSyAg04brkuCDNKpSJwyzKI4jXJhNZaeBB8k";
+
     private Constants() {
 
     }

@@ -56,7 +56,7 @@ public class TransactionRepository extends BaseRepository {
      *
      * @param connection  Database Connection
      * @param transaction a Transaction object
-     * @throws SQLException Database connection failure
+     * @throws SQLException        Database connection failure
      * @throws ArithmeticException If the transaction amount exceeds the maximum allowed balance
      */
     public void insert(Connection connection, Transaction transaction) throws SQLException, ArithmeticException {
@@ -69,7 +69,8 @@ public class TransactionRepository extends BaseRepository {
             stmt.setTimestamp(1, new Timestamp(transaction.getTimestamp().getMillis()));
             stmt.setString(2, transaction.getAmount().toString());
 
-            // If the transaction type is "DEPOSIT", set 'from' field to NULL; otherwise, set it to the transaction's 'from' account
+            // If the transaction type is "DEPOSIT", set 'from' field to NULL; otherwise, set it to the transaction's
+            // 'from' account
             if (Objects.equals(transaction.getType(), "DEPOSIT")) {
                 stmt.setNull(3, java.sql.Types.VARCHAR);
             }

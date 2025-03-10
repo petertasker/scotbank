@@ -147,7 +147,8 @@ public class Transaction {
                     yield false;
                 }
             };
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             logger.error("Arithmetic exception occurred during transaction: {}", e.getMessage());
             return false;
         }
@@ -249,7 +250,8 @@ public class Transaction {
             payer.withdraw(getAmount());
             accountRepository.updateBalance(connection, payer);
             return true;
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             logger.error("Insufficient funds for payment transaction: {}", e.getMessage());
             return false;
         }

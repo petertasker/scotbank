@@ -20,6 +20,7 @@ public class ManagerService extends BaseService {
 
     /**
      * Throws a 403 if a manager is not logged in
+     *
      * @param ctx Session context
      */
     protected void ensureManagerIsLoggedIn(Context ctx) {

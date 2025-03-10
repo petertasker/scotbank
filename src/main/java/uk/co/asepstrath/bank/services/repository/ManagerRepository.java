@@ -122,7 +122,8 @@ public class ManagerRepository extends BaseRepository {
                 row.put("TotalAmount", rs.getBigDecimal("TotalAmount"));
                 results.add(row);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new StatusCodeException(StatusCode.SERVER_ERROR, "Failed to get top ten spenders");
         }
         return results;

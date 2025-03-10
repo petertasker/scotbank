@@ -34,7 +34,8 @@ public class App extends Jooby {
             // Redirect managers to their dashboard, otherwise send users to the account page
             if (managerLoggedIn) {
                 ctx.sendRedirect(ROUTE_MANAGER + ROUTE_DASHBOARD);
-            } else {
+            }
+            else {
                 ctx.sendRedirect(ROUTE_ACCOUNT); // Regular user account page if manager is not logged in
             }
             return null;
@@ -105,7 +106,7 @@ public class App extends Jooby {
 
         // Handle favicon inconsistencies between Windows and Linux
         assets("/favicon.svg", "images/favicon.svg");
-        get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));;
+        get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
 
         /*
         Set up controllers and their dependencies
