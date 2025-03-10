@@ -301,8 +301,8 @@ hr {
 .category-container, .spenders-counts {
     display: flex;
     flex-direction: row;
-    gap: 20px; /* Space between the list and chart */
-    justify-content: space-between; /* Ensures content spreads across the container */
+    gap: 20px;
+    justify-content: space-between;
     margin-bottom: var(--spacing-md);
 }
 
@@ -312,6 +312,7 @@ hr {
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .category-item:last-child {
@@ -320,9 +321,9 @@ hr {
 
 
 .category-list, .spenders-container {
-    flex-shrink: 0; /* Prevents shrinking */
+    flex-shrink: 0;
     display: flex;
-    flex-direction: column; /* Ensures the items stack vertically */
+    flex-direction: column;
     justify-content: flex-start;
     flex-grow: 1;
 }
@@ -332,16 +333,35 @@ hr {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 20px; /* Space between text and chart */
+    gap: 20px;
     width: 100%;
+}
+
+.spender-postcode, .spender-amount {
+    text-align: right; /* Right-align postcode and amount */
+    margin-left: 10px; /* Adds some space between the name and the right-aligned text */
+}
+
+
+.spender-name {
+    flex-grow: 1; /* Ensures the name takes up the remaining space */
 }
 
 .category-name,
 .spender-name,
-.spender-postcode
-{
+.spender-postcode {
     font-weight: 500;
-    margin-right: 10px;
+}
+
+.spender-postcode {
+    text-align: left;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.spender-amount {
+    text-align: right; /* Right-align the amount */
+    margin-left: 10px; /* Adds space between the postcode and the amount */
 }
 
 .category-count,
@@ -352,6 +372,10 @@ hr {
     border-radius: 12px;
 }
 
+#top-spenders-map {
+    flex-grow: 1; /* Ensures the map takes up the remaining free space */
+    height: 100%;
+}
 
 .chart-container, .maps-container {
     flex-grow: 1;

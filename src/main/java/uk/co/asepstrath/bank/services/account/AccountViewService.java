@@ -188,8 +188,10 @@ public class AccountViewService extends AccountService {
         }
         logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
         model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // Sort in descending order
                 .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
                 .collect(Collectors.toList()));
+
 
     }
 
@@ -222,8 +224,13 @@ public class AccountViewService extends AccountService {
         }
         logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
         model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
-                .map(entry -> Map.of("category", entry.getKey(), "totalAmount", entry.getValue()))
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Sort in descending order
+                .map(entry -> Map.of("category", entry.getKey(),
+                        "totalAmount", formatCurrency(entry.getValue())))
                 .collect(Collectors.toList()));
+
+
+
     }
 
 

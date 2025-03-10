@@ -6,23 +6,24 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
+import uk.co.asepstrath.bank.services.CurrencyFormatter;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
 
 /**
  * The Manager repository service
  */
-public class ManagerRepository extends BaseRepository {
+public class ManagerRepository extends BaseRepository implements CurrencyFormatter {
 
     private static final String SQL_CREATE_TABLE = """
             CREATE TABLE Managers (
@@ -119,7 +120,7 @@ public class ManagerRepository extends BaseRepository {
                 Map<String, Object> row = new HashMap<>();
                 row.put("Name", rs.getString("Name"));
                 row.put("Postcode", rs.getString("Postcode"));
-                row.put("TotalAmount", rs.getBigDecimal("TotalAmount"));
+                row.put("TotalAmount", formatCurrency(rs.getBigDecimal("TotalAmount")));
                 results.add(row);
             }
         }
@@ -129,4 +130,16 @@ public class ManagerRepository extends BaseRepository {
         return results;
     }
 
+    @Override
+    public String formatCurrency(BigDecimal amount) {
+        if (amount == null) {
+            return "£0.00"; // Default value if balance is null
+        }
+
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.UK);
+        DecimalFormat decimalFormat = (DecimalFormat) formatter;
+        decimalFormat.applyPattern("#,###.00");
+
+        return decimalFormat.format(amount);
+    }
 }
