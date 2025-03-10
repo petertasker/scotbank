@@ -226,8 +226,4 @@ public class Transaction {
         return "Transaction [timestamp=" + timestamp + ", amount=" + amount + ", from=" + from + ", id=" + id + ", " +
                 "to=" + to + ", type=" + type + ", transactionStatus=" + transactionStatus + "]";
     }
-
-    private void setBalance(BigDecimal amount) {
-        this.amount = amount;
-    }
 }

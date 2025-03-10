@@ -50,6 +50,7 @@ public class TransactionDataService extends DataService implements DataServiceFe
         boolean hasMorePages = true;
 
         try {
+            logger.info("Fetching transactions from database...");
             while (hasMorePages) {
                 HttpResponse<String> response = fetchPage(page);
 
@@ -71,17 +72,16 @@ public class TransactionDataService extends DataService implements DataServiceFe
 
                 if (hasMorePages) {
                     page++;
-                    logger.info("Fetched page {} of {}", page, pageResult.getTotalPages());
                 }
                 else {
-                    logger.info("Reached last page ({})", page);
+                    logger.info("Reached last page ({}) of transactions", page);
                 }
             }
         }
         catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
         }
-
+        logger.info("Successfully fetched transactions data");
         return allTransactions;
     }
 

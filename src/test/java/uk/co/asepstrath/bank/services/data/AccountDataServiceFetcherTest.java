@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,18 +28,32 @@ class AccountDataServiceFetcherTest {
 
     @Test
     void testFetchDataSuccess() throws IOException {
-        // Create mock response for successful API call
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
-        when(mockResponse.isSuccess()).thenReturn(true);
+        // Mock token response
+        HttpResponse<String> mockTokenResponse = mock(HttpResponse.class);
+        when(mockTokenResponse.isSuccess()).thenReturn(true);
+        when(mockTokenResponse.getBody()).thenReturn("{\"access_token\":\"mock-token\"}");
 
-        // JSON structure that matches your Account class JsonProperty annotations
-        when(mockResponse.getBody()).thenReturn(
-                "[{\"id\":\"1\", \"name\":\"Account1\", \"startingBalance\":100.0, \"roundUpEnabled\":true}]");
+        // Mock accounts response
+        HttpResponse<String> mockAccountsResponse = mock(HttpResponse.class);
+        when(mockAccountsResponse.isSuccess()).thenReturn(true);
+        when(mockAccountsResponse.getBody()).thenReturn("""
+        [
+            {
+                "id": "1",
+                "name": "Account1",
+                "startingBalance": 100.0,
+                "roundUpEnabled": true,
+                "postcode": "AB12 3CD"
+            }
+        ]
+    """);
 
-        // Configure mock wrapper to return the mock response
-        when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
+        // Configure mock wrapper
+        when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/oauth2/token"), anyString(), anyMap()))
+                .thenReturn(mockTokenResponse);
+        when(unirestWrapper.get(eq("https://api.asep-strath.co.uk/api/accounts"), anyMap(), anyMap()))
+                .thenReturn(mockAccountsResponse);
 
-        // Call the method under test
         List<Account> accounts = accountDataService.fetchData();
 
         // Assertions
@@ -51,15 +65,20 @@ class AccountDataServiceFetcherTest {
 
     @Test
     void testFetchDataFailure() {
-        // Create mock response for failed API call
-        HttpResponse<String> mockResponse = mock(HttpResponse.class);
-        when(mockResponse.isSuccess()).thenReturn(false);
-        when(mockResponse.getStatus()).thenReturn(404);
+        // Mock token response
+        HttpResponse<String> mockTokenResponse = mock(HttpResponse.class);
+        when(mockTokenResponse.isSuccess()).thenReturn(true);
+        when(mockTokenResponse.getBody()).thenReturn("{\"access_token\":\"mock-token\"}");
 
-        // Configure mock wrapper to return the mock response
-        when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
+        // Mock failed accounts response
+        HttpResponse<String> mockAccountsResponse = mock(HttpResponse.class);
+        when(mockAccountsResponse.isSuccess()).thenReturn(false);
+        when(mockAccountsResponse.getStatus()).thenReturn(404);
 
-        // Asserting that a JsonParseException is thrown
+        // Configure mock wrapper
+        when(unirestWrapper.post(anyString(), anyString(), anyMap())).thenReturn(mockTokenResponse);
+        when(unirestWrapper.get(anyString(), anyMap(), anyMap())).thenReturn(mockAccountsResponse);
+
         assertThrows(JsonParseException.class, () -> accountDataService.fetchData());
     }
 }

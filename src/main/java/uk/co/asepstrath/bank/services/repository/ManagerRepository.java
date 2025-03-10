@@ -1,5 +1,7 @@
 package uk.co.asepstrath.bank.services.repository;
 
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
@@ -13,7 +15,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The Manager repository service
@@ -32,6 +36,15 @@ public class ManagerRepository extends BaseRepository {
             "INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)";
     private static final String SQL_SELECT_ALL_ACCOUNTS =
             "SELECT AccountID, Name, Balance, RoundUpEnabled FROM Accounts";
+    private static final String SQL_SELECT_TOP_TEN_SPENDERS = """
+            SELECT a.Name, a.Postcode, SUM(t.Amount) AS TotalAmount
+            FROM Transactions t
+            JOIN Accounts a ON t.SenderID = a.AccountID
+            WHERE t.TransactionType = 'PAYMENT'
+            GROUP BY a.Name, a.Postcode
+            ORDER BY TotalAmount DESC
+            LIMIT 10;
+            """;
 
     public ManagerRepository(Logger logger) {
         super(logger);
@@ -94,4 +107,25 @@ public class ManagerRepository extends BaseRepository {
         logger.info("Returning accounts from the database");
         return accounts;
     }
+
+    public List<Map<String, Object>> getTopTenSpenders(Connection connection) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        String sql = SQL_SELECT_TOP_TEN_SPENDERS;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("Name", rs.getString("Name"));
+                row.put("Postcode", rs.getString("Postcode"));
+                row.put("TotalAmount", rs.getBigDecimal("TotalAmount"));
+                results.add(row);
+            }
+        } catch (SQLException e) {
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Failed to get top ten spenders");
+        }
+        return results;
+    }
+
 }

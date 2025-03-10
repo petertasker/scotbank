@@ -67,6 +67,8 @@ public final class Constants {
     public static final String ACCOUNT_OBJECT_LIST_EXISTS = "hasaccounts";
     public static final String BUSINESS_COUNTS = "businesscounts";
     public static final String BUSINESS_AMOUNT_SUMS = "businesssums";
+    public static final String BIG_SPENDERS_LIST = "bigspenders";
+    public static final String BIG_SPENDERS_LIST_EXISTS = "hasbigspenders";
     /**
      * Password Hashing Constants
      */

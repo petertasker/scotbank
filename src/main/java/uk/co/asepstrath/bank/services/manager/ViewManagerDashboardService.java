@@ -44,9 +44,12 @@ public class ViewManagerDashboardService extends ManagerService {
             Session session = getSession(ctx);
             model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
             model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
-
             // Format the account balances without modifying the Account object
             formatAccountBalancesForDisplay(model, accounts);
+
+            List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
+            model.put(BIG_SPENDERS_LIST, topSpenders);
+            model.put(BIG_SPENDERS_LIST_EXISTS, !topSpenders.isEmpty());
 
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         }

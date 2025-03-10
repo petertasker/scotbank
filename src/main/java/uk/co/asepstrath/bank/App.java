@@ -25,8 +25,20 @@ public class App extends Jooby {
 
     public App() {
         // Account page as landing page
-        get("/", ctx -> ctx.sendRedirect(ROUTE_ACCOUNT));
+        get("/", ctx -> {
+            // Check if manager is logged in
+            Session session = ctx.sessionOrNull();
+            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
+                    SESSION_MANAGER_ID).isPresent();
 
+            // Redirect to manager dashboard if logged in
+            if (managerLoggedIn) {
+                ctx.sendRedirect(ROUTE_MANAGER + ROUTE_DASHBOARD);
+            } else {
+                ctx.sendRedirect(ROUTE_ACCOUNT); // Regular user account page if manager is not logged in
+            }
+            return null;
+        });
         // Ensure user is logged in
         before(ctx -> {
             String path = ctx.getRequestPath();
