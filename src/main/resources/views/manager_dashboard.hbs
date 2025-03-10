@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<!--    <script src="https://maps.googleapis.com/maps/api/js?key={{api-maps-key}}&callback=initMap" async defer></script>-->
+    <script src="/mapEmbed.js"></script>
 </head>
 <body>
 <div class="content-wrapper">
@@ -62,8 +64,9 @@
                                             </div>
                                         {{/each}}
                                     </div>
-                                    <div class="chart-container">
-                                        <canvas id="top-spenders-chart"></canvas>
+                                    <div class="maps-container">
+                                        <!-- Single map with ten markers -->
+                                        <div id="top-spenders-map" style="width: 100%; height: 400px;"></div>
                                     </div>
                                 </div>
                             {{else}}

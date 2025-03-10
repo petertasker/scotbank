@@ -25,6 +25,7 @@ public class App extends Jooby {
 
     public App() {
         // Account page as landing page
+
         get("/", ctx -> {
             // Check if manager is logged in
             Session session = ctx.sessionOrNull();
@@ -102,6 +103,7 @@ public class App extends Jooby {
         assets("/assets/*", "/assets");
         assets("/service_worker.js", "/service_worker.js");
         assets("/transaction-chart.js", "/transaction-chart.js");
+        assets("/mapEmbed.js", "/mapEmbed.js");
         assets("/favicon.svg", "images/favicon.svg");
         get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
         /*
