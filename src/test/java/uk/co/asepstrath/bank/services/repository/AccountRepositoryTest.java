@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Card;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
 import java.math.BigDecimal;
@@ -56,7 +57,7 @@ class AccountRepositoryTest {
     @Test
     void testInsert() throws SQLException, NoSuchAlgorithmException, InvalidKeySpecException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
+        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true, new Card("123", "345"));
         String psw = "Password123";
         String hashedPassword = HashingPasswordService.hashPassword(psw);
         accountRepository.insert(connection, account, hashedPassword);
@@ -75,7 +76,7 @@ class AccountRepositoryTest {
         SQLException sqlException = new SQLException("Database error");
         doThrow(sqlException).when(preparedStatement).executeUpdate();
 
-        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
+        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true, new Card("123", "345"));
         assertThrows(SQLException.class, () -> {
             accountRepository.insert(connection, account, "Password123");
         });
@@ -85,7 +86,7 @@ class AccountRepositoryTest {
     @Test
     void testUpdateBalance() throws SQLException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true);
+        Account account = new Account("12345", "Peter Tasker", new BigDecimal("90.21"), true, new Card("123", "345"));
 
         accountRepository.updateBalance(connection, account);
 

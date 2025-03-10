@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Card;
 import uk.co.asepstrath.bank.services.repository.ManagerRepository;
 
 import javax.sql.DataSource;
@@ -67,8 +68,8 @@ class ViewManagerDashboardServiceTest {
     void renderDashboardWithAccounts() throws SQLException {
         // Arrange
         List<Account> accounts = new ArrayList<>();
-        accounts.add(new Account("A001", "John Smith", BigDecimal.valueOf(1000.50), false));
-        accounts.add(new Account("A002", "Jane Doe", BigDecimal.valueOf(2500.75), false));
+        accounts.add(new Account("A001", "John Smith", BigDecimal.valueOf(1000.50), false, new Card("123", "345")));
+        accounts.add(new Account("A002", "Jane Doe", BigDecimal.valueOf(2500.75), false, new Card("123", "345")));
 
         // Mock the repository call
         ManagerRepository repository = mock(ManagerRepository.class);
