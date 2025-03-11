@@ -85,7 +85,8 @@ public final class Constants {
     public static final String DEFAULT_MANAGER_PASSWORD = "MyFixedManagerPassword";
 
     // I signed up for the Google Maps API key with a limited 10,000 accesses a month, please be gentle!
-    public static final String MAPS_API_KEY = "AIzaSyAg04brkuCDNKpSJwyzKI4jXJhNZaeBB8k";
+    // Please see the README for how to access this key
+    public static final String MAPS_API_KEY = System.getenv("MAPS_API_KEY");
 
     private Constants() {
 
