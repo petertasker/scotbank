@@ -22,16 +22,16 @@ Once you have the key, you will need to create an environment variable with the 
 your session.
 
 In powershell:
-```bash
+```ps
 $env:MAPS_API_KEY="your-key-here"
 ```
 You can test if it's set by using:
-```bash
+```ps
 echo $env:MAPS_API_KEY
 ```
 
 In bash:
-```bash
+```
 export MAPS_API_KEY="your-key-here"
 ```
 You can test if it's set by using:
