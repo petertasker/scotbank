@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank.services.repository;
 
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,6 +36,11 @@ class TransactionRepositoryTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         transactionRepository = new TransactionRepository(logger);
+    }
+
+    @Test
+    void testCreateTable() throws SQLException {
+
     }
 
     @Test
@@ -94,5 +100,23 @@ class TransactionRepositoryTest {
         verify(preparedStatement).setBoolean(8, true);
         verify(preparedStatement).executeUpdate();
 
+    }
+
+    @Test
+    void testArithmeticException() throws SQLException {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+        DateTime dateTime = new DateTime(2025, 2, 14, 8, 30, 0);
+        Transaction transaction = new Transaction(
+                dateTime,
+                new BigDecimal(1000000000),
+                "thisshouldnotmatter",
+                "123",
+                "ABC123",
+                "DEPOSIT",
+                true
+        );
+
+        Assertions.assertThrows(ArithmeticException.class, () -> transactionRepository.insert(connection, transaction));
     }
 }

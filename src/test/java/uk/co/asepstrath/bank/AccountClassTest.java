@@ -4,6 +4,7 @@
 
 package uk.co.asepstrath.bank;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -30,6 +31,12 @@ class AccountClassTest {
         Account a = new Account("1", "Simon", BigDecimal.valueOf(40), false, new Card("123", "345"));
         a.withdraw(BigDecimal.valueOf(20)); // withdraw 20 pounds
         assertEquals(BigDecimal.valueOf(20), a.getBalance());
+    }
+
+    @Test
+    void testWithdrawNull() {
+        Account a = new Account("1", "Jacob", BigDecimal.valueOf(20), true, new Card("123", "345"));
+        assertThrows(ArithmeticException.class, () -> a.withdraw(null));
     }
 
     @Test
@@ -151,5 +158,18 @@ class AccountClassTest {
         BigDecimal bal = BigDecimal.valueOf(999999999);
         assertThrows(ArithmeticException.class, () -> a.deposit(bal));
 
+    }
+
+    @Test
+    void testGetPostalCodeAdmin() {
+        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false,"G4 6FC", new Card("123", "345"));
+        assertEquals("G4 6FC", a.getPostcode(true));
+    }
+
+    @Test
+    void testPostalCodeException(){
+        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false,"G4 6FC", new Card("123", "345"));
+        SecurityException exceptionMessage = assertThrows(SecurityException.class, () -> a.getPostcode(false));
+        assertEquals("Account does not have postcode permission", exceptionMessage.getMessage());
     }
 }

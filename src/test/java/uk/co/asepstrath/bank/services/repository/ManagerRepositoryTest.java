@@ -1,5 +1,7 @@
 package uk.co.asepstrath.bank.services.repository;
 
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -40,9 +43,10 @@ class ManagerRepositoryTest {
     private ManagerRepository repository;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
         repository = new ManagerRepository(mockLogger);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
     }
 
     @Test
@@ -115,11 +119,56 @@ class ManagerRepositoryTest {
     }
 
     @Test
+    void testGetTop10Spenders() throws SQLException {
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("Name")).thenReturn("Alice", "Bob");
+        when(mockResultSet.getString("Postcode")).thenReturn("12345","67890");
+        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(new BigDecimal("1000.00"), new BigDecimal("2000.00"));
+
+        List<Map<String, Object>> spenders = repository.getTopTenSpenders(mockConnection);
+        assertEquals(2,spenders.size());
+
+        assertEquals("Alice", spenders.getFirst().get("Name"));
+        assertEquals("12345", spenders.getFirst().get("Postcode"));
+        assertEquals("1,000.00", spenders.getFirst().get("TotalAmount"));
+
+        assertEquals("Bob", spenders.get(1).get("Name"));
+        assertEquals("67890", spenders.get(1).get("Postcode"));
+        assertEquals("2,000.00", spenders.get(1).get("TotalAmount"));
+    }
+
+    @Test
+    void testTop10SpendersDefaultCurrency() throws SQLException{
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getString("Name")).thenReturn("Alice" );
+        when(mockResultSet.getString("Postcode")).thenReturn("12345");
+        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(null);
+
+        List<Map<String, Object>> spendings = repository.getTopTenSpenders(mockConnection);
+
+        assertEquals(1,spendings.size());
+        assertEquals("£0.00",spendings.getFirst().get("TotalAmount"));
+    }
+
+    @Test
     void testGetAllAccountsWithSQLException() throws SQLException {
         // Arrange
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockStatement.executeQuery(anyString())).thenThrow(new SQLException("Database error"));
 
         assertThrows(DataAccessException.class, () -> repository.getAllAccounts(mockConnection));
+    }
+
+    @Test
+    void testGetTop10SpendersWithSQLException() throws SQLException {
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
+
+        assertThrows(StatusCodeException.class, () -> repository.getTopTenSpenders(mockConnection));
     }
 }

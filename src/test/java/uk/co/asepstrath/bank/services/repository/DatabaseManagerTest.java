@@ -165,7 +165,21 @@ class DatabaseManagerTest {
 
             Assertions.assertThrows(SQLException.class, () -> databaseManager.insertData(connection));
         }
+    }
 
+    @Test
+    void testInitializer() throws SQLException, XMLStreamException, IOException {
+        when(dataSource.getConnection()).thenReturn(connection);
+
+        DatabaseManager spyDB = spy(new DatabaseManager(dataSource,log));
+
+        doNothing().when(spyDB).createTables(connection);
+        doNothing().when(spyDB).insertData(connection);
+
+        spyDB.initialise();
+
+        verify(spyDB).createTables(connection);
+        verify(spyDB).insertData(connection);
 
     }
 }
