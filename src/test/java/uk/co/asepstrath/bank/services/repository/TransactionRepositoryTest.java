@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.*;
 
@@ -39,8 +41,10 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void testCreateTable() throws SQLException {
+    void testCreateTable() throws SQLException, NoSuchFieldException, IllegalAccessException {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
+        transactionRepository.createTable(connection);
     }
 
     @Test
