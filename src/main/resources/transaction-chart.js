@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded, checking for business category data');
 
-    const businessCountData = getBusinessCategoryData('count');
-    const businessSumData = getBusinessCategoryData('sum');
+    const businessCountData = getBusinessCountData();
+    const businessSumData = getBusinessSumData();
 
     console.log('Business category count data:', businessCountData);
     console.log('Business category sum data:', businessSumData);
@@ -20,26 +20,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function getBusinessCategoryData(type) {
-    let selector;
-    if (type === 'count') {
-        selector = '#payments-by-category .business-category-item';
-    } else if (type === 'sum') {
-        selector = '#payments-sum-by-category .business-category-item';
-    }
-
-    const categoryElements = document.querySelectorAll(selector);
+function getBusinessCountData() {
+    const categoryElements = document.querySelectorAll('#payments-by-category .category-item');
     const data = [];
 
     categoryElements.forEach(element => {
         const category = element.querySelector('.category-name').textContent.replace(':', '').trim();
-        let value;
-
-        if (type === 'count') {
-            value = parseInt(element.querySelector('.category-count').textContent.trim());
-        } else if (type === 'sum') {
-            value = parseFloat(element.querySelector('.category-sum').textContent.trim().replace('£', '').replace(',', ''));
-        }
+        const value = parseInt(element.querySelector('.category-count').textContent.trim());
 
         if (!isNaN(value)) {
             data.push({category, value});
@@ -49,6 +36,22 @@ function getBusinessCategoryData(type) {
     return data;
 }
 
+function getBusinessSumData() {
+    const categoryElements = document.querySelectorAll('#payments-sum-by-category .category-item');
+    const data = [];
+
+    categoryElements.forEach(element => {
+        const category = element.querySelector('.category-name').textContent.replace(':', '').trim();
+        const valueText = element.querySelector('.category-sum').textContent.trim();
+        const value = parseFloat(valueText.replace('£', '').replace(',', ''));
+
+        if (!isNaN(value)) {
+            data.push({category, value});
+        }
+    });
+
+    return data;
+}
 
 function createBusinessPieChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
@@ -105,3 +108,6 @@ function generateColorPalette(count) {
     }
     return colors;
 }
+
+console.log('Category elements found:', document.querySelectorAll('#payments-by-category .category-item').length);
+console.log('Category elements found:', document.querySelectorAll('#payments-sum-by-category .category-item').length);

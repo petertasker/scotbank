@@ -298,58 +298,86 @@ hr {
     margin: 8px 0;
 }
 
-.business-counts {
+.category-container, .spenders-counts {
     display: flex;
     flex-direction: row;
-    gap: 20px; /* Space between the list and chart */
-    justify-content: space-between; /* Ensures content spreads across the container */
+    gap: 20px;
+    justify-content: space-between;
     margin-bottom: var(--spacing-md);
 }
 
-.business-category-item {
+.category-item {
     justify-content: space-between;
     padding: 5px 0;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
-.business-category-item:last-child {
+.category-item:last-child {
     border-bottom: none;
 }
 
 
-.business-category-list {
-    flex-shrink: 0; /* Prevents shrinking */
+.category-list, .spenders-container {
+    flex-shrink: 0;
     display: flex;
-    flex-direction: column; /* Ensures the items stack vertically */
+    flex-direction: column;
     justify-content: flex-start;
     flex-grow: 1;
 }
 
 
-.business-category-container {
+.category-list-container {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 20px; /* Space between text and chart */
+    gap: 20px;
     width: 100%;
 }
 
-.category-name {
+.spender-postcode, .spender-amount {
+    text-align: right; /* Right-align postcode and amount */
+    margin-left: 10px; /* Adds some space between the name and the right-aligned text */
+}
+
+
+.spender-name {
+    flex-grow: 1; /* Ensures the name takes up the remaining space */
+}
+
+.category-name,
+.spender-name,
+.spender-postcode {
     font-weight: 500;
-    margin-right: 10px;
+}
+
+.spender-postcode {
+    text-align: left;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.spender-amount {
+    text-align: right; /* Right-align the amount */
+    margin-left: 10px; /* Adds space between the postcode and the amount */
 }
 
 .category-count,
-.category-sum {
+.category-sum,
+.spender-amount {
     background-color: rgba(255, 255, 255, 0.2);
     padding: 2px 8px;
     border-radius: 12px;
 }
 
+#top-spenders-map {
+    flex-grow: 1; /* Ensures the map takes up the remaining free space */
+    height: 100%;
+}
 
-.chart-container {
+.chart-container, .maps-container {
     flex-grow: 1;
     background-color: var(--card-bg);
     border-radius: var(--border-radius-sm);
@@ -399,7 +427,7 @@ hr {
         width: 100%;
     }
 
-    .business-counts {
+    .category-container, .spenders-counts {
         flex-direction: column; /* Stacks the items on smaller screens */
         align-items: center; /* Centers the content */
     }

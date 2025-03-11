@@ -40,16 +40,23 @@ public class ViewManagerDashboardService extends ManagerService {
         List<Account> accounts;
         Map<String, Object> model = createModel();
         try {
-            accounts = managerRepository.getAllAccounts(getConnection());
             Session session = getSession(ctx);
+
+            // Get every account from the database
+            accounts = managerRepository.getAllAccounts(getConnection());
             model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
             model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
+
             // Format the account balances without modifying the Account object
             formatAccountBalancesForDisplay(model, accounts);
 
+            // Get details of the top ten accounts with the highest summed PAYMENT amounts
             List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
             model.put(BIG_SPENDERS_LIST, topSpenders);
             model.put(BIG_SPENDERS_LIST_EXISTS, !topSpenders.isEmpty());
+
+            // Put Peter's API key into the map
+            model.put("api-maps-key", MAPS_API_KEY);
 
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         }
@@ -73,6 +80,8 @@ public class ViewManagerDashboardService extends ManagerService {
             displayAx.put("accountid", account.getAccountID());
             displayAx.put("name", account.getName());
             displayAx.put("balance", formattedBalance);
+            displayAx.put(ACCOUNT_CARD_NUMBER, account.getCard().getCardNumber());
+            displayAx.put(ACCOUNT_CARD_CVV, account.getCard().getCvv());
             displayAccounts.add(displayAx);
         }
         model.put(ACCOUNT_OBJECT_LIST_EXISTS, !displayAccounts.isEmpty());

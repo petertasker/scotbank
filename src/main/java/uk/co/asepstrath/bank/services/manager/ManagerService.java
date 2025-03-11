@@ -18,6 +18,11 @@ public class ManagerService extends BaseService {
         super(dataSource, logger);
     }
 
+    /**
+     * Throws a 403 if a manager is not logged in
+     *
+     * @param ctx Session context
+     */
     protected void ensureManagerIsLoggedIn(Context ctx) {
         Session session = getSession(ctx);
         if (session.get(SESSION_MANAGER_NAME).isMissing() || session.get(SESSION_MANAGER_ID).isMissing()) {

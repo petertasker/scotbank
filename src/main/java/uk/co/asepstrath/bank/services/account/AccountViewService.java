@@ -3,7 +3,9 @@ package uk.co.asepstrath.bank.services.account;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
+import io.jooby.StatusCode;
 import io.jooby.annotation.GET;
+import io.jooby.exception.StatusCodeException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
@@ -43,8 +45,8 @@ public class AccountViewService extends AccountService {
         Session session = getSession(ctx);
 
         // Setup basic account info
-        setupBasicAccountInfo(model, session);
-
+        addAccountDetailsToModel(model, session);
+        addCardDetailsToModel(model, session);
         // Add account balances
         String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
         putAccountBalancesInModel(model, accountId);
@@ -61,7 +63,7 @@ public class AccountViewService extends AccountService {
     /**
      * Sets up basic account information in the model
      */
-    private void setupBasicAccountInfo(Map<String, Object> model, Session session) {
+    private void addAccountDetailsToModel(Map<String, Object> model, Session session) {
         model.put(SESSION_ACCOUNT_NAME, session.get(SESSION_ACCOUNT_NAME));
         model.put(SESSION_ACCOUNT_ID, session.get(SESSION_ACCOUNT_ID));
         logger.info("Put name and accountid in model");
@@ -73,6 +75,25 @@ public class AccountViewService extends AccountService {
     private void transferSessionMessages(Context ctx, Map<String, Object> model) {
         transferSessionAttributeToModel(ctx, SESSION_SUCCESS_MESSAGE, model);
         transferSessionAttributeToModel(ctx, Constants.SESSION_ERROR_MESSAGE, model);
+    }
+
+    /**
+     * Add card details to the model
+     */
+    private void addCardDetailsToModel(Map<String, Object> model, Session session) {
+        try (PreparedStatement preparedStatement =
+                     getConnection().prepareStatement("SELECT CardNumber, CardCVV FROM Accounts WHERE AccountId = ?")) {
+            preparedStatement.setString(1, String.valueOf(session.get(SESSION_ACCOUNT_ID)));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    model.put(ACCOUNT_CARD_NUMBER, resultSet.getString(1));
+                    model.put(ACCOUNT_CARD_CVV, resultSet.getString(2));
+                }
+            }
+        }
+        catch (SQLException e) {
+            throw new StatusCodeException(StatusCode.SERVER_ERROR, "Failed to add card details", e);
+        }
     }
 
     /**
@@ -188,8 +209,10 @@ public class AccountViewService extends AccountService {
         }
         logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
         model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // Sort in descending order
                 .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
                 .collect(Collectors.toList()));
+
 
     }
 
@@ -222,8 +245,13 @@ public class AccountViewService extends AccountService {
         }
         logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
         model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
-                .map(entry -> Map.of("category", entry.getKey(), "totalAmount", entry.getValue()))
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Sort in descending order
+                .map(entry -> Map.of("category", entry.getKey(),
+                        "totalAmount", formatCurrency(entry.getValue())))
                 .collect(Collectors.toList()));
+
+
+
     }
 
 

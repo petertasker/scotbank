@@ -15,6 +15,8 @@
 
     <div class="account-info">
         <p class="account-id">Account ID: {{accountid}}</p>
+        <p>Card Number: {{cardnumber}}</p>
+        <p>CVV: {{cardcvv}}</p>
         <p class="balance">£{{balance}}</p>
         {{#roundUpEnabled}}
             <div class="roundup-pot">
@@ -56,64 +58,61 @@
             {{/each}}
         </div>
 
-        <!-- Insights Section Wrapper -->
-        <div id="insights">
-            <!-- First Insights Section -->
-            <div class="insights-section" id="payments-by-category">
-                <h2>Spending Insights: Number of Payments</h2>
-                <hr>
-                <div class="insights-container">
-                    <div class="insight-card">
-                        <h4>Number of Payments per Business Category</h4>
-                        <div class="business-counts">
-                            {{#if businesscounts}}
-                                <div class="business-category-container">
-                                    <div class="business-category-list">
-                                        {{#each businesscounts}}
-                                            <div class="business-category-item">
-                                                <span class="category-name">{{category}}:</span>
-                                                <span class="category-count">{{count}}</span>
-                                            </div>
-                                        {{/each}}
-                                    </div>
-                                    <div class="chart-container">
-                                        <canvas id="business-account-chart"></canvas>
-                                    </div>
+        <!-- First Insights Section -->
+        <div class="insights-section" id="payments-by-category">
+            <h2>Spending Insights: Number of Payments</h2>
+            <hr>
+            <div class="insights-container">
+                <div class="insight-card">
+                    <h4>Number of Payments per Business Category</h4>
+                    <div class="category-container">
+                        {{#if businesscounts}}
+                            <div class="category-list-container">
+                                <div class="category-list">
+                                    {{#each businesscounts}}
+                                        <div class="category-item">
+                                            <span class="category-name">{{category}}:</span>
+                                            <span class="category-count">{{count}}</span>
+                                        </div>
+                                    {{/each}}
                                 </div>
-                            {{else}}
-                                <p>No business categories found.</p>
-                            {{/if}}
-                        </div>
+                                <div class="chart-container">
+                                    <canvas id="business-account-chart"></canvas>
+                                </div>
+                            </div>
+                        {{else}}
+                            <p>No business categories found.</p>
+                        {{/if}}
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Second Insights Section -->
-            <div class="insights-section" id="payments-sum-by-category">
-                <h2>Spending Insights: Sum of Payments</h2>
-                <hr>
-                <div class="insights-container">
-                    <div class="insight-card">
-                        <h4>Sum of Payments per Business Category</h4>
-                        <div class="business-counts">
-                            {{#if businesssums}}
-                                <div class="business-category-container">
-                                    <div class="business-category-list">
-                                        {{#each businesssums}}
-                                            <div class="business-category-item">
-                                                <span class="category-name">{{category}}:</span>
-                                                <span class="category-sum">{{totalAmount}}</span>
-                                            </div>
-                                        {{/each}}
-                                    </div>
-                                    <div class="chart-container">
-                                        <canvas id="business-sum-chart"></canvas>
-                                    </div>
+        <!-- Second Insights Section -->
+        <div class="insights-section" id="payments-sum-by-category">
+            <h2>Spending Insights: Sum of Payments</h2>
+            <hr>
+            <div class="insights-container">
+                <div class="insight-card">
+                    <h4>Sum of Payments per Business Category</h4>
+                    <div class="category-container">
+                        {{#if businesssums}}
+                            <div class="category-list-container">
+                                <div class="category-list">
+                                    {{#each businesssums}}
+                                        <div class="category-item">
+                                            <span class="category-name">{{category}}:</span>
+                                            <span class="category-sum">£{{totalAmount}}</span>
+                                        </div>
+                                    {{/each}}
                                 </div>
-                            {{else}}
-                                <p>No business categories found.</p>
-                            {{/if}}
-                        </div>
+                                <div class="chart-container">
+                                    <canvas id="business-sum-chart"></canvas>
+                                </div>
+                            </div>
+                        {{else}}
+                            <p>No business categories found.</p>
+                        {{/if}}
                     </div>
                 </div>
             </div>
@@ -126,15 +125,10 @@
 <script>
     // Smooth scroll function without updating URL
     function scrollToInsights() {
-        const insightsSection = document.getElementById('insights');
+        const insightsSection = document.getElementById('payments-by-category');
         if (insightsSection) {
             insightsSection.scrollIntoView({ behavior: 'smooth' });
         }
     }
-
-    // Chart initialization code
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize charts here
-    });
 </script>
 </html>

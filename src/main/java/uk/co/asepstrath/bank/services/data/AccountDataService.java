@@ -62,10 +62,13 @@ public class AccountDataService extends DataService implements DataServiceFetche
             Map<String, String> accountHeaders = new HashMap<>();
             accountHeaders.put("Authorization", "Bearer " + accessToken);
 
+            // List wanted parameters
             Map<String, Object> params = new HashMap<>();
-            params.put("include", "postcode");
+            params.put("include", "postcode,cardDetails");
 
-            HttpResponse<String> response = wrapper.get("https://api.asep-strath.co.uk/api/accounts", params, accountHeaders);
+            // Make GET request
+            HttpResponse<String> response = wrapper.get("https://api.asep-strath.co.uk/api/accounts", params,
+                    accountHeaders);
             if (response.isSuccess()) {
                 log.info("Successfully retrieved account data");
                 return mapper.readValue(response.getBody(), new TypeReference<>() {

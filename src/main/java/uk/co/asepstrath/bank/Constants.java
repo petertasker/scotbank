@@ -65,6 +65,8 @@ public final class Constants {
     public static final BigDecimal ACCOUNT_OBJECT_MAX_BALANCE = BigDecimal.valueOf(999_999_999.99);
     public static final String ACCOUNT_OBJECT_LIST = "accounts";
     public static final String ACCOUNT_OBJECT_LIST_EXISTS = "hasaccounts";
+    public static final String ACCOUNT_CARD_NUMBER = "cardnumber";
+    public static final String ACCOUNT_CARD_CVV = "cardcvv";
     public static final String BUSINESS_COUNTS = "businesscounts";
     public static final String BUSINESS_AMOUNT_SUMS = "businesssums";
     public static final String BIG_SPENDERS_LIST = "bigspenders";
@@ -81,6 +83,10 @@ public final class Constants {
      */
     public static final String DEFAULT_PASSWORD = "MyFixedPassword";
     public static final String DEFAULT_MANAGER_PASSWORD = "MyFixedManagerPassword";
+
+    // I signed up for the Google Maps API key with a limited 10,000 accesses a month, please be gentle!
+    // Please see the README for how to access this key
+    public static final String MAPS_API_KEY = System.getenv("MAPS_API_KEY");
 
     private Constants() {
 

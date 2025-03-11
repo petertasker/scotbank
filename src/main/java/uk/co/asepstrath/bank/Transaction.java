@@ -130,7 +130,9 @@ public class Transaction {
     }
 
     private boolean processTransaction(Connection connection) throws SQLException {
+        // Ensure the transaction has valid account references before processing
         if (!validateAccountsForTransactionType()) {
+            logger.info("Transaction validation failed: {}", this);
             return false;
         }
 
@@ -141,28 +143,57 @@ public class Transaction {
                 case "TRANSFER" -> handleTransfer(connection);
                 case "PAYMENT" -> handlePayment(connection);
                 default -> {
-                    logger.info("Unknown transaction type: {}", this);
-                    yield true;
+                    logger.warn("Unknown transaction type: {}", this);
+                    yield false;
                 }
             };
         }
         catch (ArithmeticException e) {
+            logger.error("Arithmetic exception occurred during transaction: {}", e.getMessage());
             return false;
         }
     }
 
+    /**
+     * Validates whether the necessary account fields are set for a given transaction type.
+     */
     private boolean validateAccountsForTransactionType() {
         return switch (getType()) {
-            case "DEPOSIT" -> getTo() != null;
-            case "WITHDRAWAL" -> getFrom() != null;
-            case "TRANSFER", "PAYMENT" -> getFrom() != null && getTo() != null;
-            default -> true;
+            case "DEPOSIT" -> {
+                if (getTo() == null) {
+                    logger.warn("Deposit transaction must have a 'to' account");
+                    yield false;
+                }
+                yield true;
+            }
+            case "WITHDRAWAL" -> {
+                if (getFrom() == null) {
+                    logger.warn("Withdrawal transaction must have a 'from' account");
+                    yield false;
+                }
+                yield true;
+            }
+            case "TRANSFER", "PAYMENT" -> {
+                if (getFrom() == null || getTo() == null) {
+                    logger.warn("Transfer/Payment transaction must have both 'from' and 'to' accounts");
+                    yield false;
+                }
+                yield true;
+            }
+            default -> {
+                logger.warn("Unknown transaction type: {}", getType());
+                yield false;
+            }
         };
     }
 
+    /**
+     * Handles deposit transactions by adding funds to the recipient's account.
+     */
     private boolean handleDeposit(Connection connection) throws SQLException {
         Account account = accountRepository.getAccount(connection, getTo());
         if (account == null) {
+            logger.warn("Deposit failed: Account {} not found", getTo());
             return false;
         }
 
@@ -171,10 +202,13 @@ public class Transaction {
         return true;
     }
 
+    /**
+     * Handles withdrawal transactions by deducting funds from the sender's account.
+     */
     private boolean handleWithdrawal(Connection connection) throws SQLException {
         Account account = accountRepository.getAccount(connection, getFrom());
         if (account == null) {
-            logger.info("account is null");
+            logger.warn("Withdrawal failed: Account {} not found", getFrom());
             return false;
         }
 
@@ -183,11 +217,15 @@ public class Transaction {
         return true;
     }
 
+    /**
+     * Handles transfer transactions by moving funds between two accounts.
+     */
     private boolean handleTransfer(Connection connection) throws SQLException {
         Account sender = accountRepository.getAccount(connection, getFrom());
         Account receiver = accountRepository.getAccount(connection, getTo());
 
         if (sender == null || receiver == null) {
+            logger.warn("Transfer failed: Sender ({}) or Receiver ({}) account not found", getFrom(), getTo());
             return false;
         }
 
@@ -198,14 +236,15 @@ public class Transaction {
         return true;
     }
 
+    /**
+     * Handles payment transactions by withdrawing funds from the payer's account.
+     */
     private boolean handlePayment(Connection connection) throws SQLException {
         Account payer = accountRepository.getAccount(connection, getFrom());
         if (payer == null) {
+            logger.warn("Payment failed: Payer account {} not found", getFrom());
             return false;
         }
-
-        payer.withdraw(getAmount());
-        accountRepository.updateBalance(connection, payer);
 
         try {
             payer.withdraw(getAmount());
@@ -213,6 +252,7 @@ public class Transaction {
             return true;
         }
         catch (ArithmeticException e) {
+            logger.error("Insufficient funds for payment transaction: {}", e.getMessage());
             return false;
         }
     }

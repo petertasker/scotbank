@@ -24,41 +24,39 @@ import static uk.co.asepstrath.bank.Constants.*;
 public class App extends Jooby {
 
     public App() {
-        // Account page as landing page
+        // Landing page route - redirect based on user type
         get("/", ctx -> {
-            // Check if manager is logged in
+            // Retrieve session information (if available)
             Session session = ctx.sessionOrNull();
             boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
                     SESSION_MANAGER_ID).isPresent();
 
-            // Redirect to manager dashboard if logged in
+            // Redirect managers to their dashboard, otherwise send users to the account page
             if (managerLoggedIn) {
                 ctx.sendRedirect(ROUTE_MANAGER + ROUTE_DASHBOARD);
-            } else {
+            }
+            else {
                 ctx.sendRedirect(ROUTE_ACCOUNT); // Regular user account page if manager is not logged in
             }
             return null;
         });
-        // Ensure user is logged in
+
+        // Middleware to enforce authentication for most routes
         before(ctx -> {
             String path = ctx.getRequestPath();
-            // add any JS/ CSS files here
-            if (path.startsWith("/css")) {
-                return;
-            }
-            if (path.endsWith("/js")) {
-                return;
-            }
-            if (path.endsWith(".ico")) {
+            // Allow access to static resources (CSS, JS, favicon)
+            if (path.startsWith("/css") || path.endsWith("/js") || path.endsWith(".ico")) {
                 return;
             }
 
+            // Retrieve session details
             Session session = ctx.sessionOrNull();
             boolean userLoggedIn = session != null && session.get(SESSION_ACCOUNT_NAME).isPresent() && session.get(
                     SESSION_ACCOUNT_ID).isPresent();
             boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
                     SESSION_MANAGER_ID).isPresent();
 
+            // If user is not logged in and attempting to access a restricted page, redirect to log in
             if (!userLoggedIn && !managerLoggedIn && !path.startsWith(ROUTE_LOGIN)
                     && !path.startsWith("/manager/login")) {
                 ctx.setResponseCode(401).sendRedirect("/login");
@@ -67,9 +65,11 @@ public class App extends Jooby {
 
         });
 
+        // Global error handling for various HTTP status codes
         // Unbelievable that I cannot switch on this
         error((ctx, cause, code) -> {
             getLog().error("Error occurred: {}, Status code: {}", cause.getMessage(), code, cause);
+            // Redirect users to appropriate error pages based on status code
             if (code == StatusCode.FORBIDDEN) {
                 ctx.setResponseCode(403).sendRedirect(ROUTE_ERROR + ROUTE_403_FORBIDDEN);
             }
@@ -88,7 +88,7 @@ public class App extends Jooby {
         });
 
         /*
-        This section is used for setting up the Jooby Framework modules
+        Serve static assets from src/main/resources
          */
         install(new NettyServer());
         install(new UniRestExtension());
@@ -102,10 +102,14 @@ public class App extends Jooby {
         assets("/assets/*", "/assets");
         assets("/service_worker.js", "/service_worker.js");
         assets("/transaction-chart.js", "/transaction-chart.js");
-        assets("/favicon.svg", "images/favicon.svg");
-        get("favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
+        assets("/mapEmbed.js", "/mapEmbed.js");
+
+        // Handle favicon inconsistencies between Windows and Linux
+        assets("/favicon.svg", "/assets/images/favicon.svg");
+        get("/favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
+
         /*
-        Now we set up our controllers and their dependencies
+        Set up controllers and their dependencies
          */
         DataSource ds = require(DataSource.class);
         Logger log = getLog();
@@ -113,6 +117,7 @@ public class App extends Jooby {
         DisplayLoginService displayLoginService = new DisplayLoginService(log);
         ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
 
+        // Register controllers with their dependencies
         mvc(new AccountController_(ds, log));
         mvc(new LoginController_(displayLoginService, processLoginService, log));
         mvc(new ManagerController_(ds, log));
@@ -121,7 +126,7 @@ public class App extends Jooby {
 
 
         /*
-        Finally we register our application lifecycle methods
+        Register application lifecycle hooks
          */
         onStarted(this::onStart);
         onStop(this::onStop);
@@ -138,7 +143,7 @@ public class App extends Jooby {
         Logger log = getLog();
         log.info("Starting Up...");
 
-        //Fetch DB Source
+        // Retrieve the database connection
         DataSource dataSource = require(DataSource.class);
 
         // Create Database and tables with initial data
