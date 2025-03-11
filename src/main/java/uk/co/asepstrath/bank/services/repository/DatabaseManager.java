@@ -158,7 +158,7 @@ public class DatabaseManager implements DatabaseOperations {
                 managerRepository.insert(connection, manager, managerPassword);
             }
             catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                throw new RuntimeException(e);
+                throw new SQLException("Unable to insert manager");
             }
         }
         logger.info("Managers inserted");

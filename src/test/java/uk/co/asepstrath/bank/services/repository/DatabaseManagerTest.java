@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.*;
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -25,8 +27,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 class DatabaseManagerTest {
@@ -141,5 +142,30 @@ class DatabaseManagerTest {
         Assertions.assertTrue(managerPassword.startsWith("Manager@"));
         Assertions.assertTrue(managerPassword.endsWith("$$"));
         Assertions.assertEquals(18, managerPassword.length());
+    }
+
+    @Test
+    void testExceptions() throws IOException {
+        Account accounts = new Account("ABC123", "John Doe", new BigDecimal(100), true, new Card("123", "345"));
+        Manager managers = new Manager("Manager123", "Nothing");
+
+        when(accountDataService.fetchData()).thenReturn(List.of(accounts));
+        when(managerDataService.fetchData()).thenReturn(List.of(managers));
+
+        try (MockedStatic<DatabaseManager> mockStaticDatabase = mockStatic(DatabaseManager.class)) {
+            mockStaticDatabase.when(() -> DatabaseManager.generatePassword(accounts.getAccountID())
+            ).thenThrow(new NoSuchAlgorithmException("Unable to insert account"));
+
+            Assertions.assertThrows(SQLException.class, () -> databaseManager.insertData(connection));
+        }
+
+        try (MockedStatic<DatabaseManager> mockStaticDatabase = mockStatic(DatabaseManager.class)) {
+            mockStaticDatabase.when(() -> DatabaseManager.generateManagerPassword(managers.getManagerID())
+            ).thenThrow(new NoSuchAlgorithmException("Unable to insert manager"));
+
+            Assertions.assertThrows(SQLException.class, () -> databaseManager.insertData(connection));
+        }
+
+
     }
 }
