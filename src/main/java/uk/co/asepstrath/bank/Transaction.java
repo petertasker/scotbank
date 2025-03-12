@@ -247,7 +247,7 @@ public class Transaction {
         }
 
         try {
-            payer.withdraw(getAmount());
+            payer.overdraftWithdraw(getAmount());
             accountRepository.updateBalance(connection, payer);
             return true;
         }
