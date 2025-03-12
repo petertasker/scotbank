@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank.services.repository;
 
-import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
