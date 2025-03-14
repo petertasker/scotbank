@@ -2,6 +2,7 @@ function getTopSpenderData() {
     const spenderElements = document.querySelectorAll('.insights-section .category-item');
     const data = [];
 
+    // Map every child element of spenders to a JSON list
     spenderElements.forEach(element => {
         const name = element.querySelector('.spender-name').textContent.replace(':', '').trim();
         const postcode = element.querySelector('.spender-postcode').textContent.replace('(', '').replace(')', '').trim();
@@ -33,11 +34,11 @@ function initMap() {
         center: { lat: 56.4907, lng: -4.2026 } // Center of Scotland
     });
 
-    // Rest of your map code remains the same
-    // Array to store geocoder requests
+    // Store geocoder requests
     const geocodingPromises = [];
 
-    // Function to geocode a postcode
+    // Use Geocoding API to turn a postcode into a marker on a map
+    // https://developers.google.com/maps/documentation/geocoding/start
     function geocodePostcode(postcode, name, amount) {
         return new Promise((resolve, reject) => {
             const geocoder = new google.maps.Geocoder();
