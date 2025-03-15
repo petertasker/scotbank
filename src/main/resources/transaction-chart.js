@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// Map every child to a JSON array
 function getBusinessCountData() {
     const categoryElements = document.querySelectorAll('#payments-by-category .category-item');
     const data = [];
@@ -62,6 +63,8 @@ function createBusinessPieChart(data, chartId) {
 
     Chart.register(ChartDataLabels);
 
+    // Create pie charts using ChartJS
+    // https://www.chartjs.org/docs/latest/charts/doughnut.html
     new Chart(ctx, {
         type: 'pie',
         data: {
@@ -82,6 +85,7 @@ function createBusinessPieChart(data, chartId) {
                         size: 14,
                         weight: 'bold'
                     },
+                    // Add a percentage label on each slice
                     formatter: (value, context) => {
                         let total = context.chart.getDatasetMeta(0).total;
                         let percentage = ((value / total) * 100).toFixed(1) + '%';
@@ -100,6 +104,7 @@ function createBusinessPieChart(data, chartId) {
     });
 }
 
+// Create random colours
 function generateColorPalette(count) {
     const colors = [];
     for (let i = 0; i < count; i++) {
