@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="content-wrapper">
+    <h1>🎁 Welcome to the Rewards Program, {{name}}!</h1>
+
+    <div class="account-info">
+        <p class="account-id">Account ID: {{accountid}}</p>
+        <p>Card Number: {{cardnumber}}</p>
+        <p>CVV: {{cardcvv}}</p>
+        <p class="balance">Current Balance: £{{balance}}</p>
+    </div>
+
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/account'">Back to Account</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
+    </div>
+
+    {{#if success}}
+        <p style="color: green">{{success}}</p>
+    {{/if}}
+    {{#if error}}
+        <p style="color: red">{{error}}</p>
+    {{/if}}
+
+    <!-- Rewards List -->
+    <div class="rewards-section">
+        <h2>🎯 Available Rewards</h2>
+        <hr>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Reward</th>
+                    <th>Description</th>
+                    <th>Value (£)</th>
+                    <th>Chance (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each rewards}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{description}}</td>
+                    <td>£{{value}}</td>
+                    <td>{{chance}}%</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Spin the Wheel Section -->
+    <div class="spin-section">
+        <h2>🎡 Spin the Wheel</h2>
+        <hr>
+        {{#if canSpin}}
+            <form action="/rewards/spin" method="post">
+                <button type="submit" class="btn btn-success">🎡 Spin Now</button>
+            </form>
+        {{else}}
+            <p style="color: gray">🚫 You have already spun the wheel today. Try again tomorrow!</p>
+        {{/if}}
+
+        {{#if spinResult}}
+            <div class="alert alert-success">
+                <h3>{{spinResult}}</h3>
+            </div>
+        {{/if}}
+    </div>
+
+    <!-- Reward History -->
+    <div class="reward-history-section">
+        <h2>🏆 Your Reward History</h2>
+        <hr>
+        {{#if rewardHistory}}
+            <pre>{{rewardHistory}}</pre>
+        {{else}}
+            <p>No rewards won yet.</p>
+        {{/if}}
+    </div>
+</div>
+</body>
+</html>
