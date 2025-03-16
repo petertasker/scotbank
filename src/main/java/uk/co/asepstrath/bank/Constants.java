@@ -25,6 +25,10 @@ public final class Constants {
     public static final String ROUTE_PROCESS = "/process";
     public static final String ROUTE_LOGOUT = "/logout";
     /**
+     * Rewards routes
+     */
+    public static final String ROUTE_REWARDS = "/rewards";
+    /**
      * Error routes
      */
     public static final String ROUTE_ERROR = "/error";

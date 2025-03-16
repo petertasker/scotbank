@@ -5,6 +5,7 @@ import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.Rewards;
 import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
@@ -18,7 +19,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
-
+import uk.co.asepstrath.bank.services.rewards.RewardFetchService;
+import uk.co.asepstrath.bank.services.rewards.RewardSpinService;
+import uk.co.asepstrath.bank.services.repository.RewardsRepository;
 import static uk.co.asepstrath.bank.Constants.DEFAULT_MANAGER_PASSWORD;
 import static uk.co.asepstrath.bank.Constants.DEFAULT_PASSWORD;
 
@@ -34,11 +37,13 @@ public class DatabaseManager implements DatabaseOperations {
     private final BusinessRepository businessRepository;
     private final TransactionRepository transactionRepository;
     private final ManagerRepository managerRepository;
+    private final RewardsRepository rewardsRepository;
 
     private final DataServiceFetcher<Account> accountDataService;
     private final DataServiceFetcher<Business> businessDataService;
     private final DataServiceFetcher<Transaction> transactionDataService;
     private final DataServiceFetcher<Manager> managerDataService;
+    private final DataServiceFetcher<Rewards> rewardsDataService;
 
     public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
         this.dataSource = dataSource;
@@ -49,12 +54,13 @@ public class DatabaseManager implements DatabaseOperations {
         this.businessRepository = new BusinessRepository(logger);
         this.transactionRepository = new TransactionRepository(logger);
         this.managerRepository = new ManagerRepository(logger);
-
+        this.rewardsRepository = new RewardsRepository(logger);
 
         this.accountDataService = new AccountDataService();
         this.businessDataService = new BusinessDataService();
         this.transactionDataService = new TransactionDataService(dataSource);
         this.managerDataService = new ManagerDataService();
+        this.rewardsDataService = new RewardsDataService(dataSource);
 
     }
 
@@ -111,6 +117,9 @@ public class DatabaseManager implements DatabaseOperations {
 
         managerRepository.createTable(connection);
         logger.info("Manager table created");
+
+        rewardsRepository.createTables(connection);
+        logger.info("Rewards table created");
     }
 
     /**
@@ -129,8 +138,7 @@ public class DatabaseManager implements DatabaseOperations {
             try {
                 String password = generatePassword(account.getAccountID());
                 accountRepository.insert(connection, account, password);
-            }
-            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 throw new SQLException("Unable to insert account");
             }
         }
@@ -156,11 +164,25 @@ public class DatabaseManager implements DatabaseOperations {
             try {
                 String managerPassword = generateManagerPassword(manager.getManagerID());
                 managerRepository.insert(connection, manager, managerPassword);
-            }
-            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 throw new SQLException("Unable to insert manager");
             }
         }
         logger.info("Managers inserted");
+        //rewardsRepository.createTables(connection);
+        try {
+            List<Rewards> rewards = rewardsDataService.fetchData();
+            if (rewards.isEmpty()) {
+                logger.warn("No rewards found in the API. Using stored rewards.");
+            }
+            for (Rewards reward : rewards) {
+                rewardsRepository.insert(connection, reward);
+            }
+            logger.info("Rewards inserted successfully");
+        } catch (SQLException e) {
+            logger.error("Error fetching rewards from database", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error while fetching rewards", e);
+        }
     }
 }
