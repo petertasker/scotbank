@@ -1,9 +1,11 @@
 package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
 import java.io.IOException;
@@ -18,11 +20,15 @@ class AccountDataServiceFetcherTest {
 
     private AccountDataService accountDataService;
     private UnirestWrapper unirestWrapper;
+    private Logger logger;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        accountDataService = new AccountDataService(unirestWrapper);
+        logger = mock(Logger.class);
+        objectMapper = new ObjectMapper();
+        accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper);
 
     }
 

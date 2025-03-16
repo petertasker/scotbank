@@ -1,11 +1,12 @@
 package uk.co.asepstrath.bank.services.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Business;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.Rewards;
+import uk.co.asepstrath.bank.Reward;
 import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
@@ -19,9 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
-import uk.co.asepstrath.bank.services.rewards.RewardFetchService;
-import uk.co.asepstrath.bank.services.rewards.RewardSpinService;
-import uk.co.asepstrath.bank.services.repository.RewardsRepository;
+
 import static uk.co.asepstrath.bank.Constants.DEFAULT_MANAGER_PASSWORD;
 import static uk.co.asepstrath.bank.Constants.DEFAULT_PASSWORD;
 
@@ -37,30 +36,33 @@ public class DatabaseManager implements DatabaseOperations {
     private final BusinessRepository businessRepository;
     private final TransactionRepository transactionRepository;
     private final ManagerRepository managerRepository;
-    private final RewardsRepository rewardsRepository;
+    private final RewardRepository rewardRepository;
 
     private final DataServiceFetcher<Account> accountDataService;
     private final DataServiceFetcher<Business> businessDataService;
     private final DataServiceFetcher<Transaction> transactionDataService;
     private final DataServiceFetcher<Manager> managerDataService;
-    private final DataServiceFetcher<Rewards> rewardsDataService;
+    private final DataServiceFetcher<Reward> rewardsDataService;
 
     public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
         this.dataSource = dataSource;
         this.logger = logger;
+        ObjectMapper objectMapper = new ObjectMapper();
+        UnirestWrapper unirestWrapper = new UnirestWrapper();
+
 
         // Instantiate repository services
         this.accountRepository = new AccountRepository(logger);
         this.businessRepository = new BusinessRepository(logger);
         this.transactionRepository = new TransactionRepository(logger);
         this.managerRepository = new ManagerRepository(logger);
-        this.rewardsRepository = new RewardsRepository(logger);
+        this.rewardRepository = new RewardRepository(logger);
 
-        this.accountDataService = new AccountDataService();
-        this.businessDataService = new BusinessDataService();
-        this.transactionDataService = new TransactionDataService(dataSource);
+        this.accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper);
+        this.businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper);
+        this.transactionDataService = new TransactionDataService(logger, unirestWrapper, objectMapper);
         this.managerDataService = new ManagerDataService();
-        this.rewardsDataService = new RewardsDataService(dataSource);
+        this.rewardsDataService = new RewardsDataService(logger, unirestWrapper, objectMapper);
 
     }
 
@@ -118,7 +120,7 @@ public class DatabaseManager implements DatabaseOperations {
         managerRepository.createTable(connection);
         logger.info("Manager table created");
 
-        rewardsRepository.createTables(connection);
+        rewardRepository.createTable(connection);
         logger.info("Rewards table created");
     }
 
@@ -171,12 +173,12 @@ public class DatabaseManager implements DatabaseOperations {
         logger.info("Managers inserted");
         //rewardsRepository.createTables(connection);
         try {
-            List<Rewards> rewards = rewardsDataService.fetchData();
+            List<Reward> rewards = rewardsDataService.fetchData();
             if (rewards.isEmpty()) {
                 logger.warn("No rewards found in the API. Using stored rewards.");
             }
-            for (Rewards reward : rewards) {
-                rewardsRepository.insert(connection, reward);
+            for (Reward reward : rewards) {
+                rewardRepository.insert(connection, reward);
             }
             logger.info("Rewards inserted successfully");
         } catch (SQLException e) {

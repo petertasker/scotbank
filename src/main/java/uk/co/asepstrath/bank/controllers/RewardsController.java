@@ -6,9 +6,9 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.services.rewards.RewardFetchService;
-import uk.co.asepstrath.bank.services.rewards.RewardSpinService;
-import uk.co.asepstrath.bank.services.repository.RewardsRepository;
+import uk.co.asepstrath.bank.services.reward.RewardFetchService;
+import uk.co.asepstrath.bank.services.reward.RewardSpinService;
+import uk.co.asepstrath.bank.services.repository.RewardRepository;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -19,12 +19,12 @@ import java.util.Map;
 public class RewardsController {
     private final RewardFetchService rewardFetchService;
     private final RewardSpinService rewardSpinService;
-    private final RewardsRepository rewardsRepository;
+    private final RewardRepository rewardRepository;
 
     public RewardsController(DataSource datasource, Logger logger) {
         this.rewardFetchService = new RewardFetchService(datasource, logger);
         this.rewardSpinService = new RewardSpinService(datasource, logger);
-        this.rewardsRepository = new RewardsRepository(logger);
+        this.rewardRepository = new RewardRepository(logger);
     }
 
     /**

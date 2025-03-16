@@ -1,5 +1,5 @@
-package uk.co.asepstrath.bank.services.rewards;
-import uk.co.asepstrath.bank.services.repository.RewardsRepository;
+package uk.co.asepstrath.bank.services.reward;
+import uk.co.asepstrath.bank.services.repository.RewardRepository;
 import org.slf4j.Logger;
 import javax.sql.DataSource;
 import java.sql.*;
@@ -9,40 +9,22 @@ import java.sql.SQLException;
 public class RewardSpinService {
     private final DataSource datasource;
     private final Logger logger;
-    private final RewardsRepository rewardsRepository;
+    private final RewardRepository rewardRepository;
     public RewardSpinService(DataSource datasource, Logger logger) {
         this.datasource = datasource;
         this.logger = logger;
-        this.rewardsRepository = new RewardsRepository(logger);
+        this.rewardRepository = new RewardRepository(logger);
     }
 
     /**
      * Process the user spinning the wheel (user MUST win a reward)
      */
     public String processSpin(String userId) throws SQLException {
-        if (hasUserSpunToday(userId)) {
-            return "You have already spun the wheel today. Try again tomorrow!";
-        }
-
         List<Map<String, Object>> rewards = getAvailableRewards();
         Map<String, Object> selectedReward = selectWeightedRandomReward(rewards);
 
         assignRewardToUser(userId, (String) selectedReward.get("Name"));
         return "Congratulations! You won: " + selectedReward.get("Name");
-    }
-
-    /**
-     * Check if the user has already spun the wheel today
-     */
-    private boolean hasUserSpunToday(String userId) throws SQLException {
-        try (Connection conn = datasource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT 1 FROM UserRewards WHERE AccountID = ? AND DATE(WonAt) = CURRENT_DATE")) {
-            stmt.setString(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next();
-            }
-        }
     }
 
     /**
@@ -87,7 +69,7 @@ public class RewardSpinService {
         }
 
         // Fallback in case of calculation issues (should not happen)
-        return rewards.get(rewards.size() - 1);
+        return rewards.getLast();
     }
     public String getUserRewardHistory(String userId) throws SQLException {
         StringBuilder history = new StringBuilder("Reward History:\n");

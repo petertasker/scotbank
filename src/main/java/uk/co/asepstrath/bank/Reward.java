@@ -2,13 +2,13 @@ package uk.co.asepstrath.bank;
 
 import java.math.BigDecimal;
 
-public class Rewards {
+public class Reward {
     private String name;
     private String description;
     private BigDecimal value;
     private double chance;
 
-    public Rewards(String name, String description, BigDecimal value, double chance){
+    public Reward(String name, String description, BigDecimal value, double chance){
         this.name = name;
         this.description = description;
         this.value = value;

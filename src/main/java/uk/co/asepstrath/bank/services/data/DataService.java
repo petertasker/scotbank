@@ -1,18 +1,17 @@
 package uk.co.asepstrath.bank.services.data;
 
-public class DataService {
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.BaseService;
 
-    protected UnirestWrapper unirestWrapper;
+public class DataService extends BaseService {
 
-    public DataService() {
-        this.unirestWrapper = new UnirestWrapper();
-    }
+    protected final UnirestWrapper unirestWrapper;
+    protected final ObjectMapper objectMapper;
 
-    public DataService(UnirestWrapper unirestWrapper) {
+    public DataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
+        super(logger);
         this.unirestWrapper = unirestWrapper;
-    }
-
-    public UnirestWrapper getUnirestWrapper() {
-        return this.unirestWrapper;
+        this.objectMapper = objectMapper;
     }
 }

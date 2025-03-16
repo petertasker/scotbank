@@ -13,7 +13,7 @@ import uk.co.asepstrath.bank.controllers.*;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 import uk.co.asepstrath.bank.services.repository.DatabaseManager;
-import uk.co.asepstrath.bank.services.rewards.RewardFetchService;
+import uk.co.asepstrath.bank.services.reward.RewardFetchService;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;

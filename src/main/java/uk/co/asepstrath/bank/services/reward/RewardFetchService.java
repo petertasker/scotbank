@@ -1,4 +1,4 @@
-package uk.co.asepstrath.bank.services.rewards;
+package uk.co.asepstrath.bank.services.reward;
 
 import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.JsonNode;

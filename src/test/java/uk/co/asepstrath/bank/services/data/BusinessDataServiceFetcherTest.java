@@ -1,8 +1,10 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Business;
 
 import java.io.IOException;
@@ -17,11 +19,15 @@ class BusinessDataServiceFetcherTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
+    private Logger logger;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        businessDataService = new BusinessDataService(unirestWrapper);
+        logger = mock(Logger.class);
+        objectMapper = new ObjectMapper();
+        businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper);
     }
 
     @Test

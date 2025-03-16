@@ -1,10 +1,12 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
 import java.sql.Connection;
@@ -27,12 +29,15 @@ class TransactionDataServiceFetcherTest {
    private TransactionDataService transactionDataService;
    private UnirestWrapper unirestWrapper;
    private HttpResponse<String> mockResponse;
+   private Logger mockLogger;
+   private ObjectMapper objectMapper;
 
    @BeforeEach
-   void setUp() {
+   void setUp() throws SQLException {
        unirestWrapper = mock(UnirestWrapper.class);
        mockResponse = mock(HttpResponse.class);
-       transactionDataService = new TransactionDataService(unirestWrapper);
+       mockLogger = mock(Logger.class);
+       transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
     }
 
    @Test
@@ -130,7 +135,7 @@ class TransactionDataServiceFetcherTest {
         Connection mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         
-        TransactionDataService service = new TransactionDataService(mockDataSource);
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
         
         // Create test transaction with null amount 
         Transaction fakeTransaction = new Transaction();
@@ -226,7 +231,7 @@ class TransactionDataServiceFetcherTest {
         // Set up mock to throw SQLException
         when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Test SQL Exception"));
         
-        TransactionDataService service = new TransactionDataService(mockDataSource);
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
         
         // Create a transaction that will trigger SQL code in createTransactionSafely
         Transaction transaction = new Transaction();

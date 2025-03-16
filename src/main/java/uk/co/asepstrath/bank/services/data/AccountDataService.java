@@ -18,17 +18,9 @@ import java.util.Map;
  * Fetches Account data from external API
  */
 public class AccountDataService extends DataService implements DataServiceFetcher<Account> {
-    private static final Logger log = LoggerFactory.getLogger(AccountDataService.class);
-    private final ObjectMapper mapper;
 
-    public AccountDataService() {
-        super(new UnirestWrapper());
-        this.mapper = new ObjectMapper();
-    }
-
-    public AccountDataService(UnirestWrapper unirestWrapper) {
-        super(unirestWrapper);
-        this.mapper = new ObjectMapper();
+    public AccountDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
+        super(logger, unirestWrapper, objectMapper);
     }
 
     /**
@@ -39,7 +31,6 @@ public class AccountDataService extends DataService implements DataServiceFetche
      */
     @Override
     public List<Account> fetchData() throws IOException {
-        UnirestWrapper wrapper = getUnirestWrapper();
         try {
 
             // Get OAuth token
@@ -48,14 +39,14 @@ public class AccountDataService extends DataService implements DataServiceFetche
 
             // This is username:password encrypted in Base64
             tokenHeaders.put("Authorization", "Basic c2NvdGJhbms6dGhpczFwYXNzd29yZDJpczNub3Q0c2VjdXJl");
-            HttpResponse<String> tokenResponse = wrapper.post(
+            HttpResponse<String> tokenResponse = unirestWrapper.post(
                     "https://api.asep-strath.co.uk/oauth2/token",
                     "grant_type=client_credentials",
                     tokenHeaders
             );
 
             // Parse response
-            JsonNode jsonNode = mapper.readTree(tokenResponse.getBody());
+            JsonNode jsonNode = objectMapper.readTree(tokenResponse.getBody());
             String accessToken = jsonNode.get("access_token").asText();
 
             // Use token to get accounts
@@ -67,11 +58,11 @@ public class AccountDataService extends DataService implements DataServiceFetche
             params.put("include", "postcode,cardDetails");
 
             // Make GET request
-            HttpResponse<String> response = wrapper.get("https://api.asep-strath.co.uk/api/accounts", params,
+            HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/accounts", params,
                     accountHeaders);
             if (response.isSuccess()) {
-                log.info("Successfully retrieved account data");
-                return mapper.readValue(response.getBody(), new TypeReference<>() {
+                logger.info("Successfully retrieved account data");
+                return objectMapper.readValue(response.getBody(), new TypeReference<>() {
                 });
             }
             else {

@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import kong.unirest.core.HttpResponse;
@@ -21,18 +22,10 @@ import java.util.Objects;
  * Fetches Transaction data from external API
  */
 public class TransactionDataService extends DataService implements DataServiceFetcher<Transaction> {
-    private final Logger logger;
     private Connection connection;
 
-    public TransactionDataService(UnirestWrapper unirestWrapper) {
-        super(unirestWrapper);
-        this.logger = LoggerFactory.getLogger(TransactionDataService.class);
-    }
-
-    public TransactionDataService(DataSource dataSource) throws SQLException {
-        super(new UnirestWrapper());
-        this.connection = dataSource.getConnection();
-        this.logger = LoggerFactory.getLogger(TransactionDataService.class);
+    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
+        super(logger, unirestWrapper, objectMapper);
     }
 
     /**
@@ -131,7 +124,7 @@ public class TransactionDataService extends DataService implements DataServiceFe
                 logger.warn("Skipping transaction with null amount: {}", transaction.getId());
                 return null;
             }
-            return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
+            return new Transaction(getConnection(), transaction.getTimestamp(), transaction.getAmount(),
                     transaction.getFrom(), transaction.getId(), transaction.getTo(), transaction.getType());
         }
         catch (SQLException e) {
