@@ -3,33 +3,38 @@ package uk.co.asepstrath.bank;
 import java.math.BigDecimal;
 
 public class Reward {
-    private String name;
-    private String description;
-    private BigDecimal value;
-    private double chance;
+    private final String name;
+    private final String description;
+    private final BigDecimal value;
+    private final double chance;
 
-    public Reward(String name, String description, BigDecimal value, double chance){
+    public Reward(String name, String description, BigDecimal value, double chance) {
         this.name = name;
         this.description = description;
         this.value = value;
         this.chance = chance;
     }
-    public String getRewardsName(){
+
+    public String getRewardsName() {
         return this.name;
     }
-    public String getRewardsDescription(){
+
+    public String getRewardsDescription() {
         return this.description;
     }
-    public BigDecimal getRewardsValue(){
+
+    public BigDecimal getRewardsValue() {
         return this.value;
     }
-    public double getRewardsChance(){
+
+    public double getRewardsChance() {
         return this.chance;
     }
+
     @Override
     public String toString() {
         return String.format("name: %s%ndescription: %s%nvalue: %s%n %s%nchance: %s%n",
-                getRewardsName(), getRewardsDescription(), getRewardsValue(),getRewardsChance());
+                getRewardsName(), getRewardsDescription(), getRewardsValue(), getRewardsChance());
     }
 
 }

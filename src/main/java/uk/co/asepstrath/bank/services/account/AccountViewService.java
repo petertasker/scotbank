@@ -6,7 +6,6 @@ import io.jooby.Session;
 import io.jooby.StatusCode;
 import io.jooby.annotation.GET;
 import io.jooby.exception.StatusCodeException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
@@ -14,7 +13,10 @@ import uk.co.asepstrath.bank.services.repository.TransactionRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +30,7 @@ import static uk.co.asepstrath.bank.Constants.*;
  */
 public class AccountViewService extends AccountService {
 
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     public AccountViewService(DataSource datasource, Logger logger) {
         super(datasource, logger);
@@ -148,11 +150,12 @@ public class AccountViewService extends AccountService {
     /**
      * Counts the number of businesses per category for all payments made by a specific account
      *
-     * @param accountId  The ID of the logged-in account
+     * @param accountId The ID of the logged-in account
      */
-    private void addPaymentCountPerBusinessToModel(String accountId, Map <String, Object> model) throws SQLException {
+    private void addPaymentCountPerBusinessToModel(String accountId, Map<String, Object> model) throws SQLException {
         try (Connection connection = getConnection()) {
-            Map<String, Integer> insightMap = transactionRepository.getTransactionsPerBusinessByCount(connection, accountId);
+            Map<String, Integer> insightMap = transactionRepository.getTransactionsPerBusinessByCount(connection,
+                    accountId);
             logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
             model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
                     .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
@@ -163,7 +166,8 @@ public class AccountViewService extends AccountService {
 
     private void addPaymentSumPerBusinessToModel(String accountID, Map<String, Object> model) throws SQLException {
         try (Connection connection = getConnection()) {
-            Map<String, BigDecimal> insightMap = transactionRepository.getTransactionsPerBusinessBySum(connection, accountID);
+            Map<String, BigDecimal> insightMap = transactionRepository.getTransactionsPerBusinessBySum(connection,
+                    accountID);
             logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
             model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
                     // Sort in descending order

@@ -1,21 +1,27 @@
 package uk.co.asepstrath.bank.services.reward;
 
-import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RewardFetchService {
+    private static final String API_URL = "https://api.asep-strath.co.uk/api/rewards";
     private final DataSource datasource;
     private final Logger logger;
-    private static final String API_URL = "https://api.asep-strath.co.uk/api/rewards";
 
     public RewardFetchService(DataSource datasource, Logger logger) {
         this.datasource = datasource;
@@ -59,7 +65,8 @@ public class RewardFetchService {
                     logger.info("Stored reward in DB: {}", name);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("Error fetching rewards from API, loading from database instead.", e);
             return getRewardsFromDatabase();
         }
@@ -86,7 +93,8 @@ public class RewardFetchService {
 
             logger.info("Fetched {} rewards from the database.", rewards.size());
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.error("Error fetching rewards from database", e);
         }
         return rewards;
@@ -95,11 +103,13 @@ public class RewardFetchService {
     /**
      * Inserts or updates a reward in the database (Upsert Logic)
      */
-    private void upsertReward(Connection conn, String name, String description, double value, double chance) throws SQLException {
+    private void upsertReward(Connection conn, String name, String description, double value, double chance) throws
+            SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(
                 "INSERT INTO Rewards (Name, Description, RewardValue, Chance) " +
                         "VALUES (?, ?, ?, ?) ON CONFLICT(Name) DO UPDATE SET " +
-                        "Description = excluded.Description, RewardValue = excluded.RewardValue, Chance = excluded.Chance")) {
+                        "Description = excluded.Description, RewardValue = excluded.RewardValue, Chance = excluded" +
+                        ".Chance")) {
             stmt.setString(1, name);
             stmt.setString(2, description);
             stmt.setDouble(3, value);

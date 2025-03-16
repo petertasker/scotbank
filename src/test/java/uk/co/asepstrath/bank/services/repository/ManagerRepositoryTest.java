@@ -1,6 +1,5 @@
 package uk.co.asepstrath.bank.services.repository;
 
-import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -115,7 +114,8 @@ class ManagerRepositoryTest {
         assertFalse(accounts.get(1).isRoundUpEnabled());
 
         // Verify SQL query
-        verify(mockStatement).executeQuery("SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts");
+        verify(mockStatement).executeQuery(
+                "SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts");
     }
 
     @Test
@@ -125,11 +125,12 @@ class ManagerRepositoryTest {
 
         when(mockResultSet.next()).thenReturn(true, true, false);
         when(mockResultSet.getString("Name")).thenReturn("Alice", "Bob");
-        when(mockResultSet.getString("Postcode")).thenReturn("12345","67890");
-        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(new BigDecimal("1000.00"), new BigDecimal("2000.00"));
+        when(mockResultSet.getString("Postcode")).thenReturn("12345", "67890");
+        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(new BigDecimal("1000.00"),
+                new BigDecimal("2000.00"));
 
         List<Map<String, Object>> spenders = repository.getTopTenSpenders(mockConnection);
-        assertEquals(2,spenders.size());
+        assertEquals(2, spenders.size());
 
         assertEquals("Alice", spenders.getFirst().get("Name"));
         assertEquals("12345", spenders.getFirst().get("Postcode"));
@@ -141,19 +142,19 @@ class ManagerRepositoryTest {
     }
 
     @Test
-    void testTop10SpendersDefaultCurrency() throws SQLException{
+    void testTop10SpendersDefaultCurrency() throws SQLException {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
         when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getString("Name")).thenReturn("Alice" );
+        when(mockResultSet.getString("Name")).thenReturn("Alice");
         when(mockResultSet.getString("Postcode")).thenReturn("12345");
         when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(null);
 
         List<Map<String, Object>> spendings = repository.getTopTenSpenders(mockConnection);
 
-        assertEquals(1,spendings.size());
-        assertEquals("£0.00",spendings.getFirst().get("TotalAmount"));
+        assertEquals(1, spendings.size());
+        assertEquals("£0.00", spendings.getFirst().get("TotalAmount"));
     }
 
     @Test

@@ -6,9 +6,10 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.repository.RewardRepository;
 import uk.co.asepstrath.bank.services.reward.RewardFetchService;
 import uk.co.asepstrath.bank.services.reward.RewardSpinService;
-import uk.co.asepstrath.bank.services.repository.RewardRepository;
+
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.HashMap;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.parsers.XmlParser;
 
@@ -22,7 +21,8 @@ import java.util.Objects;
  * Fetches Transaction data from external API
  */
 public class TransactionDataService extends DataService implements DataServiceFetcher<Transaction> {
-    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                                  DataSource dataSource) {
         super(logger, unirestWrapper, objectMapper, dataSource);
     }
 

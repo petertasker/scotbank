@@ -14,12 +14,13 @@ import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 import uk.co.asepstrath.bank.services.repository.DatabaseManager;
 import uk.co.asepstrath.bank.services.reward.RewardFetchService;
-import java.util.List;
-import java.util.Map;
+
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -156,7 +157,8 @@ public class App extends Jooby {
         List<Map<String, Object>> rewards = rewardFetchService.fetchAndStoreRewards();
         if (rewards.isEmpty()) {
             log.warn(" No rewards found in the API. Using stored rewards.");
-        } else {
+        }
+        else {
             log.info(" Successfully fetched and stored {} rewards.", rewards.size());
         }
     }

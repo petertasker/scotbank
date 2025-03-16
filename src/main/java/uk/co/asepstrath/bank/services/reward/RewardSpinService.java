@@ -1,15 +1,20 @@
 package uk.co.asepstrath.bank.services.reward;
-import uk.co.asepstrath.bank.services.repository.RewardRepository;
+
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.repository.RewardRepository;
+
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.*;
 
 public class RewardSpinService {
     private final DataSource datasource;
     private final Logger logger;
     private final RewardRepository rewardRepository;
+
     public RewardSpinService(DataSource datasource, Logger logger) {
         this.datasource = datasource;
         this.logger = logger;
@@ -28,7 +33,7 @@ public class RewardSpinService {
     }
 
     /**
-     *  Get available rewards from the database
+     * Get available rewards from the database
      */
     private List<Map<String, Object>> getAvailableRewards() throws SQLException {
         List<Map<String, Object>> rewards = new ArrayList<>();
@@ -71,6 +76,7 @@ public class RewardSpinService {
         // Fallback in case of calculation issues (should not happen)
         return rewards.getLast();
     }
+
     public String getUserRewardHistory(String userId) throws SQLException {
         StringBuilder history = new StringBuilder("Reward History:\n");
 

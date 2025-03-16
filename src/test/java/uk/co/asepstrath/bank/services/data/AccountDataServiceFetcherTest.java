@@ -46,16 +46,16 @@ class AccountDataServiceFetcherTest {
         HttpResponse<String> mockAccountsResponse = mock(HttpResponse.class);
         when(mockAccountsResponse.isSuccess()).thenReturn(true);
         when(mockAccountsResponse.getBody()).thenReturn("""
-        [
-            {
-                "id": "1",
-                "name": "Account1",
-                "startingBalance": 100.0,
-                "roundUpEnabled": true,
-                "postcode": "AB12 3CD"
-            }
-        ]
-    """);
+                    [
+                        {
+                            "id": "1",
+                            "name": "Account1",
+                            "startingBalance": 100.0,
+                            "roundUpEnabled": true,
+                            "postcode": "AB12 3CD"
+                        }
+                    ]
+                """);
 
         // Configure mock wrapper
         when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/oauth2/token"), anyString(), anyMap()))

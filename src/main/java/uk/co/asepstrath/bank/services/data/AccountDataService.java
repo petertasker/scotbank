@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Account;
 
 import javax.sql.DataSource;
@@ -20,7 +19,8 @@ import java.util.Map;
  */
 public class AccountDataService extends DataService implements DataServiceFetcher<Account> {
 
-    public AccountDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+    public AccountDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                              DataSource dataSource) {
         super(logger, unirestWrapper, objectMapper, dataSource);
     }
 

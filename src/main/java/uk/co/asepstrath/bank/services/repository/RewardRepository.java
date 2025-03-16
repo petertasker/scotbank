@@ -3,7 +3,10 @@ package uk.co.asepstrath.bank.services.repository;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Reward;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +16,12 @@ import java.util.List;
 public class RewardRepository extends BaseRepository {
 
     private static final String SQL_CREATE_TABLE_REWARDS = """
-                CREATE TABLE Rewards (
-                Name TEXT PRIMARY KEY NOT NULL,
-                Description TEXT,
-                RewardValue DECIMAL(5,2) NOT NULL,
-                Chance DECIMAL(5,2) NOT NULL)
-                """;
+            CREATE TABLE Rewards (
+            Name TEXT PRIMARY KEY NOT NULL,
+            Description TEXT,
+            RewardValue DECIMAL(5,2) NOT NULL,
+            Chance DECIMAL(5,2) NOT NULL)
+            """;
 
     private static final String SQL_GET_ALL_REWARDS =
             "SELECT * FROM Rewards";
@@ -37,6 +40,7 @@ public class RewardRepository extends BaseRepository {
     public void createTable(Connection connection) throws SQLException {
         executeUpdate(connection, SQL_CREATE_TABLE_REWARDS);
     }
+
     /**
      * Inserts a reward into the database
      *

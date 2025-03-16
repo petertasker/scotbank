@@ -21,7 +21,7 @@ public class Account {
     private BigDecimal balance;
     private BigDecimal roundUpBalance;
     private String postcode;
-    private Card card;
+    private final Card card;
 
     @JsonCreator
     public Account(

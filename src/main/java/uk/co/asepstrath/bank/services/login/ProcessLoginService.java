@@ -89,8 +89,8 @@ public class ProcessLoginService extends BaseService {
                         logger.info("Found account");
                         return new Account(rs.getString("AccountID"), rs.getString("Name"), rs.getBigDecimal("Balance"),
                                 rs.getBoolean("RoundUpEnabled"), new Card(
-                                        rs.getString("CardNumber"),
-                                        rs.getString("CardCVV")
+                                rs.getString("CardNumber"),
+                                rs.getString("CardCVV")
                         ));
                     }
                 }

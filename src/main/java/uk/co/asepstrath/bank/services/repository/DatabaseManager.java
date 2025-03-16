@@ -2,11 +2,7 @@ package uk.co.asepstrath.bank.services.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Business;
-import uk.co.asepstrath.bank.Manager;
-import uk.co.asepstrath.bank.Transaction;
-import uk.co.asepstrath.bank.Reward;
+import uk.co.asepstrath.bank.*;
 import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
@@ -140,7 +136,8 @@ public class DatabaseManager implements DatabaseOperations {
             try {
                 String password = generatePassword(account.getAccountID());
                 accountRepository.insert(connection, account, password);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            }
+            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 throw new SQLException("Unable to insert account");
             }
         }
@@ -166,7 +163,8 @@ public class DatabaseManager implements DatabaseOperations {
             try {
                 String managerPassword = generateManagerPassword(manager.getManagerID());
                 managerRepository.insert(connection, manager, managerPassword);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            }
+            catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 throw new SQLException("Unable to insert manager");
             }
         }
@@ -181,9 +179,11 @@ public class DatabaseManager implements DatabaseOperations {
                 rewardRepository.insert(connection, reward);
             }
             logger.info("Rewards inserted successfully");
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.error("Error fetching rewards from database", e);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("Unexpected error while fetching rewards", e);
         }
     }

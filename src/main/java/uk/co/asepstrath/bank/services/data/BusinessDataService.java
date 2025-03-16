@@ -16,10 +16,10 @@ import java.util.List;
 public class BusinessDataService extends DataService implements DataServiceFetcher<Business> {
 
 
-    public BusinessDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+    public BusinessDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                               DataSource dataSource) {
         super(logger, unirestWrapper, objectMapper, dataSource);
     }
-
 
 
     /**

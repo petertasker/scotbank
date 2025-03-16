@@ -19,7 +19,8 @@ public class RewardDataService extends DataService implements DataServiceFetcher
     private Connection connection; // Database connection
 
     // Constructor for API fetching (default)
-    public RewardDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+    public RewardDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                             DataSource dataSource) {
         super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
@@ -35,11 +36,14 @@ public class RewardDataService extends DataService implements DataServiceFetcher
             HttpResponse<String> response = unirestWrapper.get("https://api.asep-strath.co.uk/api/rewards");
             if (response.isSuccess()) {
                 logger.info("Successfully retrieved rewards data");
-                return objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-            } else {
+                return objectMapper.readValue(response.getBody(), new TypeReference<>() {
+                });
+            }
+            else {
                 throw new IOException("Failed to fetch rewards: " + response.getStatus());
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("Error fetching rewards data from API", e);
             throw e;
         }
@@ -67,7 +71,8 @@ public class RewardDataService extends DataService implements DataServiceFetcher
                 ));
             }
             logger.info("Successfully retrieved rewards from the database.");
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.error("Error fetching rewards from database", e);
             throw e;
         }
