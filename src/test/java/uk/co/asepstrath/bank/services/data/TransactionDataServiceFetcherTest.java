@@ -31,13 +31,18 @@ class TransactionDataServiceFetcherTest {
    private HttpResponse<String> mockResponse;
    private Logger mockLogger;
    private ObjectMapper objectMapper;
+   private DataSource mockDataSource;
+   private Connection mockConnection;
 
    @BeforeEach
    void setUp() throws SQLException {
        unirestWrapper = mock(UnirestWrapper.class);
        mockResponse = mock(HttpResponse.class);
        mockLogger = mock(Logger.class);
-       transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
+       DataSource mockDataSource = mock(DataSource.class);
+       Connection mockConnection = mock(Connection.class);
+       when(mockDataSource.getConnection()).thenReturn(mockConnection);
+       transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
     }
 
    @Test
@@ -131,11 +136,9 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafely() throws Exception {
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+
         
-        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
         
         // Create test transaction with null amount 
         Transaction fakeTransaction = new Transaction();
@@ -231,7 +234,7 @@ class TransactionDataServiceFetcherTest {
         // Set up mock to throw SQLException
         when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Test SQL Exception"));
         
-        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper);
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
         
         // Create a transaction that will trigger SQL code in createTransactionSafely
         Transaction transaction = new Transaction();

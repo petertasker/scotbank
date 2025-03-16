@@ -5,6 +5,7 @@ import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Business;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.List;
 public class BusinessDataService extends DataService implements DataServiceFetcher<Business> {
 
 
-    public BusinessDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
-        super(logger, unirestWrapper, objectMapper);
+    public BusinessDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
 

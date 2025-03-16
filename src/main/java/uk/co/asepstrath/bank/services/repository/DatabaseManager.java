@@ -42,9 +42,9 @@ public class DatabaseManager implements DatabaseOperations {
     private final DataServiceFetcher<Business> businessDataService;
     private final DataServiceFetcher<Transaction> transactionDataService;
     private final DataServiceFetcher<Manager> managerDataService;
-    private final DataServiceFetcher<Reward> rewardsDataService;
+    private final DataServiceFetcher<Reward> rewardDataService;
 
-    public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
+    public DatabaseManager(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
         ObjectMapper objectMapper = new ObjectMapper();
@@ -58,11 +58,11 @@ public class DatabaseManager implements DatabaseOperations {
         this.managerRepository = new ManagerRepository(logger);
         this.rewardRepository = new RewardRepository(logger);
 
-        this.accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper);
-        this.businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper);
-        this.transactionDataService = new TransactionDataService(logger, unirestWrapper, objectMapper);
+        this.accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper, dataSource);
+        this.businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper, dataSource);
+        this.transactionDataService = new TransactionDataService(logger, unirestWrapper, objectMapper, dataSource);
         this.managerDataService = new ManagerDataService();
-        this.rewardsDataService = new RewardsDataService(logger, unirestWrapper, objectMapper);
+        this.rewardDataService = new RewardDataService(logger, unirestWrapper, objectMapper, dataSource);
 
     }
 
@@ -173,7 +173,7 @@ public class DatabaseManager implements DatabaseOperations {
         logger.info("Managers inserted");
         //rewardsRepository.createTables(connection);
         try {
-            List<Reward> rewards = rewardsDataService.fetchData();
+            List<Reward> rewards = rewardDataService.fetchData();
             if (rewards.isEmpty()) {
                 logger.warn("No rewards found in the API. Using stored rewards.");
             }

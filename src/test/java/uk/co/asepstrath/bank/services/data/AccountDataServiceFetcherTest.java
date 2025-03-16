@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,13 +23,15 @@ class AccountDataServiceFetcherTest {
     private UnirestWrapper unirestWrapper;
     private Logger logger;
     private ObjectMapper objectMapper;
+    private DataSource dataSource;
 
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
         logger = mock(Logger.class);
         objectMapper = new ObjectMapper();
-        accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper);
+        dataSource = mock(DataSource.class);
+        accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper, dataSource);
 
     }
 

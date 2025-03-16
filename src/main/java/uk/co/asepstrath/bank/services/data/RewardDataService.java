@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Reward;
 
 import javax.sql.DataSource;
@@ -16,12 +15,12 @@ import java.util.List;
 /**
  * Fetches Rewards data from an external API or database.
  */
-public class RewardsDataService extends DataService implements DataServiceFetcher<Reward> {
+public class RewardDataService extends DataService implements DataServiceFetcher<Reward> {
     private Connection connection; // Database connection
 
     // Constructor for API fetching (default)
-    public RewardsDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
-        super(logger, unirestWrapper, objectMapper);
+    public RewardDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
     /**

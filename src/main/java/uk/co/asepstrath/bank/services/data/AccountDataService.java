@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Account;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +20,8 @@ import java.util.Map;
  */
 public class AccountDataService extends DataService implements DataServiceFetcher<Account> {
 
-    public AccountDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
-        super(logger, unirestWrapper, objectMapper);
+    public AccountDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
     /**

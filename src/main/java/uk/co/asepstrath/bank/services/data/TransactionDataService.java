@@ -22,10 +22,8 @@ import java.util.Objects;
  * Fetches Transaction data from external API
  */
 public class TransactionDataService extends DataService implements DataServiceFetcher<Transaction> {
-    private Connection connection;
-
-    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper) {
-        super(logger, unirestWrapper, objectMapper);
+    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper, DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
     /**
@@ -124,7 +122,8 @@ public class TransactionDataService extends DataService implements DataServiceFe
                 logger.warn("Skipping transaction with null amount: {}", transaction.getId());
                 return null;
             }
-            return new Transaction(getConnection(), transaction.getTimestamp(), transaction.getAmount(),
+            Connection connection = getConnection();
+            return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
                     transaction.getFrom(), transaction.getId(), transaction.getTo(), transaction.getType());
         }
         catch (SQLException e) {

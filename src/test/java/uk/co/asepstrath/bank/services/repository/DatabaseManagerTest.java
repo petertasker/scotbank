@@ -9,16 +9,12 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.*;
-import uk.co.asepstrath.bank.services.data.AccountDataService;
-import uk.co.asepstrath.bank.services.data.BusinessDataService;
-import uk.co.asepstrath.bank.services.data.ManagerDataService;
-import uk.co.asepstrath.bank.services.data.TransactionDataService;
+import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -48,6 +44,8 @@ class DatabaseManagerTest {
     @Mock
     private ManagerRepository managerRepository;
     @Mock
+    private RewardRepository rewardRepository;
+    @Mock
     private AccountDataService accountDataService;
     @Mock
     private BusinessDataService businessDataService;
@@ -55,7 +53,10 @@ class DatabaseManagerTest {
     private TransactionDataService transactionDataService;
     @Mock
     private ManagerDataService managerDataService;
+    @Mock
     private DatabaseManager databaseManager;
+    @Mock
+    private RewardDataService rewardDataService;
 
     @BeforeEach
     void setUp() throws SQLException, NoSuchFieldException, IllegalAccessException {
@@ -68,12 +69,13 @@ class DatabaseManagerTest {
         setPrivateField(databaseManager, "businessRepository", businessRepository);
         setPrivateField(databaseManager, "transactionRepository", transactionRepository);
         setPrivateField(databaseManager, "managerRepository", managerRepository);
-
+        setPrivateField(databaseManager, "rewardRepository", rewardRepository);
         // inject mock data services into private fields
         setPrivateField(databaseManager, "accountDataService", accountDataService);
         setPrivateField(databaseManager, "businessDataService", businessDataService);
         setPrivateField(databaseManager, "transactionDataService", transactionDataService);
         setPrivateField(databaseManager, "managerDataService", managerDataService);
+        setPrivateField(databaseManager, "rewardDataService", rewardDataService);
     }
 
     // using reflection to create private fields
