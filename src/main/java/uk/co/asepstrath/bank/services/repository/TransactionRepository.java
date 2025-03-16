@@ -1,10 +1,12 @@
 package uk.co.asepstrath.bank.services.repository;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
+import java.math.BigDecimal;
 import java.sql.*;
-import java.util.Objects;
+import java.util.*;
 
 import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
 
@@ -36,7 +38,36 @@ public class TransactionRepository extends BaseRepository {
                     "ReceiverBusinessID, TransactionType, TransactionAccepted)\n" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
+    private static final String SQL_GET_TRANSACTIONS_SUM = """
+                SELECT
+                    b.Category,
+                    SUM(t.Amount) AS TotalAmount
+                FROM Transactions t
+                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+                WHERE t.SenderID = ?
+                AND t.TransactionAccepted = TRUE
+                AND t.ReceiverBusinessID IS NOT NULL
+                AND t.TransactionType = 'PAYMENT'
+                GROUP BY b.Category
+                ORDER BY TotalAmount DESC""";
 
+    private static final String SQL_GET_TRANSACTIONS_COUNT = """
+                SELECT
+                    b.Category,
+                    COUNT(DISTINCT b.BusinessID) AS BusinessCount,
+                FROM Transactions t
+                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+                WHERE t.SenderID = ?
+                AND t.TransactionAccepted = TRUE
+                AND t.ReceiverBusinessID IS NOT NULL
+                AND t.TransactionType = 'PAYMENT'
+                GROUP BY b.Category
+                ORDER BY BusinessCount DESC""";
+
+    private static final String SQL_GET_TRASNACTIONS_BY_ID = "SELECT Timestamp, Amount, SenderID, TransactionID, " +
+            "ReceiverAccountID, " +
+            "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
+            "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC";
     public TransactionRepository(Logger logger) {
         super(logger);
     }
@@ -98,5 +129,77 @@ public class TransactionRepository extends BaseRepository {
             stmt.setBoolean(8, transaction.getStatus());
             stmt.executeUpdate();
         }
+    }
+
+
+    public Map <String, BigDecimal> getTransactionsPerBusinessBySum(Connection connection, String accountId) throws SQLException {
+        Map <String, BigDecimal> map = new HashMap<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRANSACTIONS_SUM)) {
+            preparedStatement.setString(1, accountId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String category = resultSet.getString("Category");
+                    BigDecimal totalAmount = resultSet.getBigDecimal("TotalAmount");
+                    map.put(category, totalAmount);
+                }
+            }
+        }
+        return map;
+    }
+
+
+    public Map <String, Integer> getTransactionsPerBusinessByCount(Connection connection, String accountId) throws SQLException {
+        Map <String, Integer> map = new HashMap<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRANSACTIONS_COUNT)) {
+            preparedStatement.setString(1, accountId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String category = resultSet.getString("Category");
+                    int count = resultSet.getInt("BusinessCount");
+                    map.put(category, count);
+                }
+            }
+        }
+        return map;
+    }
+
+    public List<Transaction> getTransactionsByAccountId(Connection connection, String accountId) throws SQLException {
+        List<Transaction> transactions = new ArrayList<>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRASNACTIONS_BY_ID)) {
+            preparedStatement.setString(1, accountId);
+            preparedStatement.setString(2, accountId);
+            preparedStatement.setString(3, accountId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    transactions.add(createTransactionFromResultSet(resultSet));
+                }
+            }
+        }
+        return transactions;
+    }
+
+
+    /**
+     * Creates a Transaction object from a database result set
+     */
+    private Transaction createTransactionFromResultSet(ResultSet resultSet) throws SQLException {
+        Timestamp timestamp = resultSet.getTimestamp("Timestamp");
+        DateTime dateTime = new DateTime(timestamp);
+        BigDecimal amount = resultSet.getBigDecimal("Amount");
+        String senderID = resultSet.getString("SenderID");
+        String transactionID = resultSet.getString("TransactionID");
+        String receiverAccountID = resultSet.getString("ReceiverAccountID");
+        String receiverBusinessID = resultSet.getString("ReceiverBusinessID");
+
+        String receiverID = (receiverAccountID != null) ? receiverAccountID : receiverBusinessID;
+
+        String transactionType = resultSet.getString("TransactionType");
+        boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
+
+        return new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType,
+                transactionAccepted);
     }
 }

@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Constants;
 import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.services.repository.TransactionRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -27,8 +28,11 @@ import static uk.co.asepstrath.bank.Constants.*;
  */
 public class AccountViewService extends AccountService {
 
+    private TransactionRepository transactionRepository;
+
     public AccountViewService(DataSource datasource, Logger logger) {
         super(datasource, logger);
+        transactionRepository = new TransactionRepository(logger);
     }
 
     /**
@@ -41,12 +45,14 @@ public class AccountViewService extends AccountService {
     @GET
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         ensureAccountIsLoggedIn(ctx);
+
         Map<String, Object> model = createModel();
         Session session = getSession(ctx);
 
         // Setup basic account info
         addAccountDetailsToModel(model, session);
         addCardDetailsToModel(model, session);
+
         // Add account balances
         String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
         putAccountBalancesInModel(model, accountId);
@@ -56,6 +62,10 @@ public class AccountViewService extends AccountService {
 
         // Get transaction history
         loadTransactionHistory(model, accountId);
+
+        // Add insights data to model
+        addPaymentSumPerBusinessToModel(accountId, model);
+        addPaymentCountPerBusinessToModel(accountId, model);
 
         return render(TEMPLATE_ACCOUNT, model);
     }
@@ -108,6 +118,7 @@ public class AccountViewService extends AccountService {
             // Create new list with display-ready transactions
             List<Map<String, Object>> displayTransactions = new ArrayList<>();
 
+
             for (Transaction transaction : transactions) {
                 Map<String, Object> displayTx = new HashMap<>();
                 displayTx.put("id", transaction.getId());
@@ -123,8 +134,6 @@ public class AccountViewService extends AccountService {
                 displayTransactions.add(displayTx);
             }
 
-            addPaymentCountPerBusinessToModel(connection, accountId, model);
-            addPaymentSumPerBusinessToModel(connection, accountId, model);
             model.put(TRANSACTION_OBJECT_LIST, displayTransactions);
         }
     }
@@ -133,126 +142,35 @@ public class AccountViewService extends AccountService {
      * Fetches transactions from the database
      */
     private List<Transaction> fetchTransactions(Connection connection, String accountId) throws SQLException {
-        List<Transaction> transactions = new ArrayList<>();
-        String query = "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, " +
-                "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
-                "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, accountId);
-            preparedStatement.setString(2, accountId);
-            preparedStatement.setString(3, accountId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    transactions.add(createTransactionFromResultSet(resultSet));
-                }
-            }
-        }
-        return transactions;
-    }
-
-    /**
-     * Creates a Transaction object from a database result set
-     */
-    private Transaction createTransactionFromResultSet(ResultSet resultSet) throws SQLException {
-        Timestamp timestamp = resultSet.getTimestamp("Timestamp");
-        DateTime dateTime = new DateTime(timestamp);
-        BigDecimal amount = resultSet.getBigDecimal("Amount");
-        String senderID = resultSet.getString("SenderID");
-        String transactionID = resultSet.getString("TransactionID");
-        String receiverAccountID = resultSet.getString("ReceiverAccountID");
-        String receiverBusinessID = resultSet.getString("ReceiverBusinessID");
-
-        String receiverID = (receiverAccountID != null) ? receiverAccountID : receiverBusinessID;
-
-        String transactionType = resultSet.getString("TransactionType");
-        boolean transactionAccepted = resultSet.getBoolean("TransactionAccepted");
-
-        return new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType,
-                transactionAccepted);
+        return transactionRepository.getTransactionsByAccountId(connection, accountId);
     }
 
     /**
      * Counts the number of businesses per category for all payments made by a specific account
      *
-     * @param connection Database connection
      * @param accountId  The ID of the logged-in account
      */
-    private void addPaymentCountPerBusinessToModel(Connection connection, String accountId,
-                                                   Map<String, Object> model) throws SQLException {
-        Map<String, Integer> insightMap = new HashMap<>();
-
-        String query = """
-                SELECT
-                    b.Category,
-                    COUNT(DISTINCT b.BusinessID) AS BusinessCount,
-                FROM Transactions t
-                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
-                WHERE t.SenderID = ?
-                AND t.TransactionAccepted = TRUE
-                AND t.ReceiverBusinessID IS NOT NULL
-                AND t.TransactionType = 'PAYMENT'
-                GROUP BY b.Category
-                ORDER BY BusinessCount DESC""";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, accountId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String category = resultSet.getString("Category");
-                    int count = resultSet.getInt("BusinessCount");
-                    insightMap.put(category, count);
-                }
-            }
+    private void addPaymentCountPerBusinessToModel(String accountId, Map <String, Object> model) throws SQLException {
+        try (Connection connection = getConnection()) {
+            Map<String, Integer> insightMap = transactionRepository.getTransactionsPerBusinessByCount(connection, accountId);
+            logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
+            model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
+                    .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                    .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
+                    .collect(Collectors.toList()));
         }
-        logger.info("Count businesses per category for account {} is {}", accountId, insightMap);
-        model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
-                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // Sort in descending order
-                .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
-                .collect(Collectors.toList()));
-
-
     }
 
-    private void addPaymentSumPerBusinessToModel(Connection connection, String accountID,
-                                                 Map<String, Object> model) throws
-            SQLException {
-        Map<String, BigDecimal> insightMap = new HashMap<>();
-        String query = """
-                SELECT
-                    b.Category,
-                    SUM(t.Amount) AS TotalAmount
-                FROM Transactions t
-                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
-                WHERE t.SenderID = ?
-                AND t.TransactionAccepted = TRUE
-                AND t.ReceiverBusinessID IS NOT NULL
-                AND t.TransactionType = 'PAYMENT'
-                GROUP BY b.Category
-                ORDER BY TotalAmount DESC""";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, accountID);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String category = resultSet.getString("Category");
-                    BigDecimal totalAmount = resultSet.getBigDecimal("TotalAmount");
-                    insightMap.put(category, totalAmount);
-                }
-            }
+    private void addPaymentSumPerBusinessToModel(String accountID, Map<String, Object> model) throws SQLException {
+        try (Connection connection = getConnection()) {
+            Map<String, BigDecimal> insightMap = transactionRepository.getTransactionsPerBusinessBySum(connection, accountID);
+            logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
+            model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
+                    // Sort in descending order
+                    .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                    .map(entry -> Map.of("category", entry.getKey(),
+                            "totalAmount", formatCurrency(entry.getValue())))
+                    .collect(Collectors.toList()));
         }
-        logger.info("Sum businesses per category for account {} is {}", accountID, insightMap);
-        model.put(BUSINESS_AMOUNT_SUMS, insightMap.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Sort in descending order
-                .map(entry -> Map.of("category", entry.getKey(),
-                        "totalAmount", formatCurrency(entry.getValue())))
-                .collect(Collectors.toList()));
-
-
-
     }
-
-
 }
