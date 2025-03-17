@@ -33,7 +33,7 @@ public class RewardController extends BaseController {
      * Display the rewards page
      */
     @GET
-    public ModelAndView viewRewardPage(Context ctx) throws SQLException {
+    public ModelAndView<Map<String, Object>> viewRewardPage(Context ctx) throws SQLException {
         return rewardViewService.viewRewardPage(ctx);
     }
 
