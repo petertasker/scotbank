@@ -8,6 +8,8 @@ import kong.unirest.core.Unirest;
 import java.util.Map;
 
 public class UnirestWrapper {
+
+
     /**
      * Performs a GET request to the specified URL
      *

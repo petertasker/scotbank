@@ -66,7 +66,8 @@ public class Transaction {
         this.transactionStatus = processTransaction(connection);
     }
 
-    /**x
+    /**
+     * x
      * Gets the DateTime of the Transaction
      *
      * @return the "timestamp" of the Transaction

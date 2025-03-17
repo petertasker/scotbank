@@ -79,7 +79,7 @@ public class AccountRepository extends BaseRepository {
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
             statement.setString(6, account.getPostcode(true));
-            statement.setString(7,account.getCard().getCardNumber());
+            statement.setString(7, account.getCard().getCardNumber());
             statement.setString(8, account.getCard().getCvv());
             statement.executeUpdate();
             logger.info("Inserted account {}, round up enabled: {}, Default password: {}, postcode: {}, Card: {}",

@@ -1,10 +1,11 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Business;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,10 @@ import java.util.List;
  */
 public class BusinessDataService extends DataService implements DataServiceFetcher<Business> {
 
-    private static final Logger log = LoggerFactory.getLogger(BusinessDataService.class);
 
-    public BusinessDataService() {
-
-    }
-
-    public BusinessDataService(UnirestWrapper unirestWrapper) {
-        super(unirestWrapper);
+    public BusinessDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                               DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
 
@@ -63,7 +60,7 @@ public class BusinessDataService extends DataService implements DataServiceFetch
                     businesses.add(new Business(id, name, category, sanctioned));
                 }
             }
-            log.info("Successfully fetched businesses data");
+            logger.info("Successfully fetched businesses data");
             return businesses;
 
         }

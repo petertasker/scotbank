@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 
+
 import static uk.co.asepstrath.bank.Constants.*;
 
 public class App extends Jooby {
@@ -123,7 +124,7 @@ public class App extends Jooby {
         mvc(new ManagerController_(ds, log));
         mvc(new LogoutController_(log));
         mvc(new ErrorController_(log));
-
+        mvc(new RewardController_(ds, log));
 
         /*
         Register application lifecycle hooks

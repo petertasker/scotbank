@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="content-wrapper">
+    <h1>🎁 Welcome to the Rewards Program!</h1>
+    <div class="action-buttons">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/account'">Back to Account</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
+    </div>
+
+    {{#if success}}
+        <p style="color: green">{{success}}</p>
+    {{/if}}
+    {{#if error}}
+        <p style="color: red">{{error}}</p>
+    {{/if}}
+
+    <!-- Rewards List -->
+    <div class="rewards-section">
+        <h2>🎯 Available Rewards</h2>
+        <hr>
+        {{#each rewards}}
+        <div class="reward">
+            <p><strong>Name: </strong>{{name}}</p>
+            <p><strong>Description: </strong>{{description}}</p>
+            <p><strong>Value: £</strong>{{value}}</p>
+            <p><strong>Chance: </strong>{{chance}}%</p>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Spin the Wheel Section -->
+    <div class="spin-section">
+        <h2>🎡 Spin the Wheel</h2>
+        <form action="/account/reward/process" method="post">
+            <button type="submit" class="btn btn-success">🎡 Spin Now</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

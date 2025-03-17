@@ -1,10 +1,8 @@
 package uk.co.asepstrath.bank.services.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Business;
-import uk.co.asepstrath.bank.Manager;
-import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.*;
 import uk.co.asepstrath.bank.services.data.*;
 
 import javax.sql.DataSource;
@@ -34,27 +32,33 @@ public class DatabaseManager implements DatabaseOperations {
     private final BusinessRepository businessRepository;
     private final TransactionRepository transactionRepository;
     private final ManagerRepository managerRepository;
+    private final RewardRepository rewardRepository;
 
     private final DataServiceFetcher<Account> accountDataService;
     private final DataServiceFetcher<Business> businessDataService;
     private final DataServiceFetcher<Transaction> transactionDataService;
     private final DataServiceFetcher<Manager> managerDataService;
+    private final DataServiceFetcher<Reward> rewardDataService;
 
-    public DatabaseManager(DataSource dataSource, Logger logger) throws SQLException {
+    public DatabaseManager(DataSource dataSource, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
+        ObjectMapper objectMapper = new ObjectMapper();
+        UnirestWrapper unirestWrapper = new UnirestWrapper();
+
 
         // Instantiate repository services
         this.accountRepository = new AccountRepository(logger);
         this.businessRepository = new BusinessRepository(logger);
         this.transactionRepository = new TransactionRepository(logger);
         this.managerRepository = new ManagerRepository(logger);
+        this.rewardRepository = new RewardRepository(logger);
 
-
-        this.accountDataService = new AccountDataService();
-        this.businessDataService = new BusinessDataService();
-        this.transactionDataService = new TransactionDataService(dataSource);
+        this.accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper, dataSource);
+        this.businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper, dataSource);
+        this.transactionDataService = new TransactionDataService(logger, unirestWrapper, objectMapper, dataSource);
         this.managerDataService = new ManagerDataService();
+        this.rewardDataService = new RewardDataService(logger, unirestWrapper, objectMapper, dataSource);
 
     }
 
@@ -111,6 +115,9 @@ public class DatabaseManager implements DatabaseOperations {
 
         managerRepository.createTable(connection);
         logger.info("Manager table created");
+
+        rewardRepository.createTable(connection);
+        logger.info("Rewards table created");
     }
 
     /**
@@ -123,7 +130,8 @@ public class DatabaseManager implements DatabaseOperations {
      */
     @Override
     public void insertData(Connection connection) throws SQLException, IOException, XMLStreamException {
-        // Insert accounts
+
+        // Insert Accounts
         List<Account> accounts = accountDataService.fetchData();
         for (Account account : accounts) {
             try {
@@ -136,14 +144,14 @@ public class DatabaseManager implements DatabaseOperations {
         }
         logger.info("Accounts inserted");
 
-        // Insert businesses
+        // Insert Businesses
         List<Business> businesses = businessDataService.fetchData();
         for (Business business : businesses) {
             businessRepository.insert(connection, business);
         }
         logger.info("Businesses inserted");
 
-        // Insert transactions
+        // Insert Transactions
         List<Transaction> transactions = transactionDataService.fetchData();
         for (Transaction transaction : transactions) {
             transactionRepository.insert(connection, transaction);
@@ -162,5 +170,12 @@ public class DatabaseManager implements DatabaseOperations {
             }
         }
         logger.info("Managers inserted");
+
+        // Insert Rewards
+        List<Reward> rewards = rewardDataService.fetchData();
+        for (Reward reward : rewards) {
+            rewardRepository.insert(connection, reward);
+        }
+        logger.info("Rewards inserted");
     }
 }

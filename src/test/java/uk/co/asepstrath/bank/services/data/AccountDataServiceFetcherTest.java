@@ -1,11 +1,14 @@
 package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,11 +21,17 @@ class AccountDataServiceFetcherTest {
 
     private AccountDataService accountDataService;
     private UnirestWrapper unirestWrapper;
+    private Logger logger;
+    private ObjectMapper objectMapper;
+    private DataSource dataSource;
 
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        accountDataService = new AccountDataService(unirestWrapper);
+        logger = mock(Logger.class);
+        objectMapper = new ObjectMapper();
+        dataSource = mock(DataSource.class);
+        accountDataService = new AccountDataService(logger, unirestWrapper, objectMapper, dataSource);
 
     }
 
@@ -37,16 +46,16 @@ class AccountDataServiceFetcherTest {
         HttpResponse<String> mockAccountsResponse = mock(HttpResponse.class);
         when(mockAccountsResponse.isSuccess()).thenReturn(true);
         when(mockAccountsResponse.getBody()).thenReturn("""
-        [
-            {
-                "id": "1",
-                "name": "Account1",
-                "startingBalance": 100.0,
-                "roundUpEnabled": true,
-                "postcode": "AB12 3CD"
-            }
-        ]
-    """);
+                    [
+                        {
+                            "id": "1",
+                            "name": "Account1",
+                            "startingBalance": 100.0,
+                            "roundUpEnabled": true,
+                            "postcode": "AB12 3CD"
+                        }
+                    ]
+                """);
 
         // Configure mock wrapper
         when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/oauth2/token"), anyString(), anyMap()))
