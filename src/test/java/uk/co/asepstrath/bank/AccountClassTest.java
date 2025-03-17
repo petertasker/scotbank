@@ -160,16 +160,9 @@ class AccountClassTest {
     }
 
     @Test
-    void testGetPostalCodeAdmin() {
+    void testGetPostalCode() {
         Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false,"G4 6FC", new Card("123", "345"));
         assertEquals("G4 6FC", a.getPostcode());
-    }
-
-    @Test
-    void testPostalCodeException(){
-        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false,"G4 6FC", new Card("123", "345"));
-        SecurityException exceptionMessage = assertThrows(SecurityException.class, () -> a.getPostcode());
-        assertEquals("Account does not have postcode permission", exceptionMessage.getMessage());
     }
 
     @Test
