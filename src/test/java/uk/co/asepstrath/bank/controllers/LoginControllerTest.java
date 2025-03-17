@@ -67,9 +67,6 @@ class LoginControllerTest {
         loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
     }
 
-    /*
-     * Changing testing from testing the entire controller to just testing each class.
-     */
 
     @Test
     void testDisplayLogin() {
@@ -83,9 +80,9 @@ class LoginControllerTest {
         verify(mockDisplayLoginService).displayLogin(mockContext);
     }
 
-    // Test that the logincontroller was succesful in calling loginProcess
+    // Test that the LoginController was successful in calling loginProcess
     @Test
-    void testLoginProcessCall() throws SQLException {
+    void testLoginProcessCall() {
         // Mock ProcessLogin
 
         // Act

@@ -162,7 +162,7 @@ class ManagerRepositoryTest {
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockStatement.executeQuery(anyString())).thenThrow(new SQLException("Database error"));
 
-        assertThrows(StatusCodeException.class, () -> repository.getAllAccounts(mockConnection));
+        assertThrows(SQLException.class, () -> repository.getAllAccounts(mockConnection));
     }
 
     @Test

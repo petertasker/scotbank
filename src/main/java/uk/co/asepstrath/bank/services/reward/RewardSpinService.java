@@ -10,6 +10,7 @@ import uk.co.asepstrath.bank.services.data.UnirestWrapper;
 import uk.co.asepstrath.bank.services.repository.RewardRepository;
 
 import javax.sql.DataSource;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -18,10 +19,12 @@ import static uk.co.asepstrath.bank.Constants.*;
 public class RewardSpinService extends RewardService {
 
     private final RewardDataService rewardDataService;
+    private final SecureRandom secureRandom;
 
     public RewardSpinService(DataSource datasource, Logger logger, RewardRepository rewardRepository) {
         super(datasource, logger, rewardRepository);
         this.rewardDataService = new RewardDataService(logger, new UnirestWrapper(), new ObjectMapper(), datasource);
+        this.secureRandom = new SecureRandom();
     }
 
     /**
@@ -55,9 +58,8 @@ public class RewardSpinService extends RewardService {
             totalWeight += reward.getChance();
         }
 
-        double random = Math.random() * totalWeight;
+        double random = secureRandom.nextDouble() * totalWeight;
 
-        // Find the reward that corresponds to the random value
         double weightSum = 0.0;
         for (Reward reward : rewards) {
             weightSum += reward.getChance();
@@ -66,7 +68,6 @@ public class RewardSpinService extends RewardService {
             }
         }
 
-        // Fallback (shouldn't happen unless list is empty)
-        return rewards.isEmpty() ? null : rewards.getLast();
+        return rewards.getLast();
     }
 }

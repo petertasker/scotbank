@@ -106,8 +106,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
             }
         }
         catch (SQLException e) {
-            logger.error(e.getMessage());
-            throw new StatusCodeException(StatusCode.SERVER_ERROR, e.getMessage());
+            throw new SQLException("Failed to retrieve accounts from database", e);
         }
         logger.info("Returning accounts from the database");
         return accounts;

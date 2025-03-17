@@ -135,7 +135,6 @@ class ProcessManagerLoginServiceTest {
         when(resultSet.getString("Password")).thenReturn(hashedPassword);
 
         // Mock the HashingPasswordService to bypass hashing
-        HashingPasswordService hashingPasswordService = mock(HashingPasswordService.class);
         try (var mockStaticHash = mockStatic(HashingPasswordService.class)) {
             mockStaticHash.when(() -> HashingPasswordService.verifyPassword(password, hashedPassword)).thenReturn(true);
             // Execute the method

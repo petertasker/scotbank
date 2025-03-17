@@ -137,8 +137,6 @@ class TransactionDataServiceTest {
         // Mock dependencies
         TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
                 mockDataSource);
-        Connection mockConnection = mock(Connection.class); // Mock Connection
-
         // Create test transaction with null amount
         Transaction fakeTransaction = new Transaction();
         setPrivateField(fakeTransaction, "id", "bad123");
@@ -227,9 +225,6 @@ class TransactionDataServiceTest {
 
     @Test
     void testCreateTransactionSafelyWithSQLException() throws Exception {
-        // Create mocks
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
 
         // Set up mock to throw SQLException

@@ -33,8 +33,10 @@ public class App extends Jooby {
 
         // Handle status code errors
         handleRouteErrors();
+
         // Install the required extensions
         installExtensions();
+
         // Load all CSS / JS / media
         loadServerAssets();
 

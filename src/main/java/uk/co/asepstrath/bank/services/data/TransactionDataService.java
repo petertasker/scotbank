@@ -46,36 +46,33 @@ public class TransactionDataService extends DataService implements DataServiceFe
                 // Make GET request for each page
                 HttpResponse<String> response = fetchPage(page);
 
-                if (!response.isSuccess()) {
+                if (response.isSuccess()) {
+                    // Map page responses to a List of Transaction Objects
+                    XmlParser pageResult = parseResponse(xmlMapper, response);
+
+                    // Process transactions with connection management
+                    List<Transaction> pageTransactions;
+                    try (Connection connection = getConnection()) {
+                        pageTransactions = processTransactions(pageResult, connection);
+                    }
+
+                    if (!pageTransactions.isEmpty()) {
+                        // Append page Transactions to List of all Transactions
+                        allTransactions.addAll(pageTransactions);
+                        hasMorePages = determineIfMorePages(pageResult, page);
+
+                        if (hasMorePages) {
+                            page++;
+                        } else {
+                            logger.info("Reached last page ({}) of transactions", page);
+                        }
+                    } else {
+                        logger.info("No more transactions found on page {}", page);
+                        hasMorePages = false;
+                    }
+                } else {
                     logger.info("Failed to fetch page {}: {}", page, response.getStatus());
-                    break;
-                }
-
-                // Map page responses to a List of Transaction Objects
-                XmlParser pageResult = parseResponse(xmlMapper, response);
-
-                // Process transactions with connection management
-                List<Transaction> pageTransactions;
-                try (Connection connection = getConnection()) {
-                    pageTransactions = processTransactions(pageResult, connection);
-                }
-
-                // Break if for some reason the XML is configured poorly, and the parser is sent to an empty page
-                if (pageTransactions.isEmpty()) {
-                    logger.info("No more transactions found on page {}", page);
-                    break;
-                }
-
-                // Append page Transactions to List of all Transactions
-                allTransactions.addAll(pageTransactions);
-                hasMorePages = determineIfMorePages(pageResult, page);
-
-                // Go to next page
-                if (hasMorePages) {
-                    page++;
-                }
-                else {
-                    logger.info("Reached last page ({}) of transactions", page);
+                    hasMorePages = false;
                 }
             }
         }
