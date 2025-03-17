@@ -39,35 +39,36 @@ public class TransactionRepository extends BaseRepository {
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_GET_TRANSACTIONS_SUM = """
-                SELECT
-                    b.Category,
-                    SUM(t.Amount) AS TotalAmount
-                FROM Transactions t
-                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
-                WHERE t.SenderID = ?
-                AND t.TransactionAccepted = TRUE
-                AND t.ReceiverBusinessID IS NOT NULL
-                AND t.TransactionType = 'PAYMENT'
-                GROUP BY b.Category
-                ORDER BY TotalAmount DESC""";
+            SELECT
+                b.Category,
+                SUM(t.Amount) AS TotalAmount
+            FROM Transactions t
+            INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+            WHERE t.SenderID = ?
+            AND t.TransactionAccepted = TRUE
+            AND t.ReceiverBusinessID IS NOT NULL
+            AND t.TransactionType = 'PAYMENT'
+            GROUP BY b.Category
+            ORDER BY TotalAmount DESC""";
 
     private static final String SQL_GET_TRANSACTIONS_COUNT = """
-                SELECT
-                    b.Category,
-                    COUNT(DISTINCT b.BusinessID) AS BusinessCount,
-                FROM Transactions t
-                INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
-                WHERE t.SenderID = ?
-                AND t.TransactionAccepted = TRUE
-                AND t.ReceiverBusinessID IS NOT NULL
-                AND t.TransactionType = 'PAYMENT'
-                GROUP BY b.Category
-                ORDER BY BusinessCount DESC""";
+            SELECT
+                b.Category,
+                COUNT(DISTINCT b.BusinessID) AS BusinessCount,
+            FROM Transactions t
+            INNER JOIN Businesses b ON t.ReceiverBusinessID = b.BusinessID
+            WHERE t.SenderID = ?
+            AND t.TransactionAccepted = TRUE
+            AND t.ReceiverBusinessID IS NOT NULL
+            AND t.TransactionType = 'PAYMENT'
+            GROUP BY b.Category
+            ORDER BY BusinessCount DESC""";
 
     private static final String SQL_GET_TRASNACTIONS_BY_ID = "SELECT Timestamp, Amount, SenderID, TransactionID, " +
             "ReceiverAccountID, " +
             "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
             "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC";
+
     public TransactionRepository(Logger logger) {
         super(logger);
     }
@@ -132,8 +133,9 @@ public class TransactionRepository extends BaseRepository {
     }
 
 
-    public Map <String, BigDecimal> getTransactionsPerBusinessBySum(Connection connection, String accountId) throws SQLException {
-        Map <String, BigDecimal> map = new HashMap<>();
+    public Map<String, BigDecimal> getTransactionsPerBusinessBySum(Connection connection, String accountId) throws
+            SQLException {
+        Map<String, BigDecimal> map = new HashMap<>();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRANSACTIONS_SUM)) {
             preparedStatement.setString(1, accountId);
@@ -149,8 +151,9 @@ public class TransactionRepository extends BaseRepository {
     }
 
 
-    public Map <String, Integer> getTransactionsPerBusinessByCount(Connection connection, String accountId) throws SQLException {
-        Map <String, Integer> map = new HashMap<>();
+    public Map<String, Integer> getTransactionsPerBusinessByCount(Connection connection, String accountId) throws
+            SQLException {
+        Map<String, Integer> map = new HashMap<>();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRANSACTIONS_COUNT)) {
             preparedStatement.setString(1, accountId);

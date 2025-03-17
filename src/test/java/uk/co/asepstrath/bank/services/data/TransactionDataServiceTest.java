@@ -1,69 +1,77 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
-
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Transaction;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
 import javax.sql.DataSource;
+import javax.xml.stream.XMLStreamException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-
-import javax.xml.stream.XMLStreamException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class TransactionDataServiceFetcherTest {
+class TransactionDataServiceTest {
 
-   private TransactionDataService transactionDataService;
-   private UnirestWrapper unirestWrapper;
-   private HttpResponse<String> mockResponse;
+    private TransactionDataService transactionDataService;
+    private UnirestWrapper unirestWrapper;
+    private HttpResponse<String> mockResponse;
+    private Logger mockLogger;
+    private ObjectMapper objectMapper;
+    private DataSource mockDataSource;
+    private Connection mockConnection;
 
-   @BeforeEach
-   void setUp() {
-       unirestWrapper = mock(UnirestWrapper.class);
-       mockResponse = mock(HttpResponse.class);
-       transactionDataService = new TransactionDataService(unirestWrapper);
+    @BeforeEach
+    void setUp() throws SQLException {
+        unirestWrapper = mock(UnirestWrapper.class);
+        mockResponse = mock(HttpResponse.class);
+        mockLogger = mock(Logger.class);
+        mockDataSource = mock(DataSource.class);
+        mockConnection = mock(Connection.class);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
     }
 
-   @Test
-   void testFetchDataSuccess() throws XMLStreamException {
+    @Test
+    void testFetchDataSuccess() throws XMLStreamException {
         // Mocking HttpResponse
-        HttpResponse<String> firstPageResponse = mock(HttpResponse.class);   
+        HttpResponse<String> firstPageResponse = mock(HttpResponse.class);
         when(firstPageResponse.isSuccess()).thenReturn(true);
-       // Sample XML Data
-       String firstPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-               "<pageResult>" +
-               "  <hasNext>true</hasNext>" +
-               "  <hasPrevious>false</hasPrevious>" +
-               "  <page>0</page>" +
-               "  <results xsi:type=\"transactionModel\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-               "    <timestamp>2023-04-10 08:43</timestamp>" +
-               "    <amount>21.00</amount>" +
-               "    <from>8f95782c-7c83-4dd7-8856-0e19a0e0a075</from>" +
-               "    <id>0043d8d9-846d-49cb-9b04-8d3823e9d8c9</id>" +
-               "    <to>TOP</to>" +
-               "    <type>PAYMENT</type>" +
-               "  </results>" +
-               "  <size>1</size>" +
-               "  <totalPages>154</totalPages>" +
-               "</pageResult>";
+        // Sample XML Data
+        String firstPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<pageResult>" +
+                "  <hasNext>true</hasNext>" +
+                "  <hasPrevious>false</hasPrevious>" +
+                "  <page>0</page>" +
+                "  <results xsi:type=\"transactionModel\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+                "    <timestamp>2023-04-10 08:43</timestamp>" +
+                "    <amount>21.00</amount>" +
+                "    <from>8f95782c-7c83-4dd7-8856-0e19a0e0a075</from>" +
+                "    <id>0043d8d9-846d-49cb-9b04-8d3823e9d8c9</id>" +
+                "    <to>TOP</to>" +
+                "    <type>PAYMENT</type>" +
+                "  </results>" +
+                "  <size>1</size>" +
+                "  <totalPages>154</totalPages>" +
+                "</pageResult>";
 
         when(firstPageResponse.getBody()).thenReturn(firstPageXml);
         when(firstPageResponse.getBody()).thenReturn(firstPageXml);
-        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0)).thenReturn(firstPageResponse);
+        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0)).thenReturn(
+                firstPageResponse);
 
         List<Transaction> transactions = transactionDataService.fetchData();
-        
+
         // Verify the results
         assertNotNull(transactions);
         verify(unirestWrapper).get("https://api.asep-strath.co.uk/api/transactions", "page", 0);
@@ -76,9 +84,9 @@ class TransactionDataServiceFetcherTest {
         when(mockResponse.isSuccess()).thenReturn(false);
         when(mockResponse.getStatus()).thenReturn(500);
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
-        
+
         List<Transaction> transactions = transactionDataService.fetchData();
-        
+
         assertNotNull(transactions);
         assertTrue(transactions.isEmpty());
         verify(unirestWrapper, times(1)).get(anyString(), eq("page"), anyInt());
@@ -90,7 +98,7 @@ class TransactionDataServiceFetcherTest {
         when(mockResponse.isSuccess()).thenReturn(true);
         when(mockResponse.getBody()).thenReturn("Invalid XML");
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
-        
+
         // Execute the method and verify exception
         assertThrows(XMLStreamException.class, () -> transactionDataService.fetchData());
     }
@@ -118,7 +126,7 @@ class TransactionDataServiceFetcherTest {
         when(mockResponse.getBody()).thenReturn(xmlWithNullAmount);
         when(unirestWrapper.get(anyString(), eq("page"), anyInt())).thenReturn(mockResponse);
         List<Transaction> transactions = transactionDataService.fetchData();
-        
+
         // Verify the results
         assertNotNull(transactions);
         assertTrue(transactions.isEmpty());
@@ -126,26 +134,25 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafely() throws Exception {
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        
-        TransactionDataService service = new TransactionDataService(mockDataSource);
-        
-        // Create test transaction with null amount 
+        // Mock dependencies
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
+                mockDataSource);
+        // Create test transaction with null amount
         Transaction fakeTransaction = new Transaction();
         setPrivateField(fakeTransaction, "id", "bad123");
+        setPrivateField(fakeTransaction, "amount", null); // Ensure amount is null
 
         // Access private createTransactionSafely method
         Method createMethod = TransactionDataService.class.getDeclaredMethod(
-            "createTransactionSafely", Transaction.class);
+                "createTransactionSafely", Transaction.class, Connection.class);
         createMethod.setAccessible(true);
-        
+
         // Call the method
-        Transaction result = (Transaction) createMethod.invoke(service, fakeTransaction);
-        
+        Transaction result = (Transaction) createMethod.invoke(service, fakeTransaction, mockConnection);
+
         // Should be null as the transaction had a null amount
         assertNull(result);
+        verify(mockLogger).warn("Skipping transaction with null amount: {}", "bad123");
     }
 
     private void setPrivateField(Object object, String fieldName, Object value) throws Exception {
@@ -159,10 +166,10 @@ class TransactionDataServiceFetcherTest {
         // Create mock responses for two pages
         HttpResponse<String> firstPageResponse = mock(HttpResponse.class);
         HttpResponse<String> lastPageResponse = mock(HttpResponse.class);
-        
+
         when(firstPageResponse.isSuccess()).thenReturn(true);
         when(lastPageResponse.isSuccess()).thenReturn(true);
-        
+
         // First transaction on the first XML Page
         String firstPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<pageResult>" +
@@ -180,7 +187,7 @@ class TransactionDataServiceFetcherTest {
                 "  <size>100</size>" +
                 "  <totalPages>154</totalPages>" +
                 "</pageResult>";
-        
+
         // First transaction on the last XML Page
         String lastPageXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<pageResult>" +
@@ -197,19 +204,19 @@ class TransactionDataServiceFetcherTest {
                 "  <size>100</size>" +
                 "  <totalPages>154</totalPages>" +
                 "</pageResult>";
-        
+
         when(firstPageResponse.getBody()).thenReturn(firstPageXml);
         when(lastPageResponse.getBody()).thenReturn(lastPageXml);
-        
+
         // Configure the wrapper to return different responses for different pages
         when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 0))
-            .thenReturn(firstPageResponse);
+                .thenReturn(firstPageResponse);
         when(unirestWrapper.get("https://api.asep-strath.co.uk/api/transactions", "page", 1))
-            .thenReturn(lastPageResponse);
-        
+                .thenReturn(lastPageResponse);
+
         // Execute the method
         List<Transaction> transactions = transactionDataService.fetchData();
-        
+
         // Verify results
         assertNotNull(transactions);
         verify(unirestWrapper).get("https://api.asep-strath.co.uk/api/transactions", "page", 0);
@@ -218,16 +225,14 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafelyWithSQLException() throws Exception {
-        // Create mocks
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        
+
         // Set up mock to throw SQLException
         when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Test SQL Exception"));
-        
-        TransactionDataService service = new TransactionDataService(mockDataSource);
-        
+
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
+                mockDataSource);
+
         // Create a transaction that will trigger SQL code in createTransactionSafely
         Transaction transaction = new Transaction();
         setPrivateField(transaction, "timestamp", new DateTime());
@@ -236,17 +241,18 @@ class TransactionDataServiceFetcherTest {
         setPrivateField(transaction, "from", "mock-from");
         setPrivateField(transaction, "to", "mock-to");
         setPrivateField(transaction, "type", "TRANSFER");
-        
+
         // Access private createTransactionSafely method
         Method createMethod = TransactionDataService.class.getDeclaredMethod(
-            "createTransactionSafely", Transaction.class);
+                "createTransactionSafely", Transaction.class, Connection.class);
         createMethod.setAccessible(true);
-        
+
         // Call the method - should return null due to SQL exception
-        Transaction result = (Transaction) createMethod.invoke(service, transaction);
-        
+        Transaction result = (Transaction) createMethod.invoke(service, transaction, mockConnection);
+
         // Verify result is null due to exception
         assertNull(result);
+        verify(mockLogger).error("Error processing transaction {}: {}", "sql-error-id", "Test SQL Exception");
     }
 }
 

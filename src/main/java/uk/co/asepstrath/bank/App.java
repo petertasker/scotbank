@@ -24,24 +24,80 @@ import static uk.co.asepstrath.bank.Constants.*;
 public class App extends Jooby {
 
     public App() {
-        // Landing page route - redirect based on user type
-        get("/", ctx -> {
-            // Retrieve session information (if available)
-            Session session = ctx.sessionOrNull();
-            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
-                    SESSION_MANAGER_ID).isPresent();
 
-            // Redirect managers to their dashboard, otherwise send users to the account page
-            if (managerLoggedIn) {
-                ctx.sendRedirect(ROUTE_MANAGER + ROUTE_DASHBOARD);
-            }
-            else {
-                ctx.sendRedirect(ROUTE_ACCOUNT); // Regular user account page if manager is not logged in
-            }
-            return null;
-        });
+        // Redirect the landing page to /login, if the user is not logged in
+        landingPageRedirect();
 
-        // Middleware to enforce authentication for most routes
+        // Apply authentication to certain routes, using session variables as keys
+        authenticateRoute();
+
+        // Handle status code errors
+        handleRouteErrors();
+
+        // Install the required extensions
+        installExtensions();
+
+        // Load all CSS / JS / media
+        loadServerAssets();
+
+        // Set up controllers and their dependencies
+        setUpControllers();
+
+        onStarted(this::onStart);
+        onStop(this::onStop);
+    }
+
+    public static void main(final String[] args) {
+        runApp(args, App::new);
+    }
+
+    private void setUpControllers() {
+    /*
+    Set up controllers and their dependencies
+     */
+        DataSource ds = require(DataSource.class);
+        Logger log = getLog();
+
+        DisplayLoginService displayLoginService = new DisplayLoginService(log);
+        ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
+
+        // Register controllers with their dependencies
+        mvc(new AccountController_(ds, log));
+        mvc(new LoginController_(displayLoginService, processLoginService, log));
+        mvc(new ManagerController_(ds, log));
+        mvc(new LogoutController_(log));
+        mvc(new ErrorController_(log));
+        mvc(new RewardController_(ds, log));
+    }
+
+    /*
+    This will host any files in src/main/resources/assets on <host>/assets
+     */
+    private void loadServerAssets() {
+
+        assets("/css/*", "/css");
+        assets("/assets/*", "/assets");
+        assets("/service_worker.js", "/service_worker.js");
+        assets("/transaction-chart.js", "/transaction-chart.js");
+        assets("/mapEmbed.js", "/mapEmbed.js");
+        // Handle favicon inconsistencies between Windows and Linux
+        assets("/favicon.svg", "/assets/images/favicon.svg");
+        get("/favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
+    }
+
+    /*
+    Serve static assets from src/main/resources
+    */
+    private void installExtensions() {
+
+        install(new NettyServer());
+        install(new UniRestExtension());
+        install(new HandlebarsModule());
+        install(new HikariModule("mem"));
+        install(new JacksonModule()); // Handle JSON requests
+    }
+
+    private void authenticateRoute() {
         before(ctx -> {
             String path = ctx.getRequestPath();
             // Allow access to static resources (CSS, JS, favicon)
@@ -64,7 +120,28 @@ public class App extends Jooby {
 
 
         });
+    }
 
+    private void landingPageRedirect() {
+        // Landing page route - redirect based on user type
+        get("/", ctx -> {
+            // Retrieve session information (if available)
+            Session session = ctx.sessionOrNull();
+            boolean managerLoggedIn = session != null && session.get(SESSION_MANAGER_NAME).isPresent() && session.get(
+                    SESSION_MANAGER_ID).isPresent();
+
+            // Redirect managers to their dashboard, otherwise send users to the account page
+            if (managerLoggedIn) {
+                ctx.sendRedirect(ROUTE_MANAGER + ROUTE_DASHBOARD);
+            }
+            else {
+                ctx.sendRedirect(ROUTE_ACCOUNT); // Regular user account page if manager is not logged in
+            }
+            return null;
+        });
+    }
+
+    private void handleRouteErrors() {
         // Global error handling for various HTTP status codes
         // Unbelievable that I cannot switch on this
         error((ctx, cause, code) -> {
@@ -86,54 +163,6 @@ public class App extends Jooby {
                 ctx.sendRedirect(ROUTE_ERROR + ROUTE_GENERIC_ERROR);
             }
         });
-
-        /*
-        Serve static assets from src/main/resources
-         */
-        install(new NettyServer());
-        install(new UniRestExtension());
-        install(new HandlebarsModule());
-        install(new HikariModule("mem"));
-        install(new JacksonModule()); // Handle JSON requests
-        /*
-        This will host any files in src/main/resources/assets on <host>/assets
-         */
-        assets("/css/*", "/css");
-        assets("/assets/*", "/assets");
-        assets("/service_worker.js", "/service_worker.js");
-        assets("/transaction-chart.js", "/transaction-chart.js");
-        assets("/mapEmbed.js", "/mapEmbed.js");
-
-        // Handle favicon inconsistencies between Windows and Linux
-        assets("/favicon.svg", "/assets/images/favicon.svg");
-        get("/favicon.ico", ctx -> ctx.sendRedirect("/favicon.svg"));
-
-        /*
-        Set up controllers and their dependencies
-         */
-        DataSource ds = require(DataSource.class);
-        Logger log = getLog();
-
-        DisplayLoginService displayLoginService = new DisplayLoginService(log);
-        ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
-
-        // Register controllers with their dependencies
-        mvc(new AccountController_(ds, log));
-        mvc(new LoginController_(displayLoginService, processLoginService, log));
-        mvc(new ManagerController_(ds, log));
-        mvc(new LogoutController_(log));
-        mvc(new ErrorController_(log));
-
-
-        /*
-        Register application lifecycle hooks
-         */
-        onStarted(this::onStart);
-        onStop(this::onStop);
-    }
-
-    public static void main(final String[] args) {
-        runApp(args, App::new);
     }
 
     /*

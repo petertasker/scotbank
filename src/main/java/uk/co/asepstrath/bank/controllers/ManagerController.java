@@ -58,7 +58,7 @@ public class ManagerController extends BaseController {
     /**
      * Engages the manager login process
      *
-     * @param ctx Session contrxt
+     * @param ctx Session context
      * @return The "/manager/login" endpoint on failure
      * Redirects to "/manager/dashboard" on success
      */

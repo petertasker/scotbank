@@ -239,12 +239,13 @@ p[style*="color: green"] {
 }
 
 /* Transaction history */
-.transactions-section {
+.transactions-section,
+.rewards-section{
     width: 100%;
     margin-top: var(--spacing-md);
 }
 
-.transaction, .account {
+.transaction, .account, .reward {
     background-color: var(--transaction-bg);
     border-radius: var(--border-radius-sm);
     padding: 15px;

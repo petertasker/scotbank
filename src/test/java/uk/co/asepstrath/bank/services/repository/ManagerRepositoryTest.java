@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
@@ -114,7 +113,8 @@ class ManagerRepositoryTest {
         assertFalse(accounts.get(1).isRoundUpEnabled());
 
         // Verify SQL query
-        verify(mockStatement).executeQuery("SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts");
+        verify(mockStatement).executeQuery(
+                "SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts");
     }
 
     @Test
@@ -124,11 +124,12 @@ class ManagerRepositoryTest {
 
         when(mockResultSet.next()).thenReturn(true, true, false);
         when(mockResultSet.getString("Name")).thenReturn("Alice", "Bob");
-        when(mockResultSet.getString("Postcode")).thenReturn("12345","67890");
-        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(new BigDecimal("1000.00"), new BigDecimal("2000.00"));
+        when(mockResultSet.getString("Postcode")).thenReturn("12345", "67890");
+        when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(new BigDecimal("1000.00"),
+                new BigDecimal("2000.00"));
 
         List<Map<String, Object>> spenders = repository.getTopTenSpenders(mockConnection);
-        assertEquals(2,spenders.size());
+        assertEquals(2, spenders.size());
 
         assertEquals("Alice", spenders.getFirst().get("Name"));
         assertEquals("12345", spenders.getFirst().get("Postcode"));
@@ -140,19 +141,19 @@ class ManagerRepositoryTest {
     }
 
     @Test
-    void testTop10SpendersDefaultCurrency() throws SQLException{
+    void testTop10SpendersDefaultCurrency() throws SQLException {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
         when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getString("Name")).thenReturn("Alice" );
+        when(mockResultSet.getString("Name")).thenReturn("Alice");
         when(mockResultSet.getString("Postcode")).thenReturn("12345");
         when(mockResultSet.getBigDecimal("TotalAmount")).thenReturn(null);
 
         List<Map<String, Object>> spendings = repository.getTopTenSpenders(mockConnection);
 
-        assertEquals(1,spendings.size());
-        assertEquals("£0.00",spendings.getFirst().get("TotalAmount"));
+        assertEquals(1, spendings.size());
+        assertEquals("£0.00", spendings.getFirst().get("TotalAmount"));
     }
 
     @Test
@@ -161,7 +162,7 @@ class ManagerRepositoryTest {
         when(mockConnection.createStatement()).thenReturn(mockStatement);
         when(mockStatement.executeQuery(anyString())).thenThrow(new SQLException("Database error"));
 
-        assertThrows(DataAccessException.class, () -> repository.getAllAccounts(mockConnection));
+        assertThrows(SQLException.class, () -> repository.getAllAccounts(mockConnection));
     }
 
     @Test

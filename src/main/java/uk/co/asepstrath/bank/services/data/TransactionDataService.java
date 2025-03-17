@@ -1,10 +1,10 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import kong.unirest.core.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.parsers.XmlParser;
 
@@ -21,18 +21,9 @@ import java.util.Objects;
  * Fetches Transaction data from external API
  */
 public class TransactionDataService extends DataService implements DataServiceFetcher<Transaction> {
-    private final Logger logger;
-    private Connection connection;
-
-    public TransactionDataService(UnirestWrapper unirestWrapper) {
-        super(unirestWrapper);
-        this.logger = LoggerFactory.getLogger(TransactionDataService.class);
-    }
-
-    public TransactionDataService(DataSource dataSource) throws SQLException {
-        super(new UnirestWrapper());
-        this.connection = dataSource.getConnection();
-        this.logger = LoggerFactory.getLogger(TransactionDataService.class);
+    public TransactionDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
+                                  DataSource dataSource) {
+        super(logger, unirestWrapper, objectMapper, dataSource);
     }
 
     /**
@@ -50,42 +41,46 @@ public class TransactionDataService extends DataService implements DataServiceFe
         boolean hasMorePages = true;
 
         try {
-            logger.info("Fetching transactions from database...");
+            logger.info("Fetching transactions from the API...");
             while (hasMorePages) {
-
                 // Make GET request for each page
                 HttpResponse<String> response = fetchPage(page);
 
-                if (!response.isSuccess()) {
+                if (response.isSuccess()) {
+                    // Map page responses to a List of Transaction Objects
+                    XmlParser pageResult = parseResponse(xmlMapper, response);
+
+                    // Process transactions with connection management
+                    List<Transaction> pageTransactions;
+                    try (Connection connection = getConnection()) {
+                        pageTransactions = processTransactions(pageResult, connection);
+                    }
+
+                    if (!pageTransactions.isEmpty()) {
+                        // Append page Transactions to List of all Transactions
+                        allTransactions.addAll(pageTransactions);
+                        hasMorePages = determineIfMorePages(pageResult, page);
+
+                        if (hasMorePages) {
+                            page++;
+                        } else {
+                            logger.info("Reached last page ({}) of transactions", page);
+                        }
+                    } else {
+                        logger.info("No more transactions found on page {}", page);
+                        hasMorePages = false;
+                    }
+                } else {
                     logger.info("Failed to fetch page {}: {}", page, response.getStatus());
-                    break;
-                }
-
-                // Map page responses to a List of Transaction Objects
-                XmlParser pageResult = parseResponse(xmlMapper, response);
-                List<Transaction> pageTransactions = processTransactions(pageResult);
-
-                // Break if for some reason the XML is configured poorly, and the parser is sent to an empty page
-                if (pageTransactions.isEmpty()) {
-                    logger.info("No more transactions found on page {}", page);
-                    break;
-                }
-
-                // Append page Transactions to List of all Transactions
-                allTransactions.addAll(pageTransactions);
-                hasMorePages = determineIfMorePages(pageResult, page);
-
-                // Go to next page
-                if (hasMorePages) {
-                    page++;
-                }
-                else {
-                    logger.info("Reached last page ({}) of transactions", page);
+                    hasMorePages = false;
                 }
             }
         }
         catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
+        }
+        catch (SQLException e) {
+            throw new XMLStreamException("Database connection error", e);
         }
         logger.info("Successfully fetched transactions data");
         return allTransactions;
@@ -115,17 +110,19 @@ public class TransactionDataService extends DataService implements DataServiceFe
     }
 
     /**
-     * Processes transactions from a page result
+     * Processes transactions from a page result using a shared connection
      */
-    private List<Transaction> processTransactions(XmlParser pageResult) {
-        return pageResult.getTransactions().stream().map(this::createTransactionSafely).filter(Objects::nonNull)
+    private List<Transaction> processTransactions(XmlParser pageResult, Connection connection) {
+        return pageResult.getTransactions().stream()
+                .map(transaction -> createTransactionSafely(transaction, connection))
+                .filter(Objects::nonNull)
                 .toList();
     }
 
     /**
-     * Safely creates a Transaction object, handling errors
+     * Safely creates a Transaction object using the provided connection
      */
-    private Transaction createTransactionSafely(Transaction transaction) {
+    private Transaction createTransactionSafely(Transaction transaction, Connection connection) {
         try {
             if (transaction.getAmount() == null) {
                 logger.warn("Skipping transaction with null amount: {}", transaction.getId());
@@ -134,12 +131,8 @@ public class TransactionDataService extends DataService implements DataServiceFe
             return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
                     transaction.getFrom(), transaction.getId(), transaction.getTo(), transaction.getType());
         }
-        catch (SQLException e) {
-            logger.error("SQL error processing transaction {}: {}", transaction.getId(), e.getMessage());
-            return null;
-        }
         catch (Exception e) {
-            logger.error("Unexpected error processing transaction {}: {}", transaction.getId(), e.getMessage());
+            logger.error("Error processing transaction {}: {}", transaction.getId(), e.getMessage());
             return null;
         }
     }

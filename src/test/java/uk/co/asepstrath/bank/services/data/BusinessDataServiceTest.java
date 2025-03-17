@@ -1,10 +1,13 @@
 package uk.co.asepstrath.bank.services.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Business;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.List;
 
@@ -13,15 +16,20 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BusinessDataServiceFetcherTest {
+class BusinessDataServiceTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
+    private Logger logger;
+    private ObjectMapper objectMapper;
+    private DataSource dataSource;
 
     @BeforeEach
     void setUp() {
         unirestWrapper = mock(UnirestWrapper.class);
-        businessDataService = new BusinessDataService(unirestWrapper);
+        logger = mock(Logger.class);
+        objectMapper = new ObjectMapper();
+        businessDataService = new BusinessDataService(logger, unirestWrapper, objectMapper, dataSource);
     }
 
     @Test
