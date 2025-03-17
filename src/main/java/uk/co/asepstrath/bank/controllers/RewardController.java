@@ -6,6 +6,7 @@ import io.jooby.annotation.GET;
 import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.repository.RewardRepository;
 import uk.co.asepstrath.bank.services.reward.RewardSpinService;
 import uk.co.asepstrath.bank.services.reward.RewardViewService;
 
@@ -25,8 +26,9 @@ public class RewardController extends BaseController {
     private final RewardSpinService rewardSpinService;
     public RewardController(DataSource dataSource, Logger logger) {
         super(logger);
-        this.rewardViewService = new RewardViewService(dataSource, logger);
-        this.rewardSpinService = new RewardSpinService(dataSource, logger);
+        RewardRepository rewardRepository = new RewardRepository(logger);
+        this.rewardViewService = new RewardViewService(dataSource, logger, rewardRepository);
+        this.rewardSpinService = new RewardSpinService(dataSource, logger, rewardRepository);
     }
 
     /**

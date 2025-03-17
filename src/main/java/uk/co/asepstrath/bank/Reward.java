@@ -2,8 +2,6 @@ package uk.co.asepstrath.bank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import kong.unirest.core.json.JSONArray;
-import kong.unirest.core.json.JSONObject;
 
 import java.math.BigDecimal;
 
@@ -45,8 +43,9 @@ public class Reward {
 
     @Override
     public String toString() {
-        return String.format("name: %s%ndescription: %s%nvalue: %s%n %s%nchance: %s%n",
+        return String.format("name: %s%ndescription: %s%nvalue: %s%nchance: %s%n",
                 getName(), getDescription(), getValue(), getChance());
+
     }
 
     public String toJson(String accountId) {

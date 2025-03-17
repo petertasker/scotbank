@@ -36,8 +36,8 @@ class TransactionDataServiceFetcherTest {
         unirestWrapper = mock(UnirestWrapper.class);
         mockResponse = mock(HttpResponse.class);
         mockLogger = mock(Logger.class);
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
+        mockDataSource = mock(DataSource.class);
+        mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
     }

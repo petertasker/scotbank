@@ -174,10 +174,7 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getPostcode(boolean isAdmin) {
-        if (isAdmin) {
+    public String getPostcode() {
             return postcode;
-        }
-        throw new SecurityException("Account does not have postcode permission");
     }
 }

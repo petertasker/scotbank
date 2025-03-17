@@ -49,7 +49,6 @@ class LoginControllerTest {
     LoginController loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
     @Mock
     private ModelAndView<Map<String, Object>> mockModelAndView;
-    private ProcessLoginService processLoginService;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -66,7 +65,6 @@ class LoginControllerTest {
 
         // Initialize controller with mocked dependencies
         loginController = new LoginController(mockDisplayLoginService, mockProcessLoginService, mockLogger);
-        processLoginService = new ProcessLoginService(mockDataSource, mockLogger);
     }
 
     /*

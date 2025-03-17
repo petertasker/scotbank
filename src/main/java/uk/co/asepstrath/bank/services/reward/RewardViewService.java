@@ -2,14 +2,12 @@ package uk.co.asepstrath.bank.services.reward;
 
 import io.jooby.Context;
 import io.jooby.ModelAndView;
-import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Reward;
 import uk.co.asepstrath.bank.services.repository.RewardRepository;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,11 +15,9 @@ import static uk.co.asepstrath.bank.Constants.*;
 
 public class RewardViewService extends RewardService {
 
-    private RewardRepository rewardRepository;
 
-    public RewardViewService(DataSource dataSource, Logger logger) {
-        super(dataSource, logger);
-        rewardRepository = new RewardRepository(logger);
+    public RewardViewService(DataSource dataSource, Logger logger, RewardRepository rewardRepository) {
+        super(dataSource, logger, rewardRepository);
     }
 
     public ModelAndView<Map<String, Object>> viewRewardPage(Context ctx) throws SQLException {
