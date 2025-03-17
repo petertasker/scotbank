@@ -1,5 +1,10 @@
 package uk.co.asepstrath.bank;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
+
 import java.math.BigDecimal;
 
 public class Reward {
@@ -8,33 +13,46 @@ public class Reward {
     private final BigDecimal value;
     private final double chance;
 
-    public Reward(String name, String description, BigDecimal value, double chance) {
+
+    @JsonCreator
+    public Reward(
+            @JsonProperty("name") String name,
+            @JsonProperty("description") String description,
+            @JsonProperty("value") BigDecimal value,
+            @JsonProperty("chance") double chance
+    ) {
         this.name = name;
         this.description = description;
         this.value = value;
         this.chance = chance;
     }
 
-    public String getRewardsName() {
+    public String getName() {
         return this.name;
     }
 
-    public String getRewardsDescription() {
+    public String getDescription() {
         return this.description;
     }
 
-    public BigDecimal getRewardsValue() {
+    public BigDecimal getValue() {
         return this.value;
     }
 
-    public double getRewardsChance() {
+    public double getChance() {
         return this.chance;
     }
 
     @Override
     public String toString() {
         return String.format("name: %s%ndescription: %s%nvalue: %s%n %s%nchance: %s%n",
-                getRewardsName(), getRewardsDescription(), getRewardsValue(), getRewardsChance());
+                getName(), getDescription(), getValue(), getChance());
     }
+
+    public String toJson(String accountId) {
+        return String.format("{\"rewardType\": \"%s\", \"team\": \"%s\", \"account\": \"%s\"}",
+                getName(), "Team05", accountId);
+    }
+
 
 }

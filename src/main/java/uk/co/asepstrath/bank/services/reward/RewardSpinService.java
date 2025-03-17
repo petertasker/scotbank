@@ -1,7 +1,13 @@
 package uk.co.asepstrath.bank.services.reward;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jooby.Context;
+import io.jooby.Session;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Reward;
 import uk.co.asepstrath.bank.services.BaseService;
+import uk.co.asepstrath.bank.services.data.RewardDataService;
+import uk.co.asepstrath.bank.services.data.UnirestWrapper;
 import uk.co.asepstrath.bank.services.repository.RewardRepository;
 
 import javax.sql.DataSource;
@@ -11,101 +17,60 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class RewardSpinService extends BaseService {
-    private final DataSource datasource;
-    private final Logger logger;
+import static uk.co.asepstrath.bank.Constants.*;
+
+public class RewardSpinService extends RewardService {
+
     private final RewardRepository rewardRepository;
+    private final RewardDataService rewardDataService;
 
     public RewardSpinService(DataSource datasource, Logger logger) {
-        this.datasource = datasource;
-        this.logger = logger;
+        super(datasource, logger);
         this.rewardRepository = new RewardRepository(logger);
+        this.rewardDataService = new RewardDataService(logger, new UnirestWrapper(), new ObjectMapper(), datasource);
     }
 
     /**
      * Process the user spinning the wheel (user MUST win a reward)
      */
-    public String processSpin(String userId) throws SQLException {
-        List<Map<String, Object>> rewards = getAvailableRewards();
-        Map<String, Object> selectedReward = selectWeightedRandomReward(rewards);
+    public void processSpin(Context ctx) throws SQLException {
+        List<Reward> rewards = rewardRepository.getAllRewards(getConnection());
+        Reward selected = selectWeightedRandomReward(rewards);
+        assert selected != null; // This might fail on a flop error???
 
-        assignRewardToUser(userId, (String) selectedReward.get("Name"));
-        return "Congratulations! You won: " + selectedReward.get("Name");
-    }
-
-    /**
-     * Get available rewards from the database
-     */
-    private List<Map<String, Object>> getAvailableRewards() throws SQLException {
-        List<Map<String, Object>> rewards = new ArrayList<>();
-
-        try (Connection conn = datasource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Rewards");
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Map<String, Object> reward = new HashMap<>();
-                reward.put("Name", rs.getString("Name"));
-                reward.put("Description", rs.getString("Description"));
-                reward.put("RewardValue", rs.getBigDecimal("RewardValue"));
-                reward.put("Chance", rs.getDouble("Chance"));
-                rewards.add(reward);
-            }
+        Session session = getSession(ctx);
+        String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+        try {
+            rewardDataService.postReward(selected, accountId);
+            addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "A " + selected.getName() + " has been added to your account");
         }
-        return rewards;
+        catch (Exception e) {
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "An upstream error occurred while adding a reward to your account");
+        }
+        redirect(ctx, ROUTE_REWARD);
     }
 
     /**
      * Selects a reward based on weighted probability
      */
-    private Map<String, Object> selectWeightedRandomReward(List<Map<String, Object>> rewards) {
+    private Reward selectWeightedRandomReward(List<Reward> rewards) {
         double totalWeight = 0.0;
-        for (Map<String, Object> reward : rewards) {
-            totalWeight += (double) reward.get("Chance");
+        for (Reward reward : rewards) {
+            totalWeight += reward.getChance();
         }
 
-        double random = new Random().nextDouble() * totalWeight;
-        double cumulativeWeight = 0.0;
+        double random = Math.random() * totalWeight;
 
-        for (Map<String, Object> reward : rewards) {
-            cumulativeWeight += (double) reward.get("Chance");
-            if (random <= cumulativeWeight) {
-                return reward; // User wins this reward
+        // Find the reward that corresponds to the random value
+        double weightSum = 0.0;
+        for (Reward reward : rewards) {
+            weightSum += reward.getChance();
+            if (random < weightSum) {
+                return reward;
             }
         }
 
-        // Fallback in case of calculation issues (should not happen)
-        return rewards.getLast();
-    }
-
-    public String getUserRewardHistory(String userId) throws SQLException {
-        StringBuilder history = new StringBuilder("Reward History:\n");
-
-        try (Connection conn = datasource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT RewardName, won_at FROM UserRewards WHERE AccountID = ? ORDER BY WonAt DESC")) {
-            stmt.setString(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    history.append(" - ").append(rs.getString("RewardName"))
-                            .append(" (").append(rs.getString("WonAt")).append(")\n");
-                }
-            }
-        }
-        return history.toString();
-    }
-
-    /**
-     * Assigns a reward to the user
-     */
-    private void assignRewardToUser(String userId, String rewardName) throws SQLException {
-        try (Connection conn = datasource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO UserRewards (AccountID, RewardName, WonAt) VALUES (?, ?, CURRENT_TIMESTAMP)")) {
-            stmt.setString(1, userId);
-            stmt.setString(2, rewardName);
-            stmt.executeUpdate();
-            logger.info("User {} won reward: {}", userId, rewardName);
-        }
+        // Fallback (shouldn't happen unless list is empty)
+        return rewards.isEmpty() ? null : rewards.getLast();
     }
 }

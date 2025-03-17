@@ -16,6 +16,7 @@ public final class Constants {
     public static final String TEMPLATE_WITHDRAW = "withdraw.hbs";
     public static final String TEMPLATE_MANAGER_LOGIN = "login_manager.hbs";
     public static final String TEMPLATE_MANAGER_DASHBOARD = "manager_dashboard.hbs";
+    public static final String TEMPLATE_REWARDS = "rewards.hbs";
     public static final String ROUTE_LOGIN = "/login";
     public static final String ROUTE_ACCOUNT = "/account";
     public static final String ROUTE_DEPOSIT = "/deposit";
@@ -24,6 +25,7 @@ public final class Constants {
     public static final String ROUTE_DASHBOARD = "/dashboard";
     public static final String ROUTE_PROCESS = "/process";
     public static final String ROUTE_LOGOUT = "/logout";
+    public static final String ROUTE_REWARD = "/account/reward";
     /**
      * Rewards routes
      */

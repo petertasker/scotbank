@@ -2,7 +2,10 @@ package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.HttpResponse;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Reward;
 
@@ -10,7 +13,9 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Fetches Rewards data from an external API or database.
@@ -49,33 +54,20 @@ public class RewardDataService extends DataService implements DataServiceFetcher
         }
     }
 
-    /**
-     * Fetches a list of rewards from the database.
-     *
-     * @return A list of Rewards objects
-     * @throws SQLException if the database query fails
-     */
-    public List<Reward> fetchFromDatabase() throws SQLException {
-        List<Reward> rewardsList = new java.util.ArrayList<>();
-        String sql = "SELECT name, description, reward_value, chance FROM rewards";
-
-        try (var statement = connection.prepareStatement(sql);
-             var resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                rewardsList.add(new Reward(
-                        resultSet.getString("name"),
-                        resultSet.getString("description"),
-                        resultSet.getBigDecimal("reward_value"),
-                        resultSet.getDouble("chance")
-                ));
-            }
-            logger.info("Successfully retrieved rewards from the database.");
+    public String postReward(Reward reward, String accountId) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Accept", "application/json");
+        try {
+            HttpResponse<String> response = unirestWrapper.post(
+                    "https://api.asep-strath.co.uk/api/rewards",
+                    reward.toJson(accountId),
+                    headers
+            );
+            return response.getBody();
         }
-        catch (SQLException e) {
-            logger.error("Error fetching rewards from database", e);
-            throw e;
+        catch (UnirestException e) {
+            throw new StatusCodeException(StatusCode.BAD_REQUEST);
         }
-        return rewardsList;
     }
 }

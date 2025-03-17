@@ -130,7 +130,8 @@ public class DatabaseManager implements DatabaseOperations {
      */
     @Override
     public void insertData(Connection connection) throws SQLException, IOException, XMLStreamException {
-        // Insert accounts
+
+        // Insert Accounts
         List<Account> accounts = accountDataService.fetchData();
         for (Account account : accounts) {
             try {
@@ -143,14 +144,14 @@ public class DatabaseManager implements DatabaseOperations {
         }
         logger.info("Accounts inserted");
 
-        // Insert businesses
+        // Insert Businesses
         List<Business> businesses = businessDataService.fetchData();
         for (Business business : businesses) {
             businessRepository.insert(connection, business);
         }
         logger.info("Businesses inserted");
 
-        // Insert transactions
+        // Insert Transactions
         List<Transaction> transactions = transactionDataService.fetchData();
         for (Transaction transaction : transactions) {
             transactionRepository.insert(connection, transaction);
@@ -169,22 +170,12 @@ public class DatabaseManager implements DatabaseOperations {
             }
         }
         logger.info("Managers inserted");
-        //rewardsRepository.createTables(connection);
-        try {
-            List<Reward> rewards = rewardDataService.fetchData();
-            if (rewards.isEmpty()) {
-                logger.warn("No rewards found in the API. Using stored rewards.");
-            }
-            for (Reward reward : rewards) {
-                rewardRepository.insert(connection, reward);
-            }
-            logger.info("Rewards inserted successfully");
+
+        // Insert Rewards
+        List<Reward> rewards = rewardDataService.fetchData();
+        for (Reward reward : rewards) {
+            rewardRepository.insert(connection, reward);
         }
-        catch (SQLException e) {
-            logger.error("Error fetching rewards from database", e);
-        }
-        catch (Exception e) {
-            logger.error("Unexpected error while fetching rewards", e);
-        }
+        logger.info("Rewards inserted");
     }
 }

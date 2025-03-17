@@ -134,25 +134,26 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafely() throws Exception {
+        // Mock dependencies
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
+        Connection mockConnection = mock(Connection.class); // Mock Connection
 
-
-        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
-                mockDataSource);
-
-        // Create test transaction with null amount 
+        // Create test transaction with null amount
         Transaction fakeTransaction = new Transaction();
         setPrivateField(fakeTransaction, "id", "bad123");
+        setPrivateField(fakeTransaction, "amount", null); // Ensure amount is null
 
         // Access private createTransactionSafely method
         Method createMethod = TransactionDataService.class.getDeclaredMethod(
-                "createTransactionSafely", Transaction.class);
+                "createTransactionSafely", Transaction.class, Connection.class);
         createMethod.setAccessible(true);
 
         // Call the method
-        Transaction result = (Transaction) createMethod.invoke(service, fakeTransaction);
+        Transaction result = (Transaction) createMethod.invoke(service, fakeTransaction, mockConnection);
 
         // Should be null as the transaction had a null amount
         assertNull(result);
+        verify(mockLogger).warn("Skipping transaction with null amount: {}", "bad123");
     }
 
     private void setPrivateField(Object object, String fieldName, Object value) throws Exception {
@@ -247,14 +248,15 @@ class TransactionDataServiceFetcherTest {
 
         // Access private createTransactionSafely method
         Method createMethod = TransactionDataService.class.getDeclaredMethod(
-                "createTransactionSafely", Transaction.class);
+                "createTransactionSafely", Transaction.class, Connection.class);
         createMethod.setAccessible(true);
 
         // Call the method - should return null due to SQL exception
-        Transaction result = (Transaction) createMethod.invoke(service, transaction);
+        Transaction result = (Transaction) createMethod.invoke(service, transaction, mockConnection);
 
         // Verify result is null due to exception
         assertNull(result);
+        verify(mockLogger).error("Error processing transaction {}: {}", "sql-error-id", "Test SQL Exception");
     }
 }
 

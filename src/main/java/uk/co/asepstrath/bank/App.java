@@ -13,14 +13,12 @@ import uk.co.asepstrath.bank.controllers.*;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 import uk.co.asepstrath.bank.services.repository.DatabaseManager;
-import uk.co.asepstrath.bank.services.reward.RewardFetchService;
 
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
+
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -126,7 +124,7 @@ public class App extends Jooby {
         mvc(new ManagerController_(ds, log));
         mvc(new LogoutController_(log));
         mvc(new ErrorController_(log));
-        mvc(new RewardsController_(ds, log));
+        mvc(new RewardController_(ds, log));
 
         /*
         Register application lifecycle hooks
@@ -152,15 +150,6 @@ public class App extends Jooby {
         // Create Database and tables with initial data
         DatabaseManager databaseManager = new DatabaseManager(dataSource, log);
         databaseManager.initialise();
-
-        RewardFetchService rewardFetchService = new RewardFetchService(dataSource, log);
-        List<Map<String, Object>> rewards = rewardFetchService.fetchAndStoreRewards();
-        if (rewards.isEmpty()) {
-            log.warn(" No rewards found in the API. Using stored rewards.");
-        }
-        else {
-            log.info(" Successfully fetched and stored {} rewards.", rewards.size());
-        }
     }
 
     /*

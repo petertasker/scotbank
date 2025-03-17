@@ -56,7 +56,7 @@ public class AccountViewService extends AccountService {
         addCardDetailsToModel(model, session);
 
         // Add account balances
-        String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+        String accountId = getAccountIdFromSession(ctx);
         putAccountBalancesInModel(model, accountId);
 
         // Transfer session messages

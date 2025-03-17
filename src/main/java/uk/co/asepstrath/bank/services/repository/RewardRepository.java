@@ -24,7 +24,7 @@ public class RewardRepository extends BaseRepository {
             """;
 
     private static final String SQL_GET_ALL_REWARDS =
-            "SELECT * FROM Rewards";
+            "SELECT Name, Description, RewardValue, Chance FROM Rewards";
 
 
     public RewardRepository(Logger logger) {
@@ -49,17 +49,15 @@ public class RewardRepository extends BaseRepository {
      * @throws SQLException Database failure
      */
     public void insert(Connection connection, Reward reward) throws SQLException {
-        String sql = "INSERT INTO Rewards (Name, Description, RewardValue, Chance) VALUES (?, ?, ?, ?) " +
-                "ON CONFLICT(Name) DO UPDATE SET Description = EXCLUDED.Description, " +
-                "RewardValue = EXCLUDED.RewardValue, Chance = EXCLUDED.Chance";
+        String sql = "INSERT INTO Rewards (Name, Description, RewardValue, Chance) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, reward.getRewardsName());
-            stmt.setString(2, reward.getRewardsDescription());
-            stmt.setBigDecimal(3, reward.getRewardsValue());
-            stmt.setDouble(4, reward.getRewardsChance());
+            stmt.setString(1, reward.getName());
+            stmt.setString(2, reward.getDescription());
+            stmt.setBigDecimal(3, reward.getValue());
+            stmt.setDouble(4, reward.getChance());
             stmt.executeUpdate();
-            logger.info("Inserted reward: {}", reward.getRewardsName());
+            logger.info("Inserted reward: {}", reward.getName());
         }
     }
 
