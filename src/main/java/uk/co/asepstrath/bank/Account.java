@@ -18,10 +18,10 @@ public class Account {
     private final String accountID;
     private final boolean roundUpEnabled;
     private final String name;
+    private final Card card;
     private BigDecimal balance;
     private BigDecimal roundUpBalance;
     private String postcode;
-    private final Card card;
 
     @JsonCreator
     public Account(
@@ -175,6 +175,6 @@ public class Account {
     }
 
     public String getPostcode() {
-            return postcode;
+        return postcode;
     }
 }

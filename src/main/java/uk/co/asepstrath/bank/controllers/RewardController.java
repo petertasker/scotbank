@@ -12,8 +12,6 @@ import uk.co.asepstrath.bank.services.reward.RewardViewService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.ROUTE_PROCESS;
@@ -24,6 +22,7 @@ public class RewardController extends BaseController {
 
     private final RewardViewService rewardViewService;
     private final RewardSpinService rewardSpinService;
+
     public RewardController(DataSource dataSource, Logger logger) {
         super(logger);
         RewardRepository rewardRepository = new RewardRepository(logger);

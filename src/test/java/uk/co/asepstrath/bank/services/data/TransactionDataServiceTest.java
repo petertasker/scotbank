@@ -135,7 +135,8 @@ class TransactionDataServiceTest {
     @Test
     void testCreateTransactionSafely() throws Exception {
         // Mock dependencies
-        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
+                mockDataSource);
         Connection mockConnection = mock(Connection.class); // Mock Connection
 
         // Create test transaction with null amount

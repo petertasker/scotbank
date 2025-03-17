@@ -5,7 +5,6 @@ import io.jooby.exception.StatusCodeException;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Card;
-import uk.co.asepstrath.bank.DataAccessException;
 import uk.co.asepstrath.bank.Manager;
 import uk.co.asepstrath.bank.services.CurrencyFormatter;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;

@@ -19,13 +19,12 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 
-
 import static uk.co.asepstrath.bank.Constants.*;
 
 public class App extends Jooby {
 
     public App() {
-        
+
         // Redirect the landing page to /login, if the user is not logged in
         landingPageRedirect();
 
@@ -46,6 +45,9 @@ public class App extends Jooby {
         onStop(this::onStop);
     }
 
+    public static void main(final String[] args) {
+        runApp(args, App::new);
+    }
 
     private void setUpControllers() {
     /*
@@ -92,7 +94,6 @@ public class App extends Jooby {
         install(new HikariModule("mem"));
         install(new JacksonModule()); // Handle JSON requests
     }
-
 
     private void authenticateRoute() {
         before(ctx -> {
@@ -160,10 +161,6 @@ public class App extends Jooby {
                 ctx.sendRedirect(ROUTE_ERROR + ROUTE_GENERIC_ERROR);
             }
         });
-    }
-
-    public static void main(final String[] args) {
-        runApp(args, App::new);
     }
 
     /*

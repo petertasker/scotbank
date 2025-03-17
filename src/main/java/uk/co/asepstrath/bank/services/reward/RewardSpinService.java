@@ -11,7 +11,7 @@ import uk.co.asepstrath.bank.services.repository.RewardRepository;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -36,10 +36,12 @@ public class RewardSpinService extends RewardService {
         String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
         try {
             rewardDataService.postReward(selected, accountId);
-            addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE, "A " + selected.getName() + " has been added to your account");
+            addMessageToSession(ctx, SESSION_SUCCESS_MESSAGE,
+                    "A " + selected.getName() + " has been added to your account");
         }
         catch (Exception e) {
-            addMessageToSession(ctx, SESSION_ERROR_MESSAGE, "An upstream error occurred while adding a reward to your account");
+            addMessageToSession(ctx, SESSION_ERROR_MESSAGE,
+                    "An upstream error occurred while adding a reward to your account");
         }
         redirect(ctx, ROUTE_REWARD);
     }

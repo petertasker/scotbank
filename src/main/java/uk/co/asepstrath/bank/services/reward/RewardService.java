@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 public class RewardService extends BaseService {
     protected RewardRepository rewardRepository;
+
     public RewardService(DataSource dataSource, Logger logger, RewardRepository rewardRepository) {
         super(dataSource, logger);
         this.rewardRepository = rewardRepository;
