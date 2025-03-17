@@ -6,6 +6,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/transaction-chart.js"></script>
+    <script src="/roundUpFunc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
@@ -18,18 +19,24 @@
         <p>Card Number: {{cardnumber}}</p>
         <p>CVV: {{cardcvv}}</p>
         <p class="balance">£{{balance}}</p>
-        {{#roundUpEnabled}}
-            <div class="roundup-pot">
-                <p class="roundup-title">Round-Up Savings Pot</p>
-                <p class="roundup-balance">£{{roundUpBalance}}</p>
+
+        <div class="roundup-pot">
+            <div class="roundup-toggle-container">
+                <p class="roundup-title">Round-Up Transactions</p>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="roundUpToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <p class="toggle-status">Disabled</p>   
             </div>
-        {{/roundUpEnabled}}
+            <p class="roundup-title">Round-Up Savings Pot 🍯</p>
+            <p class="roundup-balance">£{{roundUpBalance}}</p>
+        </div>
     </div>
 
     <div class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
-        <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal
-        </button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
         <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/reward'">Rewards</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
@@ -131,5 +138,23 @@
             insightsSection.scrollIntoView({ behavior: 'smooth' });
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('roundUpToggle');
+    const statusText = document.querySelector('.toggle-status');
+    
+    if (toggle && statusText) {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                statusText.textContent = 'Enabled';
+                statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+            } else {
+                statusText.textContent = 'Disabled';
+                statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }
+        });
+    }
+});
+
 </script>
 </html>
