@@ -1,6 +1,7 @@
 package uk.co.asepstrath.bank.services.reward;
 
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.services.BaseService;
 import uk.co.asepstrath.bank.services.repository.RewardRepository;
 
 import javax.sql.DataSource;
@@ -10,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class RewardSpinService {
+public class RewardSpinService extends BaseService {
     private final DataSource datasource;
     private final Logger logger;
     private final RewardRepository rewardRepository;

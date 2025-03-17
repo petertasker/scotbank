@@ -41,9 +41,8 @@ public class TransactionDataService extends DataService implements DataServiceFe
         boolean hasMorePages = true;
 
         try {
-            logger.info("Fetching transactions from database...");
+            logger.info("Fetching transactions from the API...");
             while (hasMorePages) {
-
                 // Make GET request for each page
                 HttpResponse<String> response = fetchPage(page);
 
@@ -54,7 +53,12 @@ public class TransactionDataService extends DataService implements DataServiceFe
 
                 // Map page responses to a List of Transaction Objects
                 XmlParser pageResult = parseResponse(xmlMapper, response);
-                List<Transaction> pageTransactions = processTransactions(pageResult);
+
+                // Process transactions with connection management
+                List<Transaction> pageTransactions;
+                try (Connection connection = getConnection()) {
+                    pageTransactions = processTransactions(pageResult, connection);
+                }
 
                 // Break if for some reason the XML is configured poorly, and the parser is sent to an empty page
                 if (pageTransactions.isEmpty()) {
@@ -77,6 +81,9 @@ public class TransactionDataService extends DataService implements DataServiceFe
         }
         catch (IOException e) {
             throw new XMLStreamException("Failed to parse XML", e);
+        }
+        catch (SQLException e) {
+            throw new XMLStreamException("Database connection error", e);
         }
         logger.info("Successfully fetched transactions data");
         return allTransactions;
@@ -106,32 +113,29 @@ public class TransactionDataService extends DataService implements DataServiceFe
     }
 
     /**
-     * Processes transactions from a page result
+     * Processes transactions from a page result using a shared connection
      */
-    private List<Transaction> processTransactions(XmlParser pageResult) {
-        return pageResult.getTransactions().stream().map(this::createTransactionSafely).filter(Objects::nonNull)
+    private List<Transaction> processTransactions(XmlParser pageResult, Connection connection) {
+        return pageResult.getTransactions().stream()
+                .map(transaction -> createTransactionSafely(transaction, connection))
+                .filter(Objects::nonNull)
                 .toList();
     }
 
     /**
-     * Safely creates a Transaction object, handling errors
+     * Safely creates a Transaction object using the provided connection
      */
-    private Transaction createTransactionSafely(Transaction transaction) {
+    private Transaction createTransactionSafely(Transaction transaction, Connection connection) {
         try {
             if (transaction.getAmount() == null) {
                 logger.warn("Skipping transaction with null amount: {}", transaction.getId());
                 return null;
             }
-            Connection connection = getConnection();
             return new Transaction(connection, transaction.getTimestamp(), transaction.getAmount(),
                     transaction.getFrom(), transaction.getId(), transaction.getTo(), transaction.getType());
         }
-        catch (SQLException e) {
-            logger.error("SQL error processing transaction {}: {}", transaction.getId(), e.getMessage());
-            return null;
-        }
         catch (Exception e) {
-            logger.error("Unexpected error processing transaction {}: {}", transaction.getId(), e.getMessage());
+            logger.error("Error processing transaction {}: {}", transaction.getId(), e.getMessage());
             return null;
         }
     }
