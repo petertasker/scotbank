@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="content-wrapper">
-    <h1>🎁 Welcome to the Rewards Program!</h1>
+    <h1>Welcome to the Rewards Program</h1>
     <div class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href='/account'">Back to Account</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
@@ -24,7 +24,7 @@
 
     <!-- Rewards List -->
     <div class="rewards-section">
-        <h2>🎯 Available Rewards</h2>
+        <h2>Available Rewards</h2>
         <hr>
         {{#each rewards}}
         <div class="reward">
@@ -40,7 +40,7 @@
     <div class="spin-section">
         <h2>🎡 Spin the Wheel</h2>
         <form action="/account/reward/process" method="post">
-            <button type="submit" class="btn btn-success">🎡 Spin Now</button>
+            <button type="submit" class="btn btn-success">Spin Now</button>
         </form>
     </div>
 </div>
