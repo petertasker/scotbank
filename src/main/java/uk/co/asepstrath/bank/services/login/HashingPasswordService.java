@@ -13,6 +13,10 @@ import static uk.co.asepstrath.bank.Constants.*;
 
 public class HashingPasswordService {
 
+    private HashingPasswordService() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Generates a random salt
      *

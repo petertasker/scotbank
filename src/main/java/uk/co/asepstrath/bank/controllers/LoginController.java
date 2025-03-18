@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import static uk.co.asepstrath.bank.Constants.ROUTE_LOGIN;
@@ -48,7 +47,7 @@ public class LoginController extends BaseController {
      */
     @POST
     @Path(ROUTE_PROCESS)
-    public void processLogin(Context ctx) throws SQLException {
+    public void processLogin(Context ctx) {
         processLoginService.processLogin(ctx);
     }
 }

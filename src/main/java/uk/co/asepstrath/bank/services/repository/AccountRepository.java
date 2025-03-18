@@ -70,7 +70,6 @@ public class AccountRepository extends BaseRepository {
 
         // Hash plaintext password before storing in the database
         String hashedPassword = HashingPasswordService.hashPassword(password);
-
         // Attempt to insert a new Account into the database
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ACCOUNT)) {
             statement.setString(1, account.getAccountID());
@@ -78,7 +77,7 @@ public class AccountRepository extends BaseRepository {
             statement.setBigDecimal(3, account.getBalance());
             statement.setString(4, account.getName());
             statement.setBoolean(5, account.isRoundUpEnabled());
-            statement.setString(6, account.getPostcode(true));
+            statement.setString(6, account.getPostcode()); // Get admin status somehow
             statement.setString(7, account.getCard().getCardNumber());
             statement.setString(8, account.getCard().getCvv());
             statement.executeUpdate();
@@ -86,8 +85,8 @@ public class AccountRepository extends BaseRepository {
                     account.getAccountID(),
                     account.isRoundUpEnabled(),
                     password,
-                    account.getPostcode(true),
-                    account.getCard().toString()
+                    account.getPostcode(),
+                    account.getCard()
             );
         }
     }

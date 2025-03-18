@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class TransactionDataServiceFetcherTest {
+class TransactionDataServiceTest {
 
     private TransactionDataService transactionDataService;
     private UnirestWrapper unirestWrapper;
@@ -36,8 +36,8 @@ class TransactionDataServiceFetcherTest {
         unirestWrapper = mock(UnirestWrapper.class);
         mockResponse = mock(HttpResponse.class);
         mockLogger = mock(Logger.class);
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
+        mockDataSource = mock(DataSource.class);
+        mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         transactionDataService = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
     }
@@ -135,9 +135,8 @@ class TransactionDataServiceFetcherTest {
     @Test
     void testCreateTransactionSafely() throws Exception {
         // Mock dependencies
-        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper, mockDataSource);
-        Connection mockConnection = mock(Connection.class); // Mock Connection
-
+        TransactionDataService service = new TransactionDataService(mockLogger, unirestWrapper, objectMapper,
+                mockDataSource);
         // Create test transaction with null amount
         Transaction fakeTransaction = new Transaction();
         setPrivateField(fakeTransaction, "id", "bad123");
@@ -226,9 +225,6 @@ class TransactionDataServiceFetcherTest {
 
     @Test
     void testCreateTransactionSafelyWithSQLException() throws Exception {
-        // Create mocks
-        DataSource mockDataSource = mock(DataSource.class);
-        Connection mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
 
         // Set up mock to throw SQLException

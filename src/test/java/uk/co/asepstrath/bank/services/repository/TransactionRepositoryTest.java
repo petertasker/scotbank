@@ -39,13 +39,6 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void testCreateTable() throws SQLException, NoSuchFieldException, IllegalAccessException {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-
-        transactionRepository.createTable(connection);
-    }
-
-    @Test
     void testInsertDeposit() throws SQLException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 

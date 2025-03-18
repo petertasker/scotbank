@@ -18,10 +18,10 @@ public class Account {
     private final String accountID;
     private final boolean roundUpEnabled;
     private final String name;
+    private final Card card;
     private BigDecimal balance;
     private BigDecimal roundUpBalance;
     private String postcode;
-    private final Card card;
 
     @JsonCreator
     public Account(
@@ -174,10 +174,7 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getPostcode(boolean isAdmin) {
-        if (isAdmin) {
-            return postcode;
-        }
-        throw new SecurityException("Account does not have postcode permission");
+    public String getPostcode() {
+        return postcode;
     }
 }

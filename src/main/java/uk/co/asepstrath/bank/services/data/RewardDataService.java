@@ -11,8 +11,6 @@ import uk.co.asepstrath.bank.Reward;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ import java.util.Map;
  * Fetches Rewards data from an external API or database.
  */
 public class RewardDataService extends DataService implements DataServiceFetcher<Reward> {
-    private Connection connection; // Database connection
 
     // Constructor for API fetching (default)
     public RewardDataService(Logger logger, UnirestWrapper unirestWrapper, ObjectMapper objectMapper,
@@ -48,13 +45,13 @@ public class RewardDataService extends DataService implements DataServiceFetcher
                 throw new IOException("Failed to fetch rewards: " + response.getStatus());
             }
         }
-        catch (IOException e) {
+        catch (UnirestException e) {
             logger.error("Error fetching rewards data from API", e);
-            throw e;
+            throw new StatusCodeException(StatusCode.SERVER_ERROR);
         }
     }
 
-    public String postReward(Reward reward, String accountId) {
+    public void postReward(Reward reward, String accountId) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Accept", "application/json");
@@ -64,9 +61,22 @@ public class RewardDataService extends DataService implements DataServiceFetcher
                     reward.toJson(accountId),
                     headers
             );
-            return response.getBody();
+
+            int statusCode = response.getStatus();
+            String responseBody = response.getBody();
+
+            // Check status code and throw appropriate exception
+            if (statusCode != 200) {
+                logger.error("API returned error status: {}", statusCode);
+                logger.error("Response body: {}", responseBody);
+                throw new StatusCodeException(StatusCode.valueOf(statusCode));
+            }
+
+            logger.info("Successfully posted reward data. Status: {}", statusCode);
+            logger.info("Response body: {}", responseBody);
         }
         catch (UnirestException e) {
+            logger.error("Error POSTing reward result to API", e);
             throw new StatusCodeException(StatusCode.BAD_REQUEST);
         }
     }

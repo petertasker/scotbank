@@ -160,15 +160,29 @@ class AccountClassTest {
     }
 
     @Test
-    void testGetPostalCodeAdmin() {
-        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false, "G4 6FC", new Card("123", "345"));
-        assertEquals("G4 6FC", a.getPostcode(true));
+    void testGetPostalCode() {
+        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false,"G4 6FC", new Card("123", "345"));
+        assertEquals("G4 6FC", a.getPostcode());
     }
 
     @Test
-    void testPostalCodeException() {
-        Account a = new Account("4", "John Doe", BigDecimal.valueOf(20), false, "G4 6FC", new Card("123", "345"));
-        SecurityException exceptionMessage = assertThrows(SecurityException.class, () -> a.getPostcode(false));
-        assertEquals("Account does not have postcode permission", exceptionMessage.getMessage());
+    void testAddToRoundUpBalance() {
+        Account account = new Account("AC123","John Doe",new BigDecimal(100),true,"G4 6FC", new Card("123", "345"));
+        account.addToRoundUpBalance(new BigDecimal(50));
+        assertEquals(BigDecimal.valueOf(50), account.getRoundUpBalance());
+    }
+
+    @Test
+    void testOverdraftMethodSuccess(){
+        Account account = new Account("AC123","John Doe",new BigDecimal(100),true,"G4 6FC", new Card("123", "345"));
+        account.overdraftWithdraw(new BigDecimal(50));
+        assertEquals(new BigDecimal(50), account.getBalance());
+    }
+
+    @Test
+    void testOverdraftMethodFail(){
+        Account account = new Account("AC13","John Dow",new BigDecimal(100),true,"G4 6FC", new Card("123", "345"));
+        BigDecimal withdraw = new BigDecimal(-5);
+        assertThrows(ArithmeticException.class, () -> account.overdraftWithdraw(withdraw));
     }
 }

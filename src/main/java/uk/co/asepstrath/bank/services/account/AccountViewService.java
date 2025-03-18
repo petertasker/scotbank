@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.co.asepstrath.bank.Constants.*;
 
@@ -160,7 +159,7 @@ public class AccountViewService extends AccountService {
             model.put(BUSINESS_COUNTS, insightMap.entrySet().stream()
                     .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
                     .map(entry -> Map.of("category", entry.getKey(), "count", entry.getValue()))
-                    .collect(Collectors.toList()));
+                    .toList());
         }
     }
 
@@ -174,7 +173,7 @@ public class AccountViewService extends AccountService {
                     .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                     .map(entry -> Map.of("category", entry.getKey(),
                             "totalAmount", formatCurrency(entry.getValue())))
-                    .collect(Collectors.toList()));
+                    .toList());
         }
     }
 }

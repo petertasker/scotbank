@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BusinessDataServiceFetcherTest {
+class BusinessDataServiceTest {
 
     private BusinessDataService businessDataService;
     private UnirestWrapper unirestWrapper;
