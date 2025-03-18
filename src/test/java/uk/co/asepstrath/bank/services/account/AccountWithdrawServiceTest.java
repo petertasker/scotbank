@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -71,5 +73,14 @@ class AccountWithdrawServiceTest {
         ModelAndView<Map<String, Object>> result = service.renderWithdraw(context);
         assertNotNull(result);
         assertEquals(TEMPLATE_WITHDRAW, result.getView());
+    }
+
+    @Test
+    void testProcessWithdraw() {
+        Account account = new Account("ABC123","John Doe",new BigDecimal(100),true,"BCA123",null);
+        BigDecimal withdrawAmount = new BigDecimal(50);
+
+        when(context.session()).thenReturn(session);
+
     }
 }
