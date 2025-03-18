@@ -21,7 +21,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class RewardViewServiceTest {
+class RewardViewServiceTest {
     @Mock
     private DataSource mockDataSource;
     @Mock

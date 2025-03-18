@@ -182,6 +182,7 @@ class AccountClassTest {
     @Test
     void testOverdraftMethodFail(){
         Account account = new Account("AC13","John Dow",new BigDecimal(100),true,"G4 6FC", new Card("123", "345"));
-        assertThrows(ArithmeticException.class, () -> account.overdraftWithdraw(new BigDecimal(-5)));
+        BigDecimal withdraw = new BigDecimal(-5);
+        assertThrows(ArithmeticException.class, () -> account.overdraftWithdraw(withdraw));
     }
 }

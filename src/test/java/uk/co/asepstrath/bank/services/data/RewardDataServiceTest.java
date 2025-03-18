@@ -1,12 +1,10 @@
 package uk.co.asepstrath.bank.services.data;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.core.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Reward;
 
 import javax.sql.DataSource;
@@ -51,7 +49,7 @@ class RewardDataServiceTest {
                 ]
                 """);
 
-        when(unirestWrapper.get(eq("https://api.asep-strath.co.uk/api/rewards"))).thenReturn(mockResponse);
+        when(unirestWrapper.get("https://api.asep-strath.co.uk/api/rewards")).thenReturn(mockResponse);
         List<Reward> rewards = rewardDataService.fetchData();
 
         assertNotNull(rewards);
@@ -63,7 +61,7 @@ class RewardDataServiceTest {
     }
 
     @Test
-    void testFetchDataFailure() throws IOException {
+    void testFetchDataFailure(){
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(false);
 
