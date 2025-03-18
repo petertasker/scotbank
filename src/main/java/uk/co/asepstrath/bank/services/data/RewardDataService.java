@@ -61,7 +61,19 @@ public class RewardDataService extends DataService implements DataServiceFetcher
                     reward.toJson(accountId),
                     headers
             );
-            response.getBody();
+
+            int statusCode = response.getStatus();
+            String responseBody = response.getBody();
+
+            // Check status code and throw appropriate exception
+            if (statusCode != 200) {
+                logger.error("API returned error status: {}", statusCode);
+                logger.error("Response body: {}", responseBody);
+                throw new StatusCodeException(StatusCode.valueOf(statusCode));
+            }
+
+            logger.info("Successfully posted reward data. Status: {}", statusCode);
+            logger.info("Response body: {}", responseBody);
         }
         catch (UnirestException e) {
             logger.error("Error POSTing reward result to API", e);
