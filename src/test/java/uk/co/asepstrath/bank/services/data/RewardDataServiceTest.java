@@ -1,7 +1,10 @@
 package uk.co.asepstrath.bank.services.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jooby.StatusCode;
+import io.jooby.exception.StatusCodeException;
 import kong.unirest.core.HttpResponse;
+import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -9,12 +12,12 @@ import uk.co.asepstrath.bank.Reward;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class RewardDataServiceTest {
 
@@ -67,5 +70,54 @@ class RewardDataServiceTest {
 
         when(unirestWrapper.get(anyString())).thenReturn(mockResponse);
         assertThrows(IOException.class, () -> rewardDataService.fetchData());
+    }
+
+    @Test
+    void testForStatusCodeException(){
+        when(unirestWrapper.get(anyString())).thenThrow(new UnirestException("failed to fetch"));
+
+        assertThrows(StatusCodeException.class, () -> rewardDataService.fetchData());
+    }
+
+    @Test
+    void testPostRewardSuccess(){
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        when(mockResponse.isSuccess()).thenReturn(true);
+        when(mockResponse.getStatus()).thenReturn(StatusCode.valueOf(200).value());
+
+        when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap())).thenReturn(mockResponse);
+
+        Reward reward  =new Reward("Some Reward","Something",new BigDecimal(2000),1);
+        rewardDataService.postReward(reward, "acc123");
+
+        verify(unirestWrapper).post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap());
+    }
+
+    @Test
+    void testPostRewardStatusCodeNot200(){
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        when(mockResponse.isSuccess()).thenReturn(true);
+        when(mockResponse.getStatus()).thenReturn(StatusCode.valueOf(500).value());
+
+        when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap())).thenReturn(mockResponse);
+
+        Reward reward  =new Reward("Some Reward","Something",new BigDecimal(2000),1);
+
+        StatusCodeException exception = assertThrows(StatusCodeException.class, () -> rewardDataService.postReward(reward, "acc123"));
+        assertEquals(StatusCode.SERVER_ERROR, exception.getStatusCode());
+
+    }
+
+    @Test
+    void testPostRewardFailure(){
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        when(mockResponse.isSuccess()).thenReturn(false);
+        when(mockResponse.getStatus()).thenReturn(400);
+
+        when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap())).thenThrow(new UnirestException("failed to fetch"));
+        Reward reward  =new Reward("Some Reward","Something",new BigDecimal(2000),1);
+
+        StatusCodeException exception = assertThrows(StatusCodeException.class, () -> rewardDataService.postReward(reward, "acc123"));
+        assertEquals(StatusCode.BAD_REQUEST,exception.getStatusCode());
     }
 }
