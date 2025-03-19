@@ -52,7 +52,7 @@ public class RewardSpinService extends RewardService {
     /**
      * Selects a reward based on weighted probability
      */
-    private Reward selectWeightedRandomReward(List<Reward> rewards) {
+    Reward selectWeightedRandomReward(List<Reward> rewards) {
         double totalWeight = 0.0;
         for (Reward reward : rewards) {
             totalWeight += reward.getChance();

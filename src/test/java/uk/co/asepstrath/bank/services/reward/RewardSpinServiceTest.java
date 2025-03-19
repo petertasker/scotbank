@@ -19,8 +19,7 @@ import org.slf4j.Logger;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -65,21 +64,101 @@ class RewardSpinServiceTest {
         verify(rewardRepository, times(1)).getAllRewards(any());
     }
 
-//    @Test
-//    void testSelectRewardRandom() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
-//        Reward reward = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 50.00);
-//        Reward reward1 = new Reward("Vacation trip", "Trip to Dubai", new BigDecimal(5000), 20.00);
-//        Reward reward2 = new Reward("DisneyLand", "Disney Land Tickets", new BigDecimal(900),30.00);
-//        List<Reward> rewards = Arrays.asList(reward, reward1, reward2);
-//
-//        SecureRandom secureRandom = mock(SecureRandom.class);
-//        when(secureRandom.nextDouble()).thenReturn(0.6); // should return Reward 1
-//
-//        Method selectRewardMethod = RewardSpinService.class.getDeclaredMethod("selectWeightedRandomReward", List.class);
-//        selectRewardMethod.setAccessible(true);
-//        Reward selectReward = (Reward) selectRewardMethod.invoke(rewardSpinService, rewards);
-//
-//        assertEquals(reward, selectReward);
-//
-//    }
+    @Test
+    void testSelectWeightedRandomRewardDistributionMatches() throws NoSuchFieldException, IllegalAccessException,
+            InvocationTargetException, NoSuchMethodException {
+
+        // Create test rewards with known probabilities
+        Reward laptop = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 50.0);
+        Reward trip = new Reward("Vacation trip", "Trip to Dubai", new BigDecimal(5000), 20.0);
+        Reward tickets = new Reward("DisneyLand", "Disney Land Tickets", new BigDecimal(900), 30.0);
+        List<Reward> rewards = Arrays.asList(laptop, trip, tickets);
+
+        SecureRandom mockRandom = mock(SecureRandom.class);
+        Field randomField = RewardSpinService.class.getDeclaredField("secureRandom");
+        randomField.setAccessible(true);
+        randomField.set(rewardSpinService, mockRandom);
+
+        // Test specific boundaries
+        // For laptop (0-49.9%)
+        when(mockRandom.nextDouble()).thenReturn(0.0);
+        assertEquals(laptop, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+
+        when(mockRandom.nextDouble()).thenReturn(0.499);
+        assertEquals(laptop, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+
+        // For trip (50-69.9%)
+        when(mockRandom.nextDouble()).thenReturn(0.5);
+        assertEquals(trip, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+
+        when(mockRandom.nextDouble()).thenReturn(0.699);
+        assertEquals(trip, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+
+        // For tickets (70-100%)
+        when(mockRandom.nextDouble()).thenReturn(0.7);
+        assertEquals(tickets, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+
+        when(mockRandom.nextDouble()).thenReturn(0.999);
+        assertEquals(tickets, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+    }
+
+    // Helper method to invoke the private method
+    private Reward invokeSelectWeightedRandomReward(RewardSpinService service, List<Reward> rewards)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method selectRewardMethod = RewardSpinService.class.getDeclaredMethod("selectWeightedRandomReward", List.class);
+        selectRewardMethod.setAccessible(true);
+        return (Reward) selectRewardMethod.invoke(service, rewards);
+    }
+
+    @Test
+    void testSelectWeightedRandomRewardStatisticalDistribution()
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Create test rewards with known probabilities
+        Reward laptop = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 50.0);
+        Reward trip = new Reward("Vacation trip", "Trip to Dubai", new BigDecimal(5000), 20.0);
+        Reward tickets = new Reward("DisneyLand", "Disney Land Tickets", new BigDecimal(900), 30.0);
+        List<Reward> rewards = Arrays.asList(laptop, trip, tickets);
+
+        int totalTrials = 10000;
+        Map<Reward, Integer> distribution = new HashMap<>();
+
+        for (int i = 0; i < totalTrials; i++) {
+            Reward selected = invokeSelectWeightedRandomReward(rewardSpinService, rewards);
+            distribution.put(selected, distribution.getOrDefault(selected, 0) + 1);
+        }
+
+        // Check if distribution is close to expected probabilities (within 3% margin)
+        double laptopPercentage = (double) distribution.getOrDefault(laptop, 0) / totalTrials * 100;
+        double tripPercentage = (double) distribution.getOrDefault(trip, 0) / totalTrials * 100;
+        double ticketsPercentage = (double) distribution.getOrDefault(tickets, 0) / totalTrials * 100;
+
+        assertTrue(Math.abs(laptopPercentage - 50.0) < 3.0);
+        assertTrue(Math.abs(tripPercentage - 20.0) < 3.0);
+        assertTrue(Math.abs(ticketsPercentage - 30.0) < 3.0);
+    }
+
+    @Test
+    void testSelectWeightedRandomRewardEmptyList() {
+        assertThrows(RuntimeException.class, () -> {
+            try {
+                invokeSelectWeightedRandomReward(rewardSpinService, Collections.emptyList());
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof IllegalArgumentException) {
+                    throw e.getCause();
+                }
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    void testSelectWeightedRandomRewardSingleReward()
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Reward reward = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 100.0);
+        List<Reward> rewards = Collections.singletonList(reward);
+
+        assertEquals(reward, invokeSelectWeightedRandomReward(rewardSpinService, rewards));
+    }
 }
