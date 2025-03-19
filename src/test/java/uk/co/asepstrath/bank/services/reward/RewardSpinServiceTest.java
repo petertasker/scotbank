@@ -53,7 +53,7 @@ class RewardSpinServiceTest {
     }
 
     @Test
-    void tsetProcessSpinSuccess() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void tsetProcessSpinSuccess() throws SQLException{
         Reward reward = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 50.00);
         List<Reward> rewards = List.of(reward);
 
