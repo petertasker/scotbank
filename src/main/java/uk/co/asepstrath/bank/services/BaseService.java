@@ -44,7 +44,7 @@ public abstract class BaseService implements
 
         NumberFormat formatter = NumberFormat.getNumberInstance(Locale.UK);
         DecimalFormat decimalFormat = (DecimalFormat) formatter;
-        decimalFormat.applyPattern("#,##0.00");
+        decimalFormat.applyPattern("#,###.00");
 
         return decimalFormat.format(amount);
     }

@@ -7,6 +7,7 @@ import io.jooby.annotation.POST;
 import io.jooby.annotation.Path;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.services.account.AccountDepositService;
+import uk.co.asepstrath.bank.services.account.AccountRoundUpService;
 import uk.co.asepstrath.bank.services.account.AccountViewService;
 import uk.co.asepstrath.bank.services.account.AccountWithdrawService;
 
@@ -25,12 +26,14 @@ public class AccountController extends BaseController {
     private final AccountViewService viewAccountService;
     private final AccountDepositService depositService;
     private final AccountWithdrawService withdrawService;
+    private final AccountRoundUpService roundUpService;
 
     public AccountController(DataSource datasource, Logger logger) {
         super(logger);
         viewAccountService = new AccountViewService(datasource, logger);
         depositService = new AccountDepositService(datasource, logger);
         withdrawService = new AccountWithdrawService(datasource, logger);
+        roundUpService = new AccountRoundUpService(datasource, logger);
     }
 
     /**
@@ -56,7 +59,6 @@ public class AccountController extends BaseController {
     public ModelAndView<Map<String, Object>> deposit(Context ctx) {
         return depositService.renderDeposit(ctx);
     }
-
 
     /**
      * Renders the withdrawal page
@@ -96,5 +98,14 @@ public class AccountController extends BaseController {
     @Path(ROUTE_DEPOSIT + ROUTE_PROCESS)
     public void depositProcess(Context ctx) throws SQLException {
         depositService.processDeposit(ctx);
+    }
+
+    /*
+     *     Update RoundUpEnabled based on toggle value 
+     */
+    @POST
+    @Path(ROUTE_ROUND_UP_TOGGLE)
+    public void toggleRoundUp(Context ctx) throws SQLException {
+        roundUpService.toggleDatabaseRoundUp(ctx);
     }
 }

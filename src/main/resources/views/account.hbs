@@ -6,7 +6,6 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/transaction-chart.js"></script>
-    <script src="/roundUpFunc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
@@ -139,6 +138,10 @@
         }
     }
 
+    /*
+    * Animation for roundUpToggle switch
+    * Requires functionality to send toggle to back-end (Update roundUpEnabled)
+    */
     document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.getElementById('roundUpToggle');
     const statusText = document.querySelector('.toggle-status');
@@ -146,6 +149,9 @@
     if (toggle && statusText) {
         toggle.addEventListener('change', function() {
             if (this.checked) {
+                const response = fetch('/account/roundup', {
+                    method: 'POST'
+                });
                 statusText.textContent = 'Enabled';
                 statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
             } else {
