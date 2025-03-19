@@ -46,6 +46,25 @@
         <div class="transactions-section">
             <h2>Transaction History</h2>
             <hr>
+            <div class="pagination" style="display: flex; justify-content: center; margin: 20px 0;">
+                {{#if pagination.hasPrev}}
+<!--                {{! <a href="?page={{decrement pagination.currentPage}}" class="btn btn-primary" style="margin: 0 5px;">&laquo; Previous</a> }}-->
+                    <a href="?page=1" class="btn btn-primary" style="margin: 0 5px;">&laquo; Previous</a>
+                {{else}}
+                    <button class="btn btn-secondary" disabled style="margin: 0 5px;">&laquo; Previous</button>
+                {{/if}}
+
+                <span style="margin: 0 10px; line-height: 38px;">Page {{pagination.currentPage}} of {{pagination.totalPages}}</span>
+
+                {{#if pagination.hasNext}}
+<!--                {{! <a href="?page={{increment pagination.currentPage}}" class="btn btn-primary" style="margin: 0 5px;">Next &raquo;</a> }}-->
+                    <a href="?page=2" class="btn btn-primary" style="margin: 0 5px;">Next &raquo;</a>
+                {{else}}
+                    <button class="btn btn-secondary" disabled style="margin: 0 5px;">Next &raquo;</button>
+                {{/if}}
+            </div>
+
+
             {{#each transactions}}
                 <div class="transaction">
                     <p><strong>Date: </strong>{{timestamp}}</p>
@@ -57,8 +76,11 @@
                     <p><strong>Status: </strong>{{#if status}}Accepted{{else}}Declined{{/if}}</p>
                 </div>
             {{/each}}
-        </div>
 
+            <!-- Pagination Controls -->
+
+        </div>
+    {{/if}}
         <!-- First Insights Section -->
         <div class="insights-section" id="payments-by-category">
             <h2>Spending Insights: Number of Payments</h2>
@@ -118,10 +140,7 @@
                 </div>
             </div>
         </div>
-    {{else}}
-        <p>No transactions found.</p>
-    {{/if}}
-</div>
+    </div>
 </body>
 <script>
     // Smooth scroll function without updating URL

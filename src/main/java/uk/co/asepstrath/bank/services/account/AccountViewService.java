@@ -47,6 +47,11 @@ public class AccountViewService extends AccountService {
     public ModelAndView<Map<String, Object>> viewAccount(Context ctx) throws SQLException {
         ensureAccountIsLoggedIn(ctx);
 
+        // Pagination params
+        int page = ctx.query("page").intValue(1);
+        logger.info("Requesting page: {}", page);
+        int limit = ctx.query("limit").intValue(10);
+
         Map<String, Object> model = createModel();
         Session session = getSession(ctx);
 
@@ -62,7 +67,7 @@ public class AccountViewService extends AccountService {
         transferSessionMessages(ctx, model);
 
         // Get transaction history
-        loadTransactionHistory(model, accountId);
+        loadTransactionHistory(model, accountId, page, limit);
 
         // Add insights data to model
         addPaymentSumPerBusinessToModel(accountId, model);
@@ -110,16 +115,18 @@ public class AccountViewService extends AccountService {
     /**
      * Loads transaction history for an account
      */
-    private void loadTransactionHistory(Map<String, Object> model, String accountId) throws SQLException {
+    private void loadTransactionHistory(Map<String, Object> model, String accountId, int page, int limit) throws SQLException {
         try (Connection connection = getConnection()) {
-            // Get original transactions
-            List<Transaction> transactions = fetchTransactions(connection, accountId);
+            // Set up pagination
+            int totalTransactions = transactionRepository.getTransactionCountByAccountId(connection, accountId);
+            int totalPages = (int) Math.ceil((double) totalTransactions / (double) limit);
+            int offset = Math.max(0, (page - 1) * limit);
+
+            List<Transaction> transactions = transactionRepository.getPaginatedTransactionsByAccountId(connection, accountId, offset, limit);
             model.put(TRANSACTION_OBJECT_LIST_EXISTS, !transactions.isEmpty());
 
             // Create new list with display-ready transactions
             List<Map<String, Object>> displayTransactions = new ArrayList<>();
-
-
             for (Transaction transaction : transactions) {
                 Map<String, Object> displayTx = new HashMap<>();
                 displayTx.put("id", transaction.getId());
@@ -136,6 +143,21 @@ public class AccountViewService extends AccountService {
             }
 
             model.put(TRANSACTION_OBJECT_LIST, displayTransactions);
+
+            // Add pagination info to model
+            Map<String, Object> pagination = new HashMap<>();
+            pagination.put("currentPage", page);
+            pagination.put("totalPages", totalPages);
+            pagination.put("hasNext", page < totalPages);
+            pagination.put("hasPrev", page > 1);
+            model.put("pagination", pagination);
+
+
+            logger.info("Pagination data - Page: {}, Total Pages: {}", page, totalPages);
+            logger.info("Pagination Model: {}", model.get("pagination"));
+            logger.info("Setting pagination: currentPage={}, totalPages={}", page, totalPages);
+
+
         }
     }
 

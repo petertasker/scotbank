@@ -1,5 +1,6 @@
 package uk.co.asepstrath.bank;
 
+import com.github.jknack.handlebars.Handlebars;
 import io.jooby.Jooby;
 import io.jooby.Session;
 import io.jooby.StatusCode;
@@ -9,6 +10,7 @@ import io.jooby.hikari.HikariModule;
 import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.controllers.*;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
@@ -22,6 +24,8 @@ import java.sql.SQLException;
 import static uk.co.asepstrath.bank.Constants.*;
 
 public class App extends Jooby {
+
+    private static final Logger log = LoggerFactory.getLogger(App.class);
 
     public App() {
 
@@ -43,9 +47,13 @@ public class App extends Jooby {
         // Set up controllers and their dependencies
         setUpControllers();
 
+        // Add helper functions for handlebars template to be able to paginate
+        // handleHandlebarsPagination();
+
         onStarted(this::onStart);
         onStop(this::onStop);
     }
+
 
     public static void main(final String[] args) {
         runApp(args, App::new);
@@ -188,4 +196,19 @@ public class App extends Jooby {
         log.info("Shutting Down...");
     }
 
+    private void handleHandlebarsPagination() {
+        Handlebars handlebars = require(Handlebars.class);
+
+        // Increment helper (adds 1)
+        handlebars.registerHelper("increment", (context, options) -> {
+            Number a = options.param(0);
+            return a.intValue() + 1;
+        });
+
+        // Decrement helper (subtracts 1)
+        handlebars.registerHelper("decrement", (context, options) -> {
+            Number a = options.param(0);
+            return a.intValue() - 1;
+        });
+    }
 }

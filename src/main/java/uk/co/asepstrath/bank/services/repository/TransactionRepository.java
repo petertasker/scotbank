@@ -67,7 +67,7 @@ public class TransactionRepository extends BaseRepository {
     private static final String SQL_GET_TRASNACTIONS_BY_ID = "SELECT Timestamp, Amount, SenderID, TransactionID, " +
             "ReceiverAccountID, " +
             "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
-            "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC";
+            "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC, TransactionID DESC";
 
     public TransactionRepository(Logger logger) {
         super(logger);
@@ -204,5 +204,45 @@ public class TransactionRepository extends BaseRepository {
 
         return new Transaction(dateTime, amount, senderID, transactionID, receiverID, transactionType,
                 transactionAccepted);
+    }
+
+    public int getTransactionCountByAccountId(Connection connection, String accountId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Transactions WHERE SenderID = ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, accountId);
+            stmt.setString(2, accountId);
+            stmt.setString(3, accountId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        }
+    }
+
+    public List<Transaction> getPaginatedTransactionsByAccountId(Connection connection, String accountId, int offset, int limit) throws SQLException {
+        String sql = "SELECT Timestamp, Amount, SenderID, TransactionID, ReceiverAccountID, " +
+                "ReceiverBusinessID, TransactionType, TransactionAccepted " +
+                "FROM Transactions " +
+                "WHERE SenderID = ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " +
+                "ORDER BY Timestamp DESC, TransactionID DESC " +
+                "LIMIT ? OFFSET ?";
+
+        List<Transaction> transactions = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, accountId);
+            stmt.setString(2, accountId);
+            stmt.setString(3, accountId);
+            stmt.setInt(4, limit);
+            stmt.setInt(5, offset);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(createTransactionFromResultSet(rs));
+                }
+            }
+        }
+        return transactions;
     }
 }
