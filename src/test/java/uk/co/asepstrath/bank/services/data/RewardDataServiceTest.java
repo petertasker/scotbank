@@ -83,7 +83,7 @@ class RewardDataServiceTest {
     void testPostRewardSuccess(){
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
-        when(mockResponse.getBody()).thenReturn("Response body");
+        when(mockResponse.getStatus()).thenReturn(StatusCode.valueOf(200).value());
 
         when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap())).thenReturn(mockResponse);
 
@@ -91,6 +91,21 @@ class RewardDataServiceTest {
         rewardDataService.postReward(reward, "acc123");
 
         verify(unirestWrapper).post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap());
+    }
+
+    @Test
+    void testPostRewardSuccessStatusCodeNot200(){
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+        when(mockResponse.isSuccess()).thenReturn(true);
+        when(mockResponse.getStatus()).thenReturn(StatusCode.valueOf(500).value());
+
+        when(unirestWrapper.post(eq("https://api.asep-strath.co.uk/api/rewards"),anyString(),anyMap())).thenReturn(mockResponse);
+
+        Reward reward  =new Reward("Some Reward","Something",new BigDecimal(2000),1);
+
+        StatusCodeException exception = assertThrows(StatusCodeException.class, () -> rewardDataService.postReward(reward, "acc123"));
+        assertEquals(StatusCode.SERVER_ERROR, exception.getStatusCode());
+
     }
 
     @Test
