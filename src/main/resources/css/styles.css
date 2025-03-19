@@ -35,7 +35,7 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    background: url(https://www.inspiringtravelscotland.com/wp-content/uploads/2019/05/Quiraing-Skye-Scottish-Highlands.jpg) no-repeat;
+    background: #111111 url(https://www.inspiringtravelscotland.com/wp-content/uploads/2019/05/Quiraing-Skye-Scottish-Highlands.jpg) no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
