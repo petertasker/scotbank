@@ -94,7 +94,7 @@ class RewardDataServiceTest {
     }
 
     @Test
-    void testPostRewardSuccessStatusCodeNot200(){
+    void testPostRewardStatusCodeNot200(){
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockResponse.isSuccess()).thenReturn(true);
         when(mockResponse.getStatus()).thenReturn(StatusCode.valueOf(500).value());
