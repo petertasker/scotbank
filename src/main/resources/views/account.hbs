@@ -18,19 +18,25 @@
         <p>Card Number: {{cardnumber}}</p>
         <p>CVV: {{cardcvv}}</p>
         <p class="balance">£{{balance}}</p>
-
         <div class="roundup-pot">
             <div class="roundup-toggle-container">
                 <p class="roundup-title">Round-Up Transactions</p>
                 <label class="toggle-switch">
                     <input type="checkbox" id="roundUpToggle">
                     <span class="toggle-slider"></span>
+                    <span class="sr-only">Toggle Round-Up Transactions feature</span>
                 </label>
                 <p class="toggle-status">Disabled</p>   
             </div>
             <p class="roundup-title">Round-Up Savings Pot 🍯</p>
-            <p class="roundup-balance">{{roundUpBalance}}</p>
-            
+            <h2 class="roundup-balance" role="text">{{roundUpBalance}}</h2>
+            <div class="reclaim-container" id="reclaimContainer">
+                <button class="reclaim-button" id="reclaimButton">
+                    <span class="sparkle">✨</span>
+                    Reclaim Round-Up
+                    <span class="sparkle">✨</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -161,6 +167,52 @@
                 statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             }
 
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('roundUpToggle');
+    const statusText = document.querySelector('.toggle-status');
+    const reclaimContainer = document.getElementById('reclaimContainer');
+    const reclaimButton = document.getElementById('reclaimButton');
+
+    if (toggle && statusText && reclaimContainer) {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Show reclaim button with animation
+                reclaimContainer.classList.add('visible');
+                statusText.textContent = 'Enabled';
+                statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+            } else {
+                // Hide reclaim button
+                reclaimContainer.classList.remove('visible');
+                statusText.textContent = 'Disabled';
+                statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }
+        });
+
+        // Reclaim button click handler
+        reclaimButton.addEventListener('click', function() {
+            // Add temporary animation
+            this.style.animation = 'reclaimAnimation 0.3s ease';
+            
+            // Remove animation after it completes
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 300);
+            
+            // Add your backend reclaim logic here later
+            console.log('Reclaiming round-up balance...');
+            
+            // Temporary visual feedback
+            this.textContent = 'Reclaiming...';
+            setTimeout(() => {
+                this.innerHTML = `<span class="sparkle">✨</span> Reclaimed! <span class="sparkle">✨</span>`;
+                setTimeout(() => {
+                    this.innerHTML = `<span class="sparkle">✨</span> Reclaim Round-Up <span class="sparkle">✨</span>`;
+                }, 2000);
+            }, 1000);
         });
     }
 });
