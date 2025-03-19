@@ -63,14 +63,17 @@ public class TransactionDataService extends DataService implements DataServiceFe
 
                         if (hasMorePages) {
                             page++;
-                        } else {
+                        }
+                        else {
                             logger.info("Reached last page ({}) of transactions", page);
                         }
-                    } else {
+                    }
+                    else {
                         logger.info("No more transactions found on page {}", page);
                         hasMorePages = false;
                     }
-                } else {
+                }
+                else {
                     logger.info("Failed to fetch page {}: {}", page, response.getStatus());
                     hasMorePages = false;
                 }
