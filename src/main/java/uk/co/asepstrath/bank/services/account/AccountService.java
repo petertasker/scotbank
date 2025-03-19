@@ -37,7 +37,6 @@ public class AccountService extends BaseService {
      * @throws SQLException Database connection failure
      */
     void updateDatabaseBalance(Account account) throws SQLException {
-
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(
                 "UPDATE Accounts SET Balance = ? WHERE AccountID = ?")) {
             statement.setBigDecimal(1, account.getBalance());
@@ -127,11 +126,10 @@ public class AccountService extends BaseService {
                         // RoundUp balance
                         boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
                         model.put("roundUpEnabled", roundUpEnabled);
+                        // Remove this after testing
 
-                        if (roundUpEnabled) {
-                            BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
-                            model.put("roundUpBalance", formatCurrency(roundUpAmount));
-                        }
+                        BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                        model.put("roundUpBalance", formatCurrency(roundUpAmount));
                     }
                     else {
                         logger.info("Account balance is empty");
