@@ -103,7 +103,7 @@ public class AccountRepository extends BaseRepository {
     public void updateBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BALANCE)) {
             statement.setBigDecimal(1, account.getBalance());
-            statement.setBigDecimal(2, account.getRoundUpBalance() != null ? account.getRoundUpBalance() : BigDecimal.ZERO);
+            statement.setBigDecimal(2, account.getRoundUpBalance()); // Update round up balance (don't need NULL anymore?)
             statement.setString(3, account.getAccountID());
             statement.executeUpdate();
         }

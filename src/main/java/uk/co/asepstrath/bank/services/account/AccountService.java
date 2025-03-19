@@ -126,8 +126,7 @@ public class AccountService extends BaseService {
                         // RoundUp balance
                         boolean roundUpEnabled = resultSet.getBoolean("RoundUpEnabled");
                         model.put("roundUpEnabled", roundUpEnabled);
-                        // Remove this after testing
-
+                        
                         BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
                         model.put("roundUpBalance", formatCurrency(roundUpAmount));
                     }

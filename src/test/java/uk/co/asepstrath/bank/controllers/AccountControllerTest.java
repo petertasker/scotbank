@@ -156,8 +156,5 @@ class AccountControllerTest {
 
         ModelAndView<Map<String, Object>> result = accountController.withdraw(mockCtx);
         assertNotNull(result);
-
     }
-
-
 }

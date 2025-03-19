@@ -29,7 +29,8 @@
                 <p class="toggle-status">Disabled</p>   
             </div>
             <p class="roundup-title">Round-Up Savings Pot 🍯</p>
-            <p class="roundup-balance">£{{roundUpBalance}}</p>
+            <p class="roundup-balance">{{roundUpBalance}}</p>
+            
         </div>
     </div>
 
@@ -138,10 +139,7 @@
         }
     }
 
-    /*
-    * Animation for roundUpToggle switch
-    * Requires functionality to send toggle to back-end (Update roundUpEnabled)
-    */
+    // Animation + Functionality for roundUpToggle switch
     document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.getElementById('roundUpToggle');
     const statusText = document.querySelector('.toggle-status');
@@ -154,10 +152,15 @@
                 });
                 statusText.textContent = 'Enabled';
                 statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+
             } else {
+                const response = fetch('/account/roundupoff', {
+                    method: 'POST'
+                });
                 statusText.textContent = 'Disabled';
                 statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             }
+
         });
     }
 });

@@ -100,12 +100,17 @@ public class AccountController extends BaseController {
         depositService.processDeposit(ctx);
     }
 
-    /*
-     *     Update RoundUpEnabled based on toggle value 
-     */
+    // Enable Round Up for the account
     @POST
-    @Path(ROUTE_ROUND_UP_TOGGLE)
-    public void toggleRoundUp(Context ctx) throws SQLException {
-        roundUpService.toggleDatabaseRoundUp(ctx);
+    @Path(ROUTE_ROUND_UP_ON)
+    public void enableRoundUp(Context ctx) throws SQLException {
+        roundUpService.enableDatabaseRoundUp(ctx);
+    }
+
+    // Disable Round Up for the account
+    @POST
+    @Path(ROUTE_ROUND_UP_OFF)
+    public void disableDatabaseRoundUp(Context ctx) throws SQLException {
+        roundUpService.disableDatabaseRoundUp(ctx);
     }
 }

@@ -13,7 +13,6 @@ import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 public class AccountRoundUpService extends AccountService {
-
     private final AccountRepository accountRepository;
 
     public AccountRoundUpService(DataSource dataSource, Logger logger) {
@@ -21,16 +20,23 @@ public class AccountRoundUpService extends AccountService {
         accountRepository = new AccountRepository(logger);
     }
 
-    /*
-     *  Process round up toggle
-     */
-    /*
-     *  Update Round Up toggle
-     */
-    public void toggleDatabaseRoundUp(Context ctx) throws SQLException {
+    // Enable round up for the account
+    public void enableDatabaseRoundUp(Context ctx) throws SQLException {
         String accountId = getAccountIdFromSession(ctx);
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(
-                "UPDATE Accounts SET RoundUpEnabled = NOT RoundUpEnabled WHERE AccountID = ?")) {
+                "UPDATE Accounts SET RoundUpEnabled = TRUE WHERE AccountID = ?")) {
+            statement.setString(1, accountId);
+            statement.executeUpdate();
+            Account account = accountRepository.getAccount(connection, accountId);
+            logger.info(accountId + " Round Up is now " + account.isRoundUpEnabled());
+        }
+    }
+
+    // Disable round up for the account
+    public void disableDatabaseRoundUp(Context ctx) throws SQLException {
+        String accountId = getAccountIdFromSession(ctx);
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(
+                "UPDATE Accounts SET RoundUpEnabled = FALSE WHERE AccountID = ?")) {
             statement.setString(1, accountId);
             statement.executeUpdate();
             Account account = accountRepository.getAccount(connection, accountId);
