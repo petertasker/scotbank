@@ -128,7 +128,7 @@ public class AccountService extends BaseService {
                         model.put("roundUpEnabled", roundUpEnabled);
                         
                         BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
-                        model.put("roundUpBalance", formatCurrency(roundUpAmount));
+                        model.put("roundUpBalance", "£" + formatCurrency(roundUpAmount != null ? roundUpAmount : BigDecimal.ZERO));
                     }
                     else {
                         logger.info("Account balance is empty");

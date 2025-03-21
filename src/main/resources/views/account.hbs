@@ -22,7 +22,7 @@
             <div class="roundup-toggle-container">
                 <p class="roundup-title">Round-Up Transactions</p>
                 <label class="toggle-switch">
-                    <input type="checkbox" id="roundUpToggle">
+                    <input type="checkbox" id="roundUpToggle"{{#if roundUpEnabled}}checked{{/if}}>
                     <span class="toggle-slider"></span>
                     <span class="sr-only">Toggle Round-Up Transactions feature</span>
                 </label>
@@ -145,77 +145,81 @@
         }
     }
 
-    // Animation + Functionality for roundUpToggle switch
+    // Animation + Functionality for roundUpToggle switch & reclaim savings
     document.addEventListener('DOMContentLoaded', function () {
-    const toggle = document.getElementById('roundUpToggle');
-    const statusText = document.querySelector('.toggle-status');
-    
-    if (toggle && statusText) {
-        toggle.addEventListener('change', function() {
-            if (this.checked) {
-                const response = fetch('/account/roundup', {
-                    method: 'POST'
-                });
-                statusText.textContent = 'Enabled';
-                statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+        const toggle = document.getElementById('roundUpToggle');
+        const statusText = document.querySelector('.toggle-status');
+        const reclaimContainer = document.getElementById('reclaimContainer');
+        const reclaimButton = document.getElementById('reclaimButton');
 
-            } else {
-                const response = fetch('/account/roundupoff', {
-                    method: 'POST'
-                });
-                statusText.textContent = 'Disabled';
-                statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        // Initial setup based on server-side state
+        if (toggle) {
+            // Initialize toggle status display
+            const initialEnabled = toggle.checked;
+            statusText.textContent = initialEnabled ? 'Enabled' : 'Disabled';
+            statusText.style.backgroundColor = initialEnabled ? 
+                'rgba(0, 255, 0, 0.2)' : 
+                'rgba(255, 255, 255, 0.2)';
+
+            // Initialize reclaim button visibility
+            if (reclaimContainer) {
+                reclaimContainer.classList.toggle('visible', initialEnabled);
             }
+        }
 
-        });
-    }
-});
+        // Toggle switch handler
+        if (toggle && statusText) {
+            toggle.addEventListener('change', function() {
+                const isEnabled = this.checked;
+                
+                // Update status display immediately
+                statusText.textContent = isEnabled ? 'Enabled' : 'Disabled';
+                statusText.style.backgroundColor = isEnabled ? 
+                    'rgba(0, 255, 0, 0.2)' : 
+                    'rgba(255, 255, 255, 0.2)';
 
-document.addEventListener('DOMContentLoaded', function () {
-    const toggle = document.getElementById('roundUpToggle');
-    const statusText = document.querySelector('.toggle-status');
-    const reclaimContainer = document.getElementById('reclaimContainer');
-    const reclaimButton = document.getElementById('reclaimButton');
+                // Update reclaim button visibility
+                if (reclaimContainer) {
+                    reclaimContainer.classList.toggle('visible', isEnabled);
+                }
 
-    if (toggle && statusText && reclaimContainer) {
-        toggle.addEventListener('change', function() {
-            if (this.checked) {
-                // Show reclaim button with animation
-                reclaimContainer.classList.add('visible');
-                statusText.textContent = 'Enabled';
-                statusText.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
-            } else {
-                // Hide reclaim button
-                reclaimContainer.classList.remove('visible');
-                statusText.textContent = 'Disabled';
-                statusText.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-            }
-        });
+                // Send API request
+                fetch(isEnabled ? '/account/roundup' : '/account/roundupoff', {
+                    method: 'POST'
+                }).catch(error => {
+                    console.error('Toggle update failed:', error);
+                    // Revert on error
+                    this.checked = !isEnabled;
+                    statusText.textContent = !isEnabled ? 'Enabled' : 'Disabled';
+                    statusText.style.backgroundColor = !isEnabled ? 
+                        'rgba(0, 255, 0, 0.2)' : 
+                        'rgba(255, 255, 255, 0.2)';
+                    if (reclaimContainer) reclaimContainer.classList.toggle('visible');
+                });
+            });
+        }
 
-        // Reclaim button click handler
-        reclaimButton.addEventListener('click', function() {
-            // Add temporary animation
-            this.style.animation = 'reclaimAnimation 0.3s ease';
-            
-            // Remove animation after it completes
-            setTimeout(() => {
-                this.style.animation = '';
-            }, 300);
-            
-            // Add your backend reclaim logic here later
-            console.log('Reclaiming round-up balance...');
-            
-            // Temporary visual feedback
-            this.textContent = 'Reclaiming...';
-            setTimeout(() => {
-                this.innerHTML = `<span class="sparkle">✨</span> Reclaimed! <span class="sparkle">✨</span>`;
+        // Reclaim button handler (existing animations preserved)
+        if (reclaimButton) {
+            reclaimButton.addEventListener('click', function() {
+                const button = this;
+                
+                // Animation handling
+                button.style.animation = 'reclaimAnimation 0.3s ease';
                 setTimeout(() => {
-                    this.innerHTML = `<span class="sparkle">✨</span> Reclaim Round-Up <span class="sparkle">✨</span>`;
-                }, 2000);
-            }, 1000);
-        });
-    }
-});
+                    button.style.animation = '';
+                }, 300);
 
+                // Visual feedback
+                button.textContent = 'Reclaiming...';
+                setTimeout(() => {
+                    button.innerHTML = `<span class="sparkle">✨</span> Reclaimed! <span class="sparkle">✨</span>`;
+                    setTimeout(() => {
+                        button.innerHTML = `<span class="sparkle">✨</span> Reclaim Round-Up <span class="sparkle">✨</span>`;
+                    }, 2000);
+                }, 1000);
+            });
+        }
+    });
 </script>
 </html>
