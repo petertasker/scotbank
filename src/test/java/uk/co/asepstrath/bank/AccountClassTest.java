@@ -185,4 +185,20 @@ class AccountClassTest {
         BigDecimal withdraw = new BigDecimal(-5);
         assertThrows(ArithmeticException.class, () -> account.overdraftWithdraw(withdraw));
     }
+
+    @Test
+    void testReclaimSavings(){
+        Account account = new Account("AC13","John Doe",new BigDecimal(100),true,"G4 6FC", new Card("123", "345"));
+        account.addToRoundUpBalance(new BigDecimal(50));
+        account.reclaimSavings();
+        assertEquals(BigDecimal.valueOf(150), account.getBalance());
+    }
+
+    @Test
+    void testRoundUp(){
+        Account account = new Account("AC123","John Doe",new BigDecimal(10),true,"G4 6FC", new Card("123", "345"));
+        account.overdraftWithdraw(new BigDecimal(5.50));
+        assertEquals(BigDecimal.valueOf(4.0), account.getBalance());
+        assertEquals(BigDecimal.valueOf(0.5), account.getRoundUpBalance());
+    }
 }

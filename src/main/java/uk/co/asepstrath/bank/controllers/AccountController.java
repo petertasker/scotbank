@@ -113,4 +113,10 @@ public class AccountController extends BaseController {
     public void disableDatabaseRoundUp(Context ctx) throws SQLException {
         roundUpService.disableDatabaseRoundUp(ctx);
     }
+
+    @POST
+    @Path(ROUTE_RECLAIM)
+    public void reclaimSavings(Context ctx) throws SQLException{
+        roundUpService.reclaimSavings(ctx);
+    }
 }

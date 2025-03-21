@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 import static uk.co.asepstrath.bank.Constants.ACCOUNT_OBJECT_MAX_BALANCE;
 
@@ -36,7 +38,7 @@ public class Account {
         this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
-        this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
+        this.roundUpBalance = BigDecimal.ZERO;
         this.postcode = postcode;
         this.card = card;
     }
@@ -46,7 +48,7 @@ public class Account {
         this.balance = balance;
         this.name = name;
         this.roundUpEnabled = roundUpEnabled;
-        this.roundUpBalance = roundUpEnabled ? BigDecimal.ZERO : null;
+        this.roundUpBalance = roundUpBalance != null ? roundUpBalance : BigDecimal.ZERO;
         this.card = card;
     }
 
@@ -99,7 +101,12 @@ public class Account {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) { // if withdraw amount is less or equal to 0
             throw new ArithmeticException("Withdraw amount must be greater than 0");
         }
-        balance = balance.subtract(amount);
+        if(roundUpEnabled){
+            BigDecimal difference = amount.setScale(0, RoundingMode.UP).subtract(amount);
+            roundUpBalance = roundUpBalance.add(difference);
+            amount = amount.add(difference);
+        }
+        balance = balance.subtract(amount); 
     }
 
     /**
@@ -138,6 +145,20 @@ public class Account {
             roundUpBalance = roundUpBalance.add(amount);
         }
         log.info("Round up balance: {}", roundUpBalance);
+    }
+    
+    public void reclaimSavings() throws ArithmeticException {
+        if (roundUpBalance == null){
+            log.error("Cannot reclaim savings: roundUpBalance is null");
+            throw new ArithmeticException("No savings to reclaim");
+        }
+        if (roundUpBalance.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ArithmeticException("No savings to reclaim");
+        }
+
+        balance = balance.add(roundUpBalance);
+        roundUpBalance = BigDecimal.ZERO;
+        log.info("RECLAIMING SAVINGS");
     }
 
     /**

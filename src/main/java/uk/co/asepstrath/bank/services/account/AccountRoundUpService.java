@@ -4,12 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 
 import io.jooby.Context;
 import uk.co.asepstrath.bank.Account;
+
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 public class AccountRoundUpService extends AccountService {
@@ -41,6 +43,17 @@ public class AccountRoundUpService extends AccountService {
             statement.executeUpdate();
             Account account = accountRepository.getAccount(connection, accountId);
             logger.info(accountId + " Round Up is now " + account.isRoundUpEnabled());
+        }
+    }
+
+    // Move savings from round up pot to the current balance
+    public void reclaimSavings(Context ctx) throws SQLException{
+        String accountId = getAccountIdFromSession(ctx);
+        try (Connection connection = getConnection()){  
+            Account account = accountRepository.getAccount(connection, accountId);
+            account.reclaimSavings();
+            accountRepository.updateBalance(connection, account);
+            logger.info("Reclaimed savings for account {}", accountId);
         }
     }
 }

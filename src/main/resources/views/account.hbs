@@ -153,7 +153,7 @@
         const reclaimButton = document.getElementById('reclaimButton');
 
         // Initial setup based on server-side state
-        if (toggle) {
+        if (toggle && statusText  && reclaimContainer) {
             // Initialize toggle status display
             const initialEnabled = toggle.checked;
             statusText.textContent = initialEnabled ? 'Enabled' : 'Disabled';
@@ -162,62 +162,72 @@
                 'rgba(255, 255, 255, 0.2)';
 
             // Initialize reclaim button visibility
-            if (reclaimContainer) {
-                reclaimContainer.classList.toggle('visible', initialEnabled);
-            }
+
+            reclaimContainer.classList.toggle('visible', initialEnabled);
         }
 
         // Toggle switch handler
-        if (toggle && statusText) {
-            toggle.addEventListener('change', function() {
+        if (toggle && statusText && reclaimContainer) {
+            toggle.addEventListener('change', async function() {
                 const isEnabled = this.checked;
                 
-                // Update status display immediately
-                statusText.textContent = isEnabled ? 'Enabled' : 'Disabled';
-                statusText.style.backgroundColor = isEnabled ? 
-                    'rgba(0, 255, 0, 0.2)' : 
-                    'rgba(255, 255, 255, 0.2)';
+                try {
+                    // Update server
+                    const response = await fetch(isEnabled ? '/account/roundup' : '/account/roundupoff', {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error('Update failed');
 
-                // Update reclaim button visibility
-                if (reclaimContainer) {
+                    // Update UI
+                    statusText.textContent = isEnabled ? 'Enabled' : 'Disabled';
+                    statusText.style.backgroundColor = isEnabled 
+                        ? 'rgba(0, 255, 0, 0.2)'
+                        : 'rgba(255, 255, 255, 0.2)';
                     reclaimContainer.classList.toggle('visible', isEnabled);
-                }
 
-                // Send API request
-                fetch(isEnabled ? '/account/roundup' : '/account/roundupoff', {
-                    method: 'POST'
-                }).catch(error => {
-                    console.error('Toggle update failed:', error);
-                    // Revert on error
-                    this.checked = !isEnabled;
-                    statusText.textContent = !isEnabled ? 'Enabled' : 'Disabled';
-                    statusText.style.backgroundColor = !isEnabled ? 
-                        'rgba(0, 255, 0, 0.2)' : 
-                        'rgba(255, 255, 255, 0.2)';
-                    if (reclaimContainer) reclaimContainer.classList.toggle('visible');
-                });
+                } catch (error) {
+                    console.error('Toggle error:', error);
+                    this.checked = !isEnabled; // Revert toggle
+                    alert('Failed to update round-up status');
+                }
             });
         }
 
-        // Reclaim button handler (existing animations preserved)
+        // Reclaim button handler 
         if (reclaimButton) {
-            reclaimButton.addEventListener('click', function() {
+            reclaimButton.addEventListener('click', async function() {
                 const button = this;
                 
-                // Animation handling
-                button.style.animation = 'reclaimAnimation 0.3s ease';
-                setTimeout(() => {
-                    button.style.animation = '';
-                }, 300);
+                try {
+                    // Disable button during processing
+                    button.disabled = true;
+                    button.innerHTML = `<span class="sparkle">✨</span> Reclaiming... <span class="sparkle">✨</span>`;
 
-                // Visual feedback
-                button.textContent = 'Reclaiming...';
-                setTimeout(() => {
+                    // Call backend
+                    const response = await fetch('/account/reclaim', {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error('Reclaim failed');
+
+                    // Update balances
+                    const data = await response.json();
+                    document.querySelector('.balance').textContent = `£${data.newBalance}`;
+                    document.querySelector('.roundup-balance').textContent = `£${data.newRoundUp}`;
+
+                    // Visual feedback
                     button.innerHTML = `<span class="sparkle">✨</span> Reclaimed! <span class="sparkle">✨</span>`;
+                    
+                } catch (error) {
+                    console.error('Reclaim error:', error);
+                    button.innerHTML = `<span class="sparkle">❌</span> Failed <span class="sparkle">❌</span>`;
+                } finally {
                     setTimeout(() => {
                         button.innerHTML = `<span class="sparkle">✨</span> Reclaim Round-Up <span class="sparkle">✨</span>`;
+                        button.disabled = false;
                     }, 2000);
-                }, 1000);
+                }
             });
         }
     });

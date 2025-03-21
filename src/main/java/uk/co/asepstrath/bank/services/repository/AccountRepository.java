@@ -129,10 +129,12 @@ public class AccountRepository extends BaseRepository {
                             resultSet.getString("CardNumber"),
                             resultSet.getString("CardCVV")
                     ));
-                    if (roundUpEnabled) {
-                        BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
-                        account.updateRoundUpBalance(roundUpAmount);
+                    BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                    if (roundUpAmount == null) {
+                        roundUpAmount = BigDecimal.ZERO;
                     }
+                    account.updateRoundUpBalance(roundUpAmount);
+                    
                     return account;
                 }
             }
