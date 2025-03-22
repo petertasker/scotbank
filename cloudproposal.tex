@@ -1,30 +1,44 @@
 \documentclass{article}
-\title{Migration to the Cloud}
+\title{The Case for Cloud Migration}
 \author{Team 5}
+\date{March 21, 2025}
 \begin{document}
-\maketitle
-\par Just as any global bank, real or not, would experience, a vast amount of extremely sensitive fiscal data must be sifted through constantly and at great rates. For this reason, among others, We propose to move to the "fully cloud native" approach to cloud migration. We detail our reasoning below:
-
-\section{Scalability \& Server Hammering}
-\par Currently, our bank is being run off a local machine, often a labtop (the creative reader may be able to suspend their disbelief and consider it as a server). At some point, the number of transactons in the system will exceed the storage space of that laptop (or server).
-
-\par Similarly, the variable rate of transactions could possibly cause some asynchronous problems relating to reading/ writing to databases, which may lead to very unhappy customers.
-
-\par Outsourcing database and server concerns to a cloud provider mitigate these risks. It allows the dynamic allocation of server overhead at almost instantaneous speed.
-
-\section{Endurance \& Quick Deployment}
-\par Our banking app in its current state is only active as long as the local machine is active. This, by itsself is an extremely lousy and shortsighted approach for a worldwide service. A single hardware failure, power outtage, system crash an cause the entire service to grind to a halt. 
-\par This, obviously, is not acceptable for a banking service. By migrating server processing to a cloud provider, we can eliminate this vulnerability and ensure continuous availability.
-
-
-\section{Security}
-\par Cloud providers offer a large 
-
-\section{Telemetry}
-
-\section{Load Balancing}
-
-
-
+	\maketitle
+	\par Just as any global bank, real, or otherwise, would experience, a vast amount of extremely sensitive fiscal data must be sifted through constantly and at great rates. For this reason, amongst others, We propose the ``fully cloud native" approach to cloud migration. We detail four points of reasoning below:
+	\section{Scalability \& Server Hammering}
+	\par Currently, our bank is being run off a local machine, often a laptop (the creative reader may be able to suspend their disbelief and consider it as a server). At some point, the number of transactions in the system will exceed the storage space of that laptop (or server).
+	\par Similarly, the variable rate of transactions could possibly cause some asynchronous problems relating to reading/ writing to databases, which may lead to very unhappy customers.
+	\par Outsourcing database and server concerns to a cloud provider mitigate these risks. It allows the dynamic allocation of server overhead at almost instantaneous speed.
+	\section{Endurance \& Quick Deployment}
+	\par Our banking app in its current state is only active as long as the local machine is active. This, by itself is an extremely lousy and short-sighted approach for a worldwide service. A single hardware failure, power outage, system crash can cause the entire service to grind to a halt.
+	\par This single point of failure, obviously, is not acceptable for a banking service. By migrating server processing to a cloud provider, we can eliminate this vulnerability and ensure continuous availability.
+	\section{Security}
+	\par Cloud providers offer a large suite of security features that surpass what can reasonably be implemented on a local machine. These include but are not limited to:
+	\subsection{Data Encryption}
+	\par Cloud providers implement encryption both in transit and at rest. This ensures that even if data is intercepted during communication or compromised at its storage location, it remains unreadable to unauthorised entities.
+	\subsection{DDoS Protection}
+	\par Please see Mitigating DDoS Attacks.
+	\subsection{Automated Security Patching}
+	\par Traditional on-premise servers require manual updates and security patching, which may introduce vulnerabilities if neglected. Cloud providers continuously monitor security threats and apply patches automatically, reducing the attack surface and eliminating known exploits in a timely manner.
+	\subsection{Intrusion Detection \& Threat Monitoring}
+	\par Cloud environments often include real-time monitoring tools, which analyse network traffic, detect anomalies, and alert administrators about potential security incidents, allowing for rapid response and mitigation.
+	\par By leveraging these cloud security benefits, our banking service can achieve a higher level of protection compared to a self-hosted solution, ensuring customer data integrity, confidentiality, and availability.
+	\section{Load Balancing}
+	\par A crucial component of cloud infrastructure is load balancing, which distributes incoming traffic across multiple servers to prevent overload and ensure high availability. This is particularly important for banking services, where downtime or slow response times can severely impact user experience and trust.
+	\subsection{Mitigating DDoS Attacks}
+	\par One major benefit of cloud-based load balancing is its role in mitigating Distributed Denial of Service (DDoS) attacks. These attacks attempt to overwhelm a system with an excessive number of requests, leading to service degradation or failure. Cloud providers implement DDoS protection through:
+	\begin{itemize}
+		\item \textbf{Traffic Filtering:} Identifying and blocking malicious traffic patterns before they reach application servers.
+		\item \textbf{Rate Limiting:} Restricting excessive requests from single sources to prevent flooding.
+		\item \textbf{Global Anycast Networks:} Distributing traffic across multiple data centres to absorb attack volumes.
+	\end{itemize}
+	\par By integrating DDoS protection with load balancing, cloud providers ensure that legitimate requests are always processed efficiently while malicious traffic is minimised.
+	\subsection{Performance Optimisation}
+	\par Load balancers dynamically allocate resources based on real-time traffic demand, preventing bottlenecks and ensuring smooth operation. They also support:
+	\begin{itemize}
+		\item \textbf{Auto-scaling:} Automatically provisioning additional resources as needed.
+		\item \textbf{Health Monitoring:} Detecting and re-routing traffic away from unhealthy instances.
+		\item \textbf{Geographic Distribution:} Routing users to the nearest data centre for reduced latency.
+	\end{itemize}
+	\par Implementing cloud-based load balancing not only enhances security but also optimises performance and reliability, making it a fundamental component of a cloud-native banking solution.
 \end{document}
-
