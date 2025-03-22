@@ -43,6 +43,8 @@ public class AccountRepository extends BaseRepository {
     private static final String SQL_GET_ACCOUNT =
             "SELECT Balance, Name, RoundUpEnabled, RoundUpAmount, CardNumber, CardCVV FROM Accounts WHERE AccountID =" +
                     " ?";
+    
+
 
     public AccountRepository(Logger logger) {
         super(logger);
@@ -101,8 +103,7 @@ public class AccountRepository extends BaseRepository {
     public void updateBalance(Connection connection, Account account) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BALANCE)) {
             statement.setBigDecimal(1, account.getBalance());
-            statement.setBigDecimal(2,
-                    account.getRoundUpBalance() != null ? account.getRoundUpBalance() : BigDecimal.ZERO);
+            statement.setBigDecimal(2, account.getRoundUpBalance()); // Update round up balance (don't need NULL anymore?)
             statement.setString(3, account.getAccountID());
             statement.executeUpdate();
         }
@@ -128,10 +129,12 @@ public class AccountRepository extends BaseRepository {
                             resultSet.getString("CardNumber"),
                             resultSet.getString("CardCVV")
                     ));
-                    if (roundUpEnabled) {
-                        BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
-                        account.updateRoundUpBalance(roundUpAmount);
+                    BigDecimal roundUpAmount = resultSet.getBigDecimal("RoundUpAmount");
+                    if (roundUpAmount == null) {
+                        roundUpAmount = BigDecimal.ZERO;
                     }
+                    account.updateRoundUpBalance(roundUpAmount);
+                    
                     return account;
                 }
             }

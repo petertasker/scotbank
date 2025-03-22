@@ -53,7 +53,7 @@ class RewardSpinServiceTest {
     }
 
     @Test
-    void tsetProcessSpinSuccess() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void tsetProcessSpinSuccess() throws SQLException{
         Reward reward = new Reward("ASUS TUF", "Gaming Laptop", new BigDecimal(3500), 50.00);
         List<Reward> rewards = List.of(reward);
 
@@ -139,18 +139,9 @@ class RewardSpinServiceTest {
 
     @Test
     void testSelectWeightedRandomRewardEmptyList() {
-        assertThrows(RuntimeException.class, () -> {
-            try {
-                invokeSelectWeightedRandomReward(rewardSpinService, Collections.emptyList());
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof IllegalArgumentException) {
-                    throw e.getCause();
-                }
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        assertThrows(InvocationTargetException.class, () ->
+                invokeSelectWeightedRandomReward(rewardSpinService, Collections.emptyList())
+        );
     }
 
     @Test

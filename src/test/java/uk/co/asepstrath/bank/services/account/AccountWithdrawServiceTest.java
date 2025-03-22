@@ -9,22 +9,19 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
+import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.services.repository.AccountRepository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static uk.co.asepstrath.bank.Constants.TEMPLATE_WITHDRAW;
-
 
 class AccountWithdrawServiceTest {
 
@@ -76,11 +73,42 @@ class AccountWithdrawServiceTest {
     }
 
     @Test
-    void testProcessWithdraw() {
-        Account account = new Account("ABC123","John Doe",new BigDecimal(100),true,"BCA123",null);
+    void testProcessWithdraw() throws SQLException {
+        // Setup
+        Account account = new Account("ABC123", "John Doe", new BigDecimal(100), true, null);
         BigDecimal withdrawAmount = new BigDecimal(50);
 
-        when(context.session()).thenReturn(session);
+        AccountWithdrawService testService = new AccountWithdrawService(dataSource, logger, accountRepository) {
+            @Override
+            protected String getAccountIdFromSession(Context ctx) {
+                return "ABC123";
+            }
 
+            @Override
+            public BigDecimal getFormBigDecimal(Context ctx, String name) {
+                return withdrawAmount;
+            }
+
+            @Override
+            protected void executeTransaction(Context ctx, Connection connection, Transaction transaction) {
+                // Do nothing in test
+            }
+
+            @Override
+            protected void executeWithdrawal(Context ctx, Account account, BigDecimal amount) {
+                // Do nothing in test
+            }
+        };
+
+        when(accountRepository.getAccount(any(Connection.class), eq("ABC123"))).thenReturn(account);
+        when(connection.createStatement()).thenReturn(mock(Statement.class));
+
+        // Execute
+        testService.processWithdraw(context);
+
+        // Verify
+        verify(logger).info("Enter withdraw process");
+        verify(accountRepository).getAccount(any(Connection.class), eq("ABC123"));
+        verify(connection).close();
     }
 }
