@@ -10,7 +10,6 @@ import io.jooby.hikari.HikariModule;
 import io.jooby.jackson.JacksonModule;
 import io.jooby.netty.NettyServer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.co.asepstrath.bank.controllers.*;
 import uk.co.asepstrath.bank.services.login.DisplayLoginService;
 import uk.co.asepstrath.bank.services.login.ProcessLoginService;
@@ -24,8 +23,6 @@ import java.sql.SQLException;
 import static uk.co.asepstrath.bank.Constants.*;
 
 public class App extends Jooby {
-
-    private static final Logger log = LoggerFactory.getLogger(App.class);
 
     public App() {
 
@@ -64,18 +61,18 @@ public class App extends Jooby {
     Set up controllers and their dependencies
      */
         DataSource ds = require(DataSource.class);
-        Logger log = getLog();
+        Logger logger = getLog();
 
-        DisplayLoginService displayLoginService = new DisplayLoginService(log);
-        ProcessLoginService processLoginService = new ProcessLoginService(ds, log);
+        DisplayLoginService displayLoginService = new DisplayLoginService(logger);
+        ProcessLoginService processLoginService = new ProcessLoginService(ds, logger);
 
         // Register controllers with their dependencies
-        mvc(new AccountController_(ds, log));
-        mvc(new LoginController_(displayLoginService, processLoginService, log));
-        mvc(new ManagerController_(ds, log));
-        mvc(new LogoutController_(log));
-        mvc(new ErrorController_(log));
-        mvc(new RewardController_(ds, log));
+        mvc(new AccountController_(ds, logger));
+        mvc(new LoginController_(displayLoginService, processLoginService, logger));
+        mvc(new ManagerController_(ds, logger));
+        mvc(new LogoutController_(logger));
+        mvc(new ErrorController_(logger));
+        mvc(new RewardController_(ds, logger));
     }
 
     /*
@@ -177,38 +174,35 @@ public class App extends Jooby {
     This function will be called when the application starts up,
      */
     public void onStart() throws SQLException, XMLStreamException, IOException {
-        Logger log = getLog();
-        log.info("Starting Up...");
+        Logger logger = getLog();
+        logger.info("Starting Up...");
 
         // Retrieve the database connection
         DataSource dataSource = require(DataSource.class);
 
         // Create Database and tables with initial data
-        DatabaseManager databaseManager = new DatabaseManager(dataSource, log);
+        DatabaseManager databaseManager = new DatabaseManager(dataSource, logger);
         databaseManager.initialise();
     }
 
-    /*
-    This function will be called when the application shuts down
-     */
     public void onStop() {
-        Logger log = getLog();
-        log.info("Shutting Down...");
+        Logger logger = getLog();
+        logger.info("Shutting Down...");
     }
 
     private void handleHandlebarsPagination() {
         Handlebars handlebars = require(Handlebars.class);
 
         handlebars.registerHelper("increment", (context, options) -> {
-            if (context instanceof Number) {
-                return ((Number) context).intValue() + 1;
+            if (context instanceof Number number) {
+                return number.intValue() + 1;
             }
             return null;
         });
 
         handlebars.registerHelper("decrement", (context, options) -> {
-            if (context instanceof Number) {
-                return ((Number) context).intValue() - 1;
+            if (context instanceof Number number) {
+                return number.intValue() - 1;
             }
             return null;
         });
