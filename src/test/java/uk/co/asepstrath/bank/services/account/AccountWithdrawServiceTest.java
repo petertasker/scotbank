@@ -3,7 +3,6 @@ package uk.co.asepstrath.bank.services.account;
 import io.jooby.Context;
 import io.jooby.ModelAndView;
 import io.jooby.Session;
-import io.jooby.ValueNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,13 +16,11 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static uk.co.asepstrath.bank.Constants.SESSION_ACCOUNT_ID;
 import static uk.co.asepstrath.bank.Constants.TEMPLATE_WITHDRAW;
 
 class AccountWithdrawServiceTest {
@@ -81,7 +78,7 @@ class AccountWithdrawServiceTest {
         Account account = new Account("ABC123", "John Doe", new BigDecimal(100), true, null);
         BigDecimal withdrawAmount = new BigDecimal(50);
 
-        AccountWithdrawService service = new AccountWithdrawService(dataSource, logger, accountRepository) {
+        AccountWithdrawService testService = new AccountWithdrawService(dataSource, logger, accountRepository) {
             @Override
             protected String getAccountIdFromSession(Context ctx) {
                 return "ABC123";
@@ -107,7 +104,7 @@ class AccountWithdrawServiceTest {
         when(connection.createStatement()).thenReturn(mock(Statement.class));
 
         // Execute
-        service.processWithdraw(context);
+        testService.processWithdraw(context);
 
         // Verify
         verify(logger).info("Enter withdraw process");
