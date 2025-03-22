@@ -23,12 +23,15 @@
     --blur-amount: 20px;
 }
 
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
 }
+
+
 
 body {
     display: flex;
@@ -76,6 +79,10 @@ h3 {
 h4 {
     font-size: 16px;
     margin-bottom: 10px;
+}
+
+ul {
+    list-style-type: none;
 }
 
 /* Account info */
@@ -248,12 +255,21 @@ p[style*="color: green"] {
 .transaction, .account, .reward {
     background-color: var(--transaction-bg);
     border-radius: var(--border-radius-sm);
+    list-style-type: none;
     padding: 15px;
     margin: 15px 0;
 }
 
+.transaction ul {
+    list-style-type: none;
+}
+
 .transaction p {
     margin: 5px 0;
+    list-style-type: none;
+}
+.transaction li {
+    list-style-type: none;
 }
 
 hr {
@@ -432,4 +448,6 @@ hr {
         flex-direction: column; /* Stacks the items on smaller screens */
         align-items: center; /* Centers the content */
     }
+
+
 }

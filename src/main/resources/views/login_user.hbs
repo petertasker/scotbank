@@ -12,12 +12,12 @@
 <div class="wrapper">
     <form action="/login/process" method="post">
         <h1>Account Login</h1>
-        <div class="input-box">
-            <input type="text" placeholder="Account ID" id="accountid" name="accountid" autocomplete="off" required>
+        <div class="input-box" >
+            <input type="text" placeholder="Account ID" id="accountid" name="accountid" autocomplete="off" required aria-label = "Input Username">
             <i class='bx bxs-user'></i>
         </div>
         <div class="input-box">
-            <input type="password" placeholder="Password" id="password" name="password" required>
+            <input type="password" placeholder="Password" id="password" name="password" required  aria-label = "Input password">
             <i class='bx bxs-lock-alt'></i>
         </div>
         <button type="submit" class="btn">Login</button>

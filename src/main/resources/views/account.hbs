@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 <body>
+
 <div class="content-wrapper">
     <h1>Welcome, {{name}}</h1>
 
@@ -17,7 +18,7 @@
         <p class="account-id">Account ID: {{accountid}}</p>
         <p>Card Number: {{cardnumber}}</p>
         <p>CVV: {{cardcvv}}</p>
-        <p class="balance">£{{balance}}</p>
+        <h2 class="balance">£{{balance}}</h2>
         {{#roundUpEnabled}}
             <div class="roundup-pot">
                 <p class="roundup-title">Round-Up Savings Pot</p>
@@ -26,14 +27,14 @@
         {{/roundUpEnabled}}
     </div>
 
-    <div class="action-buttons">
+    <nav class="action-buttons" role="Navigation">
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal
         </button>
         <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/reward'">Rewards</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
-    </div>
+    </nav>
 
     {{#if success}}
         <p style="color: green">{{success}}</p>
@@ -47,15 +48,15 @@
             <h2>Transaction History</h2>
             <hr>
             {{#each transactions}}
-                <div class="transaction">
-                    <p><strong>Date: </strong>{{timestamp}}</p>
-                    <p><strong>ID: </strong>{{id}}</p>
-                    <p><strong>Amount: </strong>£{{amount}}</p>
-                    <p><strong>From: </strong>{{from}}</p>
-                    <p><strong>To: </strong>{{to}}</p>
-                    <p><strong>Type: </strong>{{type}}</p>
-                    <p><strong>Status: </strong>{{#if status}}Accepted{{else}}Declined{{/if}}</p>
-                </div>
+                <ul class="transaction">
+                    <li><strong>Date: </strong>{{timestamp}}</li>
+                    <li><strong>ID: </strong>{{id}}</li>
+                    <li><strong>Amount: </strong>£{{amount}}</li>
+                    <li><strong>From: </strong>{{from}}</li>
+                    <li><strong>To: </strong>{{to}}</li>
+                    <li><strong>Type: </strong>{{type}}</li>
+                    <li><strong>Status: </strong>{{#if status}}Accepted{{else}}Declined{{/if}}</li>
+                </ul>
             {{/each}}
         </div>
 
@@ -65,16 +66,16 @@
             <hr>
             <div class="insights-container">
                 <div class="insight-card">
-                    <h4>Number of Payments per Business Category</h4>
+                    <h3>Number of Payments per Business Category</h3>
                     <div class="category-container">
                         {{#if businesscounts}}
                             <div class="category-list-container">
                                 <div class="category-list">
                                     {{#each businesscounts}}
-                                        <div class="category-item">
-                                            <span class="category-name">{{category}}:</span>
-                                            <span class="category-count">{{count}}</span>
-                                        </div>
+                                        <ul class="category-item">
+                                            <li class="category-name">{{category}}:</li>
+                                            <li class="category-count">{{count}}</li>
+                                        </ul>
                                     {{/each}}
                                 </div>
                                 <div class="chart-container">
@@ -95,16 +96,16 @@
             <hr>
             <div class="insights-container">
                 <div class="insight-card">
-                    <h4>Sum of Payments per Business Category</h4>
+                    <h3>Sum of Payments per Business Category</h3>
                     <div class="category-container">
                         {{#if businesssums}}
                             <div class="category-list-container">
                                 <div class="category-list">
                                     {{#each businesssums}}
-                                        <div class="category-item">
-                                            <span class="category-name">{{category}}:</span>
-                                            <span class="category-sum">£{{totalAmount}}</span>
-                                        </div>
+                                        <ul class="category-item">
+                                            <li class="category-name">{{category}}:</li>
+                                            <li class="category-sum">£{{totalAmount}}</li>
+                                        </ul>
                                     {{/each}}
                                 </div>
                                 <div class="chart-container">
