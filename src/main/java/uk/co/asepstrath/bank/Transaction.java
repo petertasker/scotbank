@@ -246,8 +246,7 @@ public class Transaction {
             logger.warn("Payment failed: Payer account {} not found", getFrom());
             return false;
         }
-
-        try {
+        try {        
             payer.overdraftWithdraw(getAmount());
             accountRepository.updateBalance(connection, payer);
             return true;

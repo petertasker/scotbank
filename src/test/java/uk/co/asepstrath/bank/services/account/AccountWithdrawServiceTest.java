@@ -25,7 +25,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.co.asepstrath.bank.Constants.TEMPLATE_WITHDRAW;
 
-
 class AccountWithdrawServiceTest {
 
     @Mock
@@ -81,6 +80,5 @@ class AccountWithdrawServiceTest {
         BigDecimal withdrawAmount = new BigDecimal(50);
 
         when(context.session()).thenReturn(session);
-
     }
 }

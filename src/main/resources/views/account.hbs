@@ -18,18 +18,31 @@
         <p>Card Number: {{cardnumber}}</p>
         <p>CVV: {{cardcvv}}</p>
         <p class="balance">£{{balance}}</p>
-        {{#roundUpEnabled}}
-            <div class="roundup-pot">
-                <p class="roundup-title">Round-Up Savings Pot</p>
-                <p class="roundup-balance">£{{roundUpBalance}}</p>
+        <div class="roundup-pot">
+            <div class="roundup-toggle-container">
+                <p class="roundup-title">Round-Up Transactions</p>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="roundUpToggle"{{#if roundUpEnabled}}checked{{/if}}>
+                    <span class="toggle-slider"></span>
+                    <span class="sr-only">Toggle Round-Up Transactions feature</span>
+                </label>
+                <p class="toggle-status">Disabled</p>   
             </div>
-        {{/roundUpEnabled}}
+            <p class="roundup-title">Round-Up Savings Pot 🍯</p>
+            <h2 class="roundup-balance" role="text">{{roundUpBalance}}</h2>
+            <div class="reclaim-container" id="reclaimContainer">
+                <button class="reclaim-button" id="reclaimButton">
+                    <span class="sparkle">✨</span>
+                    Reclaim Round-Up
+                    <span class="sparkle">✨</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/deposit'">Deposit</button>
-        <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal
-        </button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='account/withdraw'">Withdrawal</button>
         <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='account/reward'">Rewards</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
@@ -131,5 +144,92 @@
             insightsSection.scrollIntoView({ behavior: 'smooth' });
         }
     }
+
+    // Animation + Functionality for roundUpToggle switch & reclaim savings
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('roundUpToggle');
+        const statusText = document.querySelector('.toggle-status');
+        const reclaimContainer = document.getElementById('reclaimContainer');
+        const reclaimButton = document.getElementById('reclaimButton');
+
+        // Initial setup based on server-side state
+        if (toggle && statusText  && reclaimContainer) {
+            // Initialize toggle status display
+            const initialEnabled = toggle.checked;
+            statusText.textContent = initialEnabled ? 'Enabled' : 'Disabled';
+            statusText.style.backgroundColor = initialEnabled ? 
+                'rgba(0, 255, 0, 0.2)' : 
+                'rgba(255, 255, 255, 0.2)';
+
+            // Initialize reclaim button visibility
+
+            reclaimContainer.classList.toggle('visible', initialEnabled);
+        }
+
+        // Toggle switch handler
+        if (toggle && statusText && reclaimContainer) {
+            toggle.addEventListener('change', async function() {
+                const isEnabled = this.checked;
+                
+                try {
+                    // Update server
+                    const response = await fetch(isEnabled ? '/account/roundup' : '/account/roundupoff', {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error('Update failed');
+
+                    // Update UI
+                    statusText.textContent = isEnabled ? 'Enabled' : 'Disabled';
+                    statusText.style.backgroundColor = isEnabled 
+                        ? 'rgba(0, 255, 0, 0.2)'
+                        : 'rgba(255, 255, 255, 0.2)';
+                    reclaimContainer.classList.toggle('visible', isEnabled);
+
+                } catch (error) {
+                    console.error('Toggle error:', error);
+                    this.checked = !isEnabled; // Revert toggle
+                    alert('Failed to update round-up status');
+                }
+            });
+        }
+
+        // Reclaim button handler 
+        if (reclaimButton) {
+            reclaimButton.addEventListener('click', async function() {
+                const button = this;
+                
+                try {
+                    // Disable button during processing
+                    button.disabled = true;
+                    button.innerHTML = `<span class="sparkle">✨</span> Reclaiming... <span class="sparkle">✨</span>`;
+
+                    // Call backend
+                    const response = await fetch('/account/reclaim', {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error('Reclaim failed');
+
+                    // Update balances
+                    const data = await response.json();
+                    document.querySelector('.balance').textContent = `£${data.newBalance}`;
+                    document.querySelector('.roundup-balance').textContent = `£${data.newRoundUp}`;
+
+                    // Visual feedback
+                    button.innerHTML = `<span class="sparkle">✨</span> Reclaimed! <span class="sparkle">✨</span>`;
+                    
+                } catch (error) {
+                    console.error('Reclaim error:', error);
+                    button.innerHTML = `<span class="sparkle">❌</span> Failed <span class="sparkle">❌</span>`;
+                } finally {
+                    setTimeout(() => {
+                        button.innerHTML = `<span class="sparkle">✨</span> Reclaim Round-Up <span class="sparkle">✨</span>`;
+                        button.disabled = false;
+                    }, 2000);
+                }
+            });
+        }
+    });
 </script>
 </html>

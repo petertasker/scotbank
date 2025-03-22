@@ -26,6 +26,9 @@ public final class Constants {
     public static final String ROUTE_PROCESS = "/process";
     public static final String ROUTE_LOGOUT = "/logout";
     public static final String ROUTE_REWARD = "/account/reward";
+    public static final String ROUTE_ROUND_UP_ON = "/roundup";
+    public static final String ROUTE_ROUND_UP_OFF = "/roundupoff";
+    public static final String ROUTE_RECLAIM = "/reclaim";
     /**
      * Rewards routes
      */
