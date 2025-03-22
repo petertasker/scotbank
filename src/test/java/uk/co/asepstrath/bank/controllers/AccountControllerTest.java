@@ -1,9 +1,6 @@
 package uk.co.asepstrath.bank.controllers;
 
-import io.jooby.Context;
-import io.jooby.ModelAndView;
-import io.jooby.Session;
-import io.jooby.Value;
+import io.jooby.*;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,10 +62,20 @@ class AccountControllerTest {
     void testViewAccountWithTransactions() throws Exception {
         // Mock session values
 
+
+
         Value mockNameValue = mock(Value.class);
         when(mockNameValue.toString()).thenReturn("John Doe");
         Value mockAccountValue = mock(Value.class);
         when(mockAccountValue.toString()).thenReturn("12345");
+
+        ValueNode mockPageValue = mock(ValueNode.class);
+        when(mockPageValue.intValue(1)).thenReturn(1);
+        when(mockCtx.query("page")).thenReturn(mockPageValue);
+
+        ValueNode mockLimitValue = mock(ValueNode.class);
+        when(mockLimitValue.intValue(10)).thenReturn(10);
+        when(mockCtx.query("limit")).thenReturn(mockLimitValue);
 
         when(mockSession.get("name")).thenReturn(mockNameValue);
         when(mockSession.get("accountid")).thenReturn(mockAccountValue);
@@ -101,6 +108,14 @@ class AccountControllerTest {
         when(mockNameValue.toString()).thenReturn("Jane Smith");
         Value mockAccountValue = mock(Value.class);
         when(mockAccountValue.toString()).thenReturn("67890");
+
+        ValueNode mockPageValue = mock(ValueNode.class);
+        when(mockPageValue.intValue(1)).thenReturn(1);
+        when(mockCtx.query("page")).thenReturn(mockPageValue);
+
+        ValueNode mockLimitValue = mock(ValueNode.class);
+        when(mockLimitValue.intValue(10)).thenReturn(10);
+        when(mockCtx.query("limit")).thenReturn(mockLimitValue);
 
         when(mockSession.get("name")).thenReturn(mockNameValue);
         when(mockSession.get("accountid")).thenReturn(mockAccountValue);
