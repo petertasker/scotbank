@@ -162,13 +162,6 @@ public class AccountViewService extends AccountService {
     }
 
     /**
-     * Fetches transactions from the database
-     */
-    private List<Transaction> fetchTransactions(Connection connection, String accountId) throws SQLException {
-        return transactionRepository.getTransactionsByAccountId(connection, accountId);
-    }
-
-    /**
      * Counts the number of businesses per category for all payments made by a specific account
      *
      * @param accountId The ID of the logged-in account

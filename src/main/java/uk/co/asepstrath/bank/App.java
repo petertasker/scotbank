@@ -48,7 +48,7 @@ public class App extends Jooby {
         setUpControllers();
 
         // Add helper functions for handlebars template to be able to paginate
-        // handleHandlebarsPagination();
+        handleHandlebarsPagination();
 
         onStarted(this::onStart);
         onStop(this::onStop);
@@ -199,16 +199,18 @@ public class App extends Jooby {
     private void handleHandlebarsPagination() {
         Handlebars handlebars = require(Handlebars.class);
 
-        // Increment helper (adds 1)
         handlebars.registerHelper("increment", (context, options) -> {
-            Number a = options.param(0);
-            return a.intValue() + 1;
+            if (context instanceof Number) {
+                return ((Number) context).intValue() + 1;
+            }
+            return null;
         });
 
-        // Decrement helper (subtracts 1)
         handlebars.registerHelper("decrement", (context, options) -> {
-            Number a = options.param(0);
-            return a.intValue() - 1;
+            if (context instanceof Number) {
+                return ((Number) context).intValue() - 1;
+            }
+            return null;
         });
     }
 }

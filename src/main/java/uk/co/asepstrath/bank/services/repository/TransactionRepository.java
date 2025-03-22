@@ -168,22 +168,6 @@ public class TransactionRepository extends BaseRepository {
         return map;
     }
 
-    public List<Transaction> getTransactionsByAccountId(Connection connection, String accountId) throws SQLException {
-        List<Transaction> transactions = new ArrayList<>();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_TRASNACTIONS_BY_ID)) {
-            preparedStatement.setString(1, accountId);
-            preparedStatement.setString(2, accountId);
-            preparedStatement.setString(3, accountId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    transactions.add(createTransactionFromResultSet(resultSet));
-                }
-            }
-        }
-        return transactions;
-    }
-
 
     /**
      * Creates a Transaction object from a database result set
