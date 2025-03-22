@@ -30,7 +30,7 @@ public class AccountRoundUpService extends AccountService {
             statement.setString(1, accountId);
             statement.executeUpdate();
             Account account = accountRepository.getAccount(connection, accountId);
-            logger.info(accountId + " Round Up is now " + account.isRoundUpEnabled());
+            logger.info("{} Round Up is now {}", accountId,account.isRoundUpEnabled());
         }
     }
 
@@ -42,7 +42,7 @@ public class AccountRoundUpService extends AccountService {
             statement.setString(1, accountId);
             statement.executeUpdate();
             Account account = accountRepository.getAccount(connection, accountId);
-            logger.info(accountId + " Round Up is now " + account.isRoundUpEnabled());
+            logger.info("{} Round Up is now {}", accountId,account.isRoundUpEnabled());
         }
     }
 

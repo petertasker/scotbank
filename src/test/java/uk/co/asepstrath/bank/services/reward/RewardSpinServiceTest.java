@@ -139,18 +139,9 @@ class RewardSpinServiceTest {
 
     @Test
     void testSelectWeightedRandomRewardEmptyList() {
-        assertThrows(RuntimeException.class, () -> {
-            try {
-                invokeSelectWeightedRandomReward(rewardSpinService, Collections.emptyList());
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof IllegalArgumentException) {
-                    throw e.getCause();
-                }
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        assertThrows(InvocationTargetException.class, () ->
+                invokeSelectWeightedRandomReward(rewardSpinService, Collections.emptyList())
+        );
     }
 
     @Test
