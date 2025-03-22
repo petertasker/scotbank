@@ -38,3 +38,6 @@ You can test if it's set by using:
 ```bash
 echo $MAPS_API_KEY
 ```
+
+## Cloud Migration
+Please read our [case for cloud migration](cloudproposal.pdf), where we outline four reasons for a fully-cloud-integrated approach for our app.
