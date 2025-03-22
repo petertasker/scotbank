@@ -64,11 +64,6 @@ public class TransactionRepository extends BaseRepository {
             GROUP BY b.Category
             ORDER BY BusinessCount DESC""";
 
-    private static final String SQL_GET_TRASNACTIONS_BY_ID = "SELECT Timestamp, Amount, SenderID, TransactionID, " +
-            "ReceiverAccountID, " +
-            "ReceiverBusinessID, TransactionType, TransactionAccepted " + "FROM Transactions " + "WHERE SenderID " +
-            "= ? OR ReceiverAccountID = ? OR ReceiverBusinessID = ? " + "ORDER BY Timestamp DESC, TransactionID DESC";
-
     public TransactionRepository(Logger logger) {
         super(logger);
     }
