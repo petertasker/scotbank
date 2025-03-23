@@ -2,21 +2,16 @@ package uk.co.asepstrath.bank.services.repository;
 
 import io.jooby.StatusCode;
 import io.jooby.exception.StatusCodeException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
-import uk.co.asepstrath.bank.Account;
-import uk.co.asepstrath.bank.Card;
-import uk.co.asepstrath.bank.Manager;
-import uk.co.asepstrath.bank.Transaction;
+import uk.co.asepstrath.bank.*;
 import uk.co.asepstrath.bank.services.CurrencyFormatter;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -46,6 +41,28 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
             GROUP BY a.Name, a.Postcode
             ORDER BY TotalAmount DESC
             LIMIT 10;
+            """;
+    private static final String SQL_GET_SANCTIONED_TRANSACTIONS = """
+            SELECT\s
+                b.BusinessID,
+                b.BusinessName,
+                b.Category,
+                COUNT(t.TransactionID) AS TotalTransactions,
+                SUM(t.Amount) AS TotalAmount,
+                MIN(t.Timestamp) AS FirstTransactionDate,
+                MAX(t.Timestamp) AS LastTransactionDate,
+                SUM(CASE WHEN t.TransactionAccepted = TRUE THEN 1 ELSE 0 END) AS AcceptedTransactions,
+                SUM(CASE WHEN t.TransactionAccepted = FALSE THEN 1 ELSE 0 END) AS RejectedTransactions
+            FROM\s
+                Businesses b
+            JOIN\s
+                Transactions t ON b.BusinessID = t.ReceiverBusinessID
+            WHERE\s
+                b.Sanctioned = TRUE
+            GROUP BY\s
+                b.BusinessID, b.BusinessName, b.Category
+            ORDER BY\s
+                SUM(t.Amount) DESC;
             """;
 
     public ManagerRepository(Logger logger) {
@@ -152,5 +169,44 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
         decimalFormat.applyPattern("#,###.00");
 
         return decimalFormat.format(amount);
+    }
+
+    public List<SanctionedBusinessReport> getSanctionedBusinessReports(Connection connection) throws SQLException {
+        List<SanctionedBusinessReport> reports = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_SANCTIONED_TRANSACTIONS)) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    // Create business from result set
+                    Business business = new Business(
+                            rs.getString("BusinessID"),
+                            rs.getString("BusinessName"),
+                            rs.getString("Category"),
+                            true // Sanctioned is always true based on the WHERE clause
+                    );
+
+                    // Create custom constructor for this use case since we have no setters
+                    SanctionedBusinessReport report = new SanctionedBusinessReport(
+                            business,
+                            rs.getInt("TotalTransactions"),
+                            rs.getBigDecimal("TotalAmount"),
+                            convertToDateTime(rs.getTimestamp("FirstTransactionDate")),
+                            convertToDateTime(rs.getTimestamp("LastTransactionDate")),
+                            rs.getInt("AcceptedTransactions"),
+                            rs.getInt("RejectedTransactions")
+                    );
+
+                    reports.add(report);
+                }
+            }
+        }
+
+        return reports;
+    }
+
+    // Helper method to convert java.sql.Timestamp to DateTime
+    private DateTime convertToDateTime(Timestamp timestamp) {
+        if (timestamp == null) return null;
+        return new DateTime(timestamp.getTime());
     }
 }

@@ -6,6 +6,7 @@ import io.jooby.Session;
 import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.DataAccessException;
+import uk.co.asepstrath.bank.SanctionedBusinessReport;
 import uk.co.asepstrath.bank.services.repository.ManagerRepository;
 
 import javax.sql.DataSource;
@@ -54,6 +55,14 @@ public class ViewManagerDashboardService extends ManagerService {
             List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
             model.put(BIG_SPENDERS_LIST, topSpenders);
             model.put(BIG_SPENDERS_LIST_EXISTS, !topSpenders.isEmpty());
+
+            // Get sanctioned business reports
+            List<SanctionedBusinessReport> reports =
+                    managerRepository.getSanctionedBusinessReports(getConnection());
+            model.put(SANCTIONED_BUSINESSES_LIST, reports);
+            model.put(SANCTIONED_BUSINESSES_LIST_EXISTS, !reports.isEmpty());
+
+
 
             // Put Peter's API key into the map
             model.put("api-maps-key", MAPS_API_KEY);

@@ -80,6 +80,8 @@ public final class Constants {
     public static final String BUSINESS_AMOUNT_SUMS = "businesssums";
     public static final String BIG_SPENDERS_LIST = "bigspenders";
     public static final String BIG_SPENDERS_LIST_EXISTS = "hasbigspenders";
+    public static final String SANCTIONED_BUSINESSES_LIST = "sanctionedbusinesses";
+    public static final String SANCTIONED_BUSINESSES_LIST_EXISTS = "hassanctionedbusinesses";
     /**
      * Password Hashing Constants
      */
