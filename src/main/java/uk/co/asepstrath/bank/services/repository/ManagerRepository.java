@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import uk.co.asepstrath.bank.Account;
 import uk.co.asepstrath.bank.Card;
 import uk.co.asepstrath.bank.Manager;
+import uk.co.asepstrath.bank.Transaction;
 import uk.co.asepstrath.bank.services.CurrencyFormatter;
 import uk.co.asepstrath.bank.services.login.HashingPasswordService;
 
@@ -36,7 +37,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
     private static final String SQL_INSERT_MANAGER =
             "INSERT INTO Managers (ManagerID, Name, Password) VALUES (?, ?, ?)";
     private static final String SQL_SELECT_ALL_ACCOUNTS =
-            "SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts";
+            "SELECT AccountID, Name, Balance, RoundUpEnabled, CardNumber, CardCVV FROM Accounts ORDER BY Name ASC LIMIT ? OFFSET ?";
     private static final String SQL_SELECT_TOP_TEN_SPENDERS = """
             SELECT a.Name, a.Postcode, SUM(t.Amount) AS TotalAmount
             FROM Transactions t
@@ -80,35 +81,42 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
         }
     }
 
-    /**
-     * Selects all accounts from the database
-     *
-     * @param connection Database connection
-     * @return List of Account objects
-     * @throws SQLException Database connection failure
-     */
-    public List<Account> getAllAccounts(Connection connection) throws SQLException {
-        List<Account> accounts = new ArrayList<>();
-        try (ResultSet resultSet = connection.createStatement().executeQuery(SQL_SELECT_ALL_ACCOUNTS)) {
-            while (resultSet.next()) {
-                accounts.add(
-                        new Account(
-                                resultSet.getString("AccountID"),
-                                resultSet.getString("Name"),
-                                resultSet.getBigDecimal("Balance"),
-                                resultSet.getBoolean("RoundUpEnabled"),
-                                new Card(
-                                        resultSet.getString("CardNumber"),
-                                        resultSet.getString("CardCVV")
-                                )
-                        )
-                );
+    public int getCountOfAccounts(Connection connection) throws SQLException {
+        int n = 0;
+        String sql = "SELECT COUNT(AccountID) FROM Accounts";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    n = resultSet.getInt(1);
+                }
             }
         }
-        catch (SQLException e) {
-            throw new SQLException("Failed to retrieve accounts from database", e);
+        return n;
+    }
+
+    public List<Account> getPaginatedAccounts(Connection connection, int offset, int limit) throws SQLException {
+        List<Account> accounts = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(SQL_SELECT_ALL_ACCOUNTS)) {
+            stmt.setInt(1, limit);
+            stmt.setInt(2, offset);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    accounts.add(
+                            new Account(
+                                    resultSet.getString("AccountID"),
+                                    resultSet.getString("Name"),
+                                    resultSet.getBigDecimal("Balance"),
+                                    resultSet.getBoolean("RoundUpEnabled"),
+                                    new Card(
+                                            resultSet.getString("CardNumber"),
+                                            resultSet.getString("CardCVV")
+                                    )
+                            )
+                    );
+                }
+            }
         }
-        logger.info("Returning accounts from the database");
+        logger.info("Loaded {} accounts from DB", accounts.size());
         return accounts;
     }
 
