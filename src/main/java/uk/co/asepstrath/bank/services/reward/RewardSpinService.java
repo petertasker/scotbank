@@ -48,6 +48,24 @@ public class RewardSpinService extends RewardService {
         }
         redirect(ctx, ROUTE_REWARD);
     }
+    /**
+     * Process the user spinning the wheel returning JSON (user MUST win a reward)
+     */
+    public void processSpinAPI(Context ctx) throws SQLException {
+        List<Reward> rewards = rewardRepository.getAllRewards(getConnection());
+        Reward selected = selectWeightedRandomReward(rewards);
+
+        Session session = getSession(ctx);
+        String accountId = String.valueOf(session.get(SESSION_ACCOUNT_ID));
+
+        try {
+            rewardDataService.postReward(selected, accountId);
+            ctx.setResponseType("application/json");
+            ctx.send("{\"reward\":\"" + selected.getName() + "\"}");
+        } catch (Exception e) {
+            ctx.setResponseCode(500).send("{\"error\": \"Failed to assign reward.\"}");
+        }
+    }
 
     /**
      * Selects a reward based on weighted probability
@@ -59,7 +77,6 @@ public class RewardSpinService extends RewardService {
         }
 
         double random = secureRandom.nextDouble() * totalWeight;
-
         double weightSum = 0.0;
         for (Reward reward : rewards) {
             weightSum += reward.getChance();
