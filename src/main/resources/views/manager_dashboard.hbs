@@ -18,10 +18,10 @@
         <p class="account-id">Manager ID: {{managerid}}</p>
     </div>
 
-    <div class="action-buttons">
+    <nav class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href = '/logout'">Logout</button>
         <button type="button" class="btn btn-primary" onclick="scrollToInsights()">Insights</button>
-    </div>
+    </nav>
 
     {{#if success}}
         <p style="color: green">{{success}}</p>
@@ -35,13 +35,13 @@
             <h2>Managed Accounts</h2>
             <hr>
             {{#each accounts}}
-                <div class="account">
-                    <p><strong>Account ID: </strong>{{accountid}}</p>
-                    <p><strong>Name: </strong>{{name}}</p>
-                    <p><strong>Balance: </strong>£{{balance}}</p>
-                    <p><strong>Card Number: </strong>{{cardnumber}}</p>
-                    <p><strong>CVV: </strong>{{cardcvv}}</p>
-                </div>
+                <ul class="account">
+                    <li><strong>Account ID: </strong>{{accountid}}</li>
+                    <li><strong>Name: </strong>{{name}}</li>
+                    <li><strong>Balance: </strong>£{{balance}}</li>
+                    <li><strong>Card Number: </strong>{{cardnumber}}</li>
+                    <li><strong>CVV: </strong>{{cardcvv}}</li>
+                </ul>
             {{/each}}
         </div>
 
@@ -51,17 +51,17 @@
             <hr>
             <div class="insights-container">
                 <div class="insight-card">
-                    <h4>Top Ten Spenders by Total Amount</h4>
+                    <h3>Top Ten Spenders by Total Amount</h3>
                     <div class="category-container">
                         {{#if hasbigspenders}}
                             <div class="category-list-container">
                                 <div class="category-list">
                                     {{#each bigspenders}}
-                                        <div class="category-item">
-                                            <span class="spender-name">{{Name}}:</span>
-                                            <span class="spender-postcode">({{Postcode}})</span>
-                                            <span class="spender-amount">£{{TotalAmount}}</span>
-                                        </div>
+                                        <ul class="category-item">
+                                            <li class="spender-name">{{Name}}:</li>
+                                            <li class="spender-postcode">({{Postcode}})</li>
+                                            <li class="spender-amount">£{{TotalAmount}}</li>
+                                        </ul>
                                     {{/each}}
                                 </div>
                                     <!-- Single map with ten markers -->

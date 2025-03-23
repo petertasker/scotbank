@@ -10,10 +10,10 @@
 <body>
 <div class="content-wrapper">
     <h1>Welcome to the Rewards Program</h1>
-    <div class="action-buttons">
+    <nav class="action-buttons">
         <button type="button" class="btn btn-primary" onclick="window.location.href='/account'">Back to Account</button>
         <button type="button" class="btn btn-primary" onclick="window.location.href='/logout'">Log out</button>
-    </div>
+    </nav>
 
     {{#if success}}
         <p style="color: green">{{success}}</p>
@@ -27,12 +27,12 @@
         <h2>Available Rewards</h2>
         <hr>
         {{#each rewards}}
-        <div class="reward">
-            <p><strong>Name: </strong>{{name}}</p>
-            <p><strong>Description: </strong>{{description}}</p>
-            <p><strong>Value: £</strong>{{value}}</p>
-            <p><strong>Chance: </strong>{{chance}}%</p>
-        </div>
+        <ul class="reward">
+            <li><strong>Name: </strong>{{name}}</li>
+            <li><strong>Description: </strong>{{description}}</li>
+            <li><strong>Value: £</strong>{{value}}</li>
+            <li><strong>Chance: </strong>{{chance}}%</li>
+        </ul>
         {{/each}}
     </div>
 
