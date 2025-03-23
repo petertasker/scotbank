@@ -73,8 +73,7 @@ class ViewManagerDashboardServiceTest {
 
         // Mock the repository call
         ManagerRepository repository = mock(ManagerRepository.class);
-        when(repository.getAllAccounts(any(Connection.class))).thenReturn(accounts);
-
+        when(repository.getPaginatedAccounts(any(Connection.class), eq(0), eq(10))).thenReturn(accounts);
         // Inject mocked repository using reflection
         try {
             java.lang.reflect.Field field = ViewManagerDashboardService.class.getDeclaredField("managerRepository");
@@ -86,7 +85,16 @@ class ViewManagerDashboardServiceTest {
         }
 
         // Act
+        ValueNode pageValueNode = mock(ValueNode.class);
+        ValueNode limitValueNode = mock(ValueNode.class);
+
+        when(context.query("page")).thenReturn(pageValueNode);
+        when(context.query("limit")).thenReturn(limitValueNode);
+
+        when(pageValueNode.intValue(1)).thenReturn(1);
+        when(limitValueNode.intValue(10)).thenReturn(10);
         ModelAndView<Map<String, Object>> result = service.renderDashboard(context);
+
 
         // Assert
         assertNotNull(result);
@@ -94,7 +102,7 @@ class ViewManagerDashboardServiceTest {
 
         Map<String, Object> model = result.getModel();
 
-
+        System.out.println("Accounts returned from repository: " + repository.getPaginatedAccounts(null, 10, 10));
         assertTrue((Boolean) model.get(ACCOUNT_OBJECT_LIST_EXISTS));
 
         List<Map<String, Object>> displayAccounts = (List<Map<String, Object>>) model.get(ACCOUNT_OBJECT_LIST);
@@ -116,10 +124,17 @@ class ViewManagerDashboardServiceTest {
         // Arrange
         List<Account> emptyAccounts = new ArrayList<>();
 
-        // Mock the repository call
-        ManagerRepository repository = mock(ManagerRepository.class);
-        when(repository.getAllAccounts(any(Connection.class))).thenReturn(emptyAccounts);
+        ValueNode pageValue = mock(ValueNode.class);
+        when(context.query("page")).thenReturn(pageValue);
+        when(pageValue.intValue(anyInt())).thenReturn(1);
 
+        ValueNode limitValue = mock(ValueNode.class);
+        when(context.query("limit")).thenReturn(limitValue);
+        when(limitValue.intValue(anyInt())).thenReturn(10);
+
+
+        ManagerRepository repository = mock(ManagerRepository.class);
+        when(repository.getPaginatedAccounts(any(Connection.class), eq(10), eq(10))).thenReturn(emptyAccounts);
         // Inject mocked repository using reflection
         try {
             java.lang.reflect.Field field = ViewManagerDashboardService.class.getDeclaredField("managerRepository");

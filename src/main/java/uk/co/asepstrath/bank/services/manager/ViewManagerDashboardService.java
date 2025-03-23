@@ -35,20 +35,20 @@ public class ViewManagerDashboardService extends ManagerService {
      * @return The "/manager/dashboard" endpoint
      */
     public ModelAndView<Map<String, Object>> renderDashboard(Context ctx) {
-        ensureManagerIsLoggedIn(ctx);
-
-        List<Account> accounts;
-        Map<String, Object> model = createModel();
         try {
+            ensureManagerIsLoggedIn(ctx);
+            Map<String, Object> model = createModel();
             Session session = getSession(ctx);
 
+            int page = ctx.query("page").intValue(1);
+            int limit = ctx.query("limit").intValue(10);
+            logger.info("Requesting page: {}", page);
+
             // Get every account from the database
-            accounts = managerRepository.getAllAccounts(getConnection());
+            loadAccountsIntoModel(model, page, limit);
+
             model.put(SESSION_MANAGER_NAME, session.get(SESSION_MANAGER_NAME));
             model.put(SESSION_MANAGER_ID, session.get(SESSION_MANAGER_ID));
-
-            // Format the account balances without modifying the Account object
-            formatAccountBalancesForDisplay(model, accounts);
 
             // Get details of the top ten accounts with the highest summed PAYMENT amounts
             List<Map<String, Object>> topSpenders = managerRepository.getTopTenSpenders(getConnection());
@@ -58,11 +58,34 @@ public class ViewManagerDashboardService extends ManagerService {
             // Put Peter's API key into the map
             model.put("api-maps-key", MAPS_API_KEY);
 
+
+
             return render(TEMPLATE_MANAGER_DASHBOARD, model);
         }
         catch (SQLException e) {
             throw new DataAccessException("Failed to retrieve accounts", e);
         }
+    }
+
+    private void loadAccountsIntoModel(Map<String, Object> model, int page, int limit) throws SQLException {
+        int totalAccounts = managerRepository.getCountOfAccounts(getConnection());
+        int totalPages = (int) Math.ceil((double) totalAccounts / (double) limit);
+        int offset = Math.max(0, (page - 1) * limit);
+
+        // Not proud of this
+        List<Account> accounts = managerRepository.getPaginatedAccounts(getConnection(), offset, limit);
+        formatAccountBalancesForDisplay(model, accounts);
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("currentPage", page);
+        pagination.put("totalPages", totalPages);
+        pagination.put("hasNext", page < totalPages);
+        pagination.put("hasPrev", page > 1);
+        model.put("pagination", pagination);
+
+
+        logger.info("Pagination data - Page: {}, Total Pages: {}", page, totalPages);
+        logger.info("Pagination Model: {}", model.get("pagination"));
+        logger.info("Setting pagination: currentPage={}, totalPages={}", page, totalPages);
     }
 
     /**
