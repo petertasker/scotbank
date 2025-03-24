@@ -46,4 +46,12 @@ public class RewardController extends BaseController {
     public void processRewardSpin(Context ctx) throws SQLException {
         rewardSpinService.processSpin(ctx);
     }
+    /**
+     * Handle the spin logic for frontend animation (returns JSON)
+     */
+    @POST
+    @Path("/api")
+    public void processRewardSpinAPI(Context ctx) throws SQLException {
+        rewardSpinService.processSpinAPI(ctx);
+    }
 }
