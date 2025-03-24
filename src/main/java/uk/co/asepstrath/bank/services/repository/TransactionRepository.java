@@ -2,6 +2,8 @@ package uk.co.asepstrath.bank.services.repository;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import uk.co.asepstrath.bank.Business;
+import uk.co.asepstrath.bank.SanctionedBusinessReport;
 import uk.co.asepstrath.bank.Transaction;
 
 import java.math.BigDecimal;

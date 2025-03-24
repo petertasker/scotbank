@@ -441,7 +441,7 @@ hr {
     margin-bottom: var(--spacing-md);
 }
 
-.category-item {
+.category-item, .sanctioned-report-item {
     justify-content: space-between;
     padding: 5px 0;
     border-bottom: 1px solid var(--border-color);
@@ -454,6 +454,30 @@ hr {
     border-bottom: none;
 }
 
+.business-details {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.business-details p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.business-transactions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.business-transactions p {
+    margin: 5px 0;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
 
 .category-list, .spenders-container {
     flex-shrink: 0;
@@ -471,7 +495,6 @@ hr {
     gap: 20px;
     width: 100%;
 }
-
 .spender-postcode, .spender-amount {
     text-align: right; /* Right-align postcode and amount */
     margin-left: 10px; /* Adds some space between the name and the right-aligned text */

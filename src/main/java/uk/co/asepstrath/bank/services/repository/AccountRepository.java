@@ -43,8 +43,6 @@ public class AccountRepository extends BaseRepository {
     private static final String SQL_GET_ACCOUNT =
             "SELECT Balance, Name, RoundUpEnabled, RoundUpAmount, CardNumber, CardCVV FROM Accounts WHERE AccountID =" +
                     " ?";
-    
-
 
     public AccountRepository(Logger logger) {
         super(logger);

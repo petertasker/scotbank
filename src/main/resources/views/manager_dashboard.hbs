@@ -89,10 +89,34 @@
                         {{/if}}
                     </div>
                 </div>
+                <div class="insight-card">
+                    <h3>Sanctioned Business Reports</h3>
+                    <div class="category-container">
+                        {{#if hassanctionedbusinesses}}
+                            <div class="category-list-container">
+                                {{#each sanctionedbusinesses}}
+                                    <ul class="sanctioned-report-item">
+                                        <li class="business-details">
+                                            <p><strong>Business:</strong> {{businessName}} ({{businessId}})</>
+                                            <p><strong>Category:</strong> {{category}}</p>
+                                        </li>
+                                        <li class="business-transactions">
+                                            <p><strong>Total:</strong> £{{totalAmount}}</p>
+                                            <p><strong>Transactions:</strong> {{totalTransactions}} (✓<span style="color:green;">{{acceptedTransactions}}</span> | <span style="color:red;">✗{{rejectedTransactions}}</span>)</p>
+                                        </li>
+                                    </ul>
+                                    <hr>
+                                {{/each}}
+                            </div>
+                        {{else}}
+                            <p>No sanctioned business reports available.</p>
+                        {{/if}}
+                    </div>
+                </div>
             </div>
         </div>
     {{else}}
-        <p>No accounts found under your management.</p>
+        <p>No accounts found</p>
     {{/if}}
 </div>
 <script>
