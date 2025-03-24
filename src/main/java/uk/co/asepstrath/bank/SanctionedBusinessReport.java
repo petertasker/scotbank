@@ -59,7 +59,7 @@ public class SanctionedBusinessReport {
         return acceptedTransactions;
     }
 
-    public int getRejectedTransactions() { return
-            rejectedTransactions;
+    public int getRejectedTransactions() {
+        return rejectedTransactions;
     }
 }
