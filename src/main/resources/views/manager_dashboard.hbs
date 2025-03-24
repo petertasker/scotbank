@@ -90,21 +90,21 @@
                     </div>
                 </div>
                 <div class="insight-card">
-                    <h4>Sanctioned Business Reports</h4>
+                    <h3>Sanctioned Business Reports</h3>
                     <div class="category-container">
                         {{#if hassanctionedbusinesses}}
                             <div class="category-list-container">
                                 {{#each sanctionedbusinesses}}
-                                    <div class="sanctioned-report-item">
-                                        <div class="business-details">
-                                            <p><strong>Business:</strong> {{businessName}} ({{businessId}})</p>
+                                    <ul class="sanctioned-report-item">
+                                        <li class="business-details">
+                                            <p><strong>Business:</strong> {{businessName}} ({{businessId}})</>
                                             <p><strong>Category:</strong> {{category}}</p>
-                                        </div>
-                                        <div class="business-transactions">
+                                        </li>
+                                        <li class="business-transactions">
                                             <p><strong>Total:</strong> £{{totalAmount}}</p>
                                             <p><strong>Transactions:</strong> {{totalTransactions}} (✓<span style="color:green;">{{acceptedTransactions}}</span> | <span style="color:red;">✗{{rejectedTransactions}}</span>)</p>
-                                        </div>
-                                    </div>
+                                        </li>
+                                    </ul>
                                     <hr>
                                 {{/each}}
                             </div>
