@@ -34,7 +34,7 @@
         <div class="accounts-section">
             <h2>Managed Accounts</h2>
             <hr>
-            <div class="pagination" style="display: flex; justify-content: center; margin: 20px 0;">
+            <nav class="pagination" style="display: flex; justify-content: center; margin: 20px 0;">
 
                 {{#if pagination.hasPrev}}
                     <a href="?page={{decrement pagination.currentPage}}" class="btn btn-primary" style="margin: 0 5px;">&laquo; Previous</a>
@@ -49,7 +49,7 @@
                 {{else}}
                     <button class="btn btn-secondary" disabled style="margin: 0 5px;">Next &raquo;</button>
                 {{/if}}
-            </div>
+            </nav>
             {{#each accounts}}
                 <ul class="account">
                     <li><strong>Account ID: </strong>{{accountid}}</li>
