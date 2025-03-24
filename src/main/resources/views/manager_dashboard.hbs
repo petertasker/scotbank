@@ -90,22 +90,26 @@
                     </div>
                 </div>
                 <div class="insight-card">
-                    <h4>Sanctioned Business reports</h4>
+                    <h4>Sanctioned Business Reports</h4>
                     <div class="category-container">
                         {{#if hassanctionedbusinesses}}
                             <div class="category-list-container">
                                 {{#each sanctionedbusinesses}}
-                                    <p><strong>Business:</strong> {{businessName}} ({{businessId}})</p>
-                                    <p><strong>Category:</strong> {{category}}</p>
-                                    <p><strong>Total Transactions:</strong> {{totalTransactions}}</p>
-                                    <p><strong>Accepted Transactions:</strong> {{acceptedTransactions}}</p>
-                                    <p><strong>Rejected Transactions:</strong> {{rejectedTransactions}}</p>
-                                    <p><strong>Total Amount:</strong> £{{totalAmount}}</p>
-                                    <p><strong>First Transaction:</strong> {{firstTransactionDate}}</p>
-                                    <p><strong>Last Transaction:</strong> {{lastTransactionDate}}</p>
+                                    <div class="sanctioned-report-item">
+                                        <div class="business-details">
+                                            <p><strong>Business:</strong> {{businessName}} ({{businessId}})</p>
+                                            <p><strong>Category:</strong> {{category}}</p>
+                                        </div>
+                                        <div class="business-transactions">
+                                            <p><strong>Total:</strong> £{{totalAmount}}</p>
+                                            <p><strong>Transactions:</strong> {{totalTransactions}} (✓<span style="color:green;">{{acceptedTransactions}}</span> | <span style="color:red;">✗{{rejectedTransactions}}</span>)</p>
+                                        </div>
+                                    </div>
                                     <hr>
                                 {{/each}}
                             </div>
+                        {{else}}
+                            <p>No sanctioned business reports available.</p>
                         {{/if}}
                     </div>
                 </div>
