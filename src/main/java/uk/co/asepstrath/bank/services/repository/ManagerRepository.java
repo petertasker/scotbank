@@ -20,7 +20,6 @@ import java.util.*;
  * The Manager repository service
  */
 public class ManagerRepository extends BaseRepository implements CurrencyFormatter {
-    private static final String COLUMN_TOTAL_AMOUNT = "TotalAmount";
 
     private static final String SQL_CREATE_TABLE = """
             CREATE TABLE Managers (
@@ -149,7 +148,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
                 Map<String, Object> row = new HashMap<>();
                 row.put("Name", rs.getString("Name"));
                 row.put("Postcode", rs.getString("Postcode"));
-                row.put(COLUMN_TOTAL_AMOUNT, formatCurrency(rs.getBigDecimal(COLUMN_TOTAL_AMOUNT)));
+                row.put("TotalAmount", formatCurrency(rs.getBigDecimal("TotalAmount")));
                 results.add(row);
             }
         }
@@ -190,7 +189,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
                     SanctionedBusinessReport report = new SanctionedBusinessReport(
                             business,
                             rs.getInt("TotalTransactions"),
-                            rs.getBigDecimal(COLUMN_TOTAL_AMOUNT),
+                            rs.getBigDecimal("TotalAmount"),
                             convertToDateTime(rs.getTimestamp("FirstTransactionDate")),
                             convertToDateTime(rs.getTimestamp("LastTransactionDate")),
                             rs.getInt("AcceptedTransactions"),
