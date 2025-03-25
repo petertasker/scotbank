@@ -149,7 +149,7 @@ public class ManagerRepository extends BaseRepository implements CurrencyFormatt
                 Map<String, Object> row = new HashMap<>();
                 row.put("Name", rs.getString("Name"));
                 row.put("Postcode", rs.getString("Postcode"));
-                row.put(COLUMN_TOTAL_AMOUNT, formatCurrency(rs.getBigDecimal("TotalAmount")));
+                row.put(COLUMN_TOTAL_AMOUNT, formatCurrency(rs.getBigDecimal(COLUMN_TOTAL_AMOUNT)));
                 results.add(row);
             }
         }
