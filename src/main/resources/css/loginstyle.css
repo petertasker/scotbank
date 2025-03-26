@@ -46,6 +46,7 @@ body {
     color: var(--text-primary);
     border-radius: var(--border-radius-sm);
     padding: var(--spacing-md) var(--spacing-lg);
+    text-align: center;
 }
 
 .wrapper h1 {
