@@ -2,6 +2,14 @@
 
 A bank project for CS217 - Agile Software Engineering in Practice
 
+Authors:
+
+[Mohammad Rayyan Adhoni](https://github.com/MoRayyan107)
+[Jack Allones](https://github.com/newpants5)
+[Peter Tasker](https://github.com/petertasker)
+[Zara Warne](https://github.com/riiant)
+Oles Vynnychuk
+
 ## Running
 
     ./mvnw.cmd clean jooby:run
