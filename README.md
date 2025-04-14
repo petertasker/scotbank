@@ -8,7 +8,7 @@ Authors:
 [Jack Allones](https://github.com/newpants5)  
 [Peter Tasker](https://github.com/petertasker)  
 [Zara Warne](https://github.com/riiant)  
-Oles Vynnychuk
+[Oles Vynnychuk](https://github.com/OlesVynnychuk)
 
 ## Running
 
